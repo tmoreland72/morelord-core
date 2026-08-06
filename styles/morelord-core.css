@@ -14,3 +14,8 @@
 .mlc-code { font-size:2rem; font-weight:800; letter-spacing:.18em; text-align:center; padding:1rem; margin:1rem 0; border:2px dashed #d49a24; border-radius:8px; user-select:all; }
 .mlc-actions { display:flex; flex-wrap:wrap; gap:.5rem; margin-top:1rem; }
 .mlc-actions .danger { color:#b3261e; }
+
+.mlc-steps { display:grid; gap:.4rem; margin:.75rem 0; padding:.8rem 1rem; border-left:3px solid #d49a24; background:rgba(212,154,36,.08); }
+.mlc-steps p { margin:0; line-height:1.45; }
+.mlc-steps strong { color:#d49a24; }
+.mlc-steps em { font-weight:700; }

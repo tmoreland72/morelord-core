@@ -25,11 +25,15 @@
   {{else}}
     <section class="mlc-card">
       {{#if activation}}
-        <div class="mlc-status pending"><i class="fa-solid fa-hourglass-half"></i> Waiting for approval</div>
-        <p>Sign in to Morelord Gaming and enter this temporary code:</p>
+        <div class="mlc-status pending"><i class="fa-solid fa-hourglass-half"></i> Waiting for website approval</div>
+        <div class="mlc-steps">
+          <p><strong>1.</strong> The Morelord account page was opened in your browser.</p>
+          <p><strong>2.</strong> Confirm that the code below matches the prefilled code on that page.</p>
+          <p><strong>3.</strong> Select <em>Approve Foundry Connection</em>, then return here.</p>
+        </div>
         <div class="mlc-code">{{activation.userCode}}</div>
-        <p class="notes">The account page has been opened in your browser. This code expires in 15 minutes.</p>
-        <button type="button" data-action="openAccount"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open Account Page</button>
+        <p class="notes">Foundry is checking for approval automatically. This code expires in 15 minutes.</p>
+        <button type="button" data-action="openAccount"><i class="fa-solid fa-arrow-up-right-from-square"></i> Reopen Approval Page</button>
       {{else}}
         <div class="mlc-status"><i class="fa-solid fa-link"></i> Not connected</div>
         <p>Connect once to unlock premium features across supported Morelord Tools modules in this world.</p>

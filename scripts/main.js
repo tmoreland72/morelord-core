@@ -139,7 +139,7 @@ async function pollActivation(app, activation) {
       app.activation = null;
       await refreshEntitlements(PRODUCT_SLUG, { quiet: true });
       app.render({ force: true });
-      notify("info", "Morelord account connected successfully.");
+      notify("info", "Morelord account connected successfully. You may close the browser account page.");
       Hooks.callAll("morelordCoreConnected", result.installationId);
       return;
     }
@@ -183,7 +183,7 @@ class MorelordConnectionApp extends HandlebarsApplicationMixin(ApplicationV2) {
       validatedAt: core?.validatedAt ? new Date(core.validatedAt).toLocaleString() : null,
       expiresAt: core?.expiresAt ? new Date(core.expiresAt).toLocaleString() : null,
       activation: this.activation,
-      accountUrl: `${normalizeServerUrl(game.settings.get(MODULE_ID, SETTINGS.SERVER_URL))}/account`
+      accountUrl: this.activation?.verificationUrl || `${normalizeServerUrl(game.settings.get(MODULE_ID, SETTINGS.SERVER_URL))}/account`
     };
   }
 
@@ -219,7 +219,8 @@ class MorelordConnectionApp extends HandlebarsApplicationMixin(ApplicationV2) {
 
   static openAccount(event) {
     event.preventDefault();
-    window.open(`${normalizeServerUrl(game.settings.get(MODULE_ID, SETTINGS.SERVER_URL))}/account`, "_blank", "noopener,noreferrer");
+    const url = this.activation?.verificationUrl || `${normalizeServerUrl(game.settings.get(MODULE_ID, SETTINGS.SERVER_URL))}/account`;
+    window.open(url, "_blank", "noopener,noreferrer");
   }
 }
 
