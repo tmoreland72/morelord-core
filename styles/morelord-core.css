@@ -1,0 +1,16 @@
+.morelord-core-app { padding: 1rem; color: var(--color-text-primary); }
+.mlc-header { display:flex; gap:1rem; align-items:center; padding-bottom:1rem; border-bottom:2px solid #d49a24; }
+.mlc-header img { width:84px; height:84px; object-fit:contain; }
+.mlc-header h2 { margin:0; color:#d49a24; }
+.mlc-header p { margin:.25rem 0 0; opacity:.8; }
+.mlc-card { margin-top:1rem; padding:1rem; border:1px solid rgba(212,154,36,.55); border-radius:8px; background:rgba(20,16,14,.08); }
+.mlc-status { font-weight:700; font-size:1.05rem; margin-bottom:1rem; }
+.mlc-status.connected { color:#4f9f55; }
+.mlc-status.pending { color:#d49a24; }
+.mlc-card dl { display:grid; grid-template-columns:145px 1fr; gap:.5rem 1rem; }
+.mlc-card dt { font-weight:700; }
+.mlc-card dd { margin:0; }
+.mlc-tier { text-transform:capitalize; }
+.mlc-code { font-size:2rem; font-weight:800; letter-spacing:.18em; text-align:center; padding:1rem; margin:1rem 0; border:2px dashed #d49a24; border-radius:8px; user-select:all; }
+.mlc-actions { display:flex; flex-wrap:wrap; gap:.5rem; margin-top:1rem; }
+.mlc-actions .danger { color:#b3261e; }

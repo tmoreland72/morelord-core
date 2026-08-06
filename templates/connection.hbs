@@ -1,0 +1,40 @@
+<div class="morelord-core-app">
+  <header class="mlc-header">
+    <img src="modules/morelord-core/assets/morelord-core.png" alt="Morelord Gaming">
+    <div>
+      <h2>Morelord Account</h2>
+      <p>Shared premium access for Morelord Tools modules.</p>
+    </div>
+  </header>
+
+  {{#if connected}}
+    <section class="mlc-card">
+      <div class="mlc-status connected"><i class="fa-solid fa-circle-check"></i> Connected</div>
+      <dl>
+        <dt>Installation</dt><dd>{{connectionLabel}}</dd>
+        <dt>Membership</dt><dd class="mlc-tier">{{tier}}</dd>
+        <dt>Last validated</dt><dd>{{validatedAt}}</dd>
+        <dt>Offline access through</dt><dd>{{expiresAt}}</dd>
+      </dl>
+      <div class="mlc-actions">
+        <button type="button" data-action="refresh"><i class="fa-solid fa-rotate"></i> Refresh Access</button>
+        <button type="button" data-action="openAccount"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open Account</button>
+        <button type="button" class="danger" data-action="disconnect"><i class="fa-solid fa-link-slash"></i> Disconnect</button>
+      </div>
+    </section>
+  {{else}}
+    <section class="mlc-card">
+      {{#if activation}}
+        <div class="mlc-status pending"><i class="fa-solid fa-hourglass-half"></i> Waiting for approval</div>
+        <p>Sign in to Morelord Gaming and enter this temporary code:</p>
+        <div class="mlc-code">{{activation.userCode}}</div>
+        <p class="notes">The account page has been opened in your browser. This code expires in 15 minutes.</p>
+        <button type="button" data-action="openAccount"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open Account Page</button>
+      {{else}}
+        <div class="mlc-status"><i class="fa-solid fa-link"></i> Not connected</div>
+        <p>Connect once to unlock premium features across supported Morelord Tools modules in this world.</p>
+        <button type="button" data-action="connect"><i class="fa-solid fa-crown"></i> Connect Morelord Account</button>
+      {{/if}}
+    </section>
+  {{/if}}
+</div>
