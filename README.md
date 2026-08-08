@@ -35,13 +35,13 @@ Prerequisites:
 Validate packaging without changing Git or GitHub:
 
 ```powershell
-.\release.ps1 -Version 0.1.0 -DryRun
+.\release.ps1 -Version 0.1.2 -DryRun
 ```
 
 Create the release:
 
 ```powershell
-.\release.ps1 -Version 0.1.0
+.\release.ps1 -Version 0.1.2
 ```
 
 The script updates `module.json`, packages only Foundry runtime files, verifies the ZIP structure and encoding, commits the manifest, creates and pushes an annotated tag, and publishes the GitHub Release.
@@ -51,3 +51,7 @@ Foundry manifest URL:
 ```text
 https://raw.githubusercontent.com/tmoreland72/morelord-core/main/module.json
 ```
+
+## Anonymous usage statistics
+
+Morelord Core can report only the installed Core version and Foundry version during entitlement refreshes. This is enabled by default and can be disabled by a GM in Module Settings with **Share Anonymous Usage Statistics**. Disabling it does not affect account linking, entitlement checks, or premium access. No campaign, player, actor, item, chat, or world-name data is added to the analytics report.

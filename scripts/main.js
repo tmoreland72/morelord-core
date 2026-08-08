@@ -8,7 +8,8 @@ const SETTINGS = Object.freeze({
   TOKEN: "installationToken",
   INSTALLATION_ID: "installationId",
   CONNECTION_LABEL: "connectionLabel",
-  ENTITLEMENT_CACHE: "entitlementCache"
+  ENTITLEMENT_CACHE: "entitlementCache",
+  SHARE_USAGE: "shareUsageStatistics"
 });
 
 function notify(level, message) {
@@ -61,9 +62,14 @@ async function refreshEntitlements(productSlug = PRODUCT_SLUG, { quiet = false }
   if (!token) return null;
 
   try {
+    const shareUsage = game.settings.get(MODULE_ID, SETTINGS.SHARE_USAGE);
+    const telemetryHeaders = shareUsage ? {
+      "x-morelord-core-version": game.modules.get(MODULE_ID)?.version || "",
+      "x-foundry-version": game.version || ""
+    } : {};
     const result = await request(`/api/foundry/entitlements?product=${encodeURIComponent(productSlug)}`, {
       method: "GET",
-      headers: { authorization: `Bearer ${token}` }
+      headers: { authorization: `Bearer ${token}`, ...telemetryHeaders }
     });
 
     const cache = getCache();
@@ -232,6 +238,15 @@ Hooks.once("init", () => {
     config: true,
     type: String,
     default: DEFAULT_SERVER,
+    restricted: true
+  });
+  game.settings.register(MODULE_ID, SETTINGS.SHARE_USAGE, {
+    name: "Share Anonymous Usage Statistics",
+    hint: "Share only the Morelord Core and Foundry version during access checks. No campaign, player, actor, item, or chat data is collected.",
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: true,
     restricted: true
   });
   for (const [key, type, defaultValue] of [
