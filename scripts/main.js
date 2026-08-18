@@ -101,6 +101,103 @@ function getTier(productSlug = PRODUCT_SLUG) {
   return getEntitlements(productSlug)?.tier ?? "standard";
 }
 
+function packageDiagnostics(pkg) {
+  if (!pkg) return null;
+  const compatibility = pkg.compatibility ?? {};
+  return {
+    id: pkg.id,
+    title: pkg.title,
+    version: pkg.version,
+    active: pkg.active ?? undefined,
+    compatibility: {
+      minimum: compatibility.minimum ?? null,
+      verified: compatibility.verified ?? null,
+      maximum: compatibility.maximum ?? null
+    }
+  };
+}
+
+function getRendererDiagnostics() {
+  try {
+    const renderer = canvas?.app?.renderer;
+    const gl = renderer?.gl;
+    if (!renderer || !gl) return null;
+    const debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
+    return {
+      type: renderer.type === 1 ? "WebGL" : String(renderer.type ?? "unknown"),
+      webglVersion: gl.getParameter(gl.VERSION),
+      vendor: debugInfo ? gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) : gl.getParameter(gl.VENDOR),
+      renderer: debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER),
+      maxTextureSize: gl.getParameter(gl.MAX_TEXTURE_SIZE)
+    };
+  } catch (error) {
+    return { unavailable: true, reason: error.message };
+  }
+}
+
+/** Build a support report without account credentials, world identity, or game content. */
+function getDiagnostics() {
+  const modules = Array.from(game.modules?.values?.() ?? [])
+    .filter((module) => module.active)
+    .map(packageDiagnostics)
+    .sort((a, b) => a.id.localeCompare(b.id));
+  const core = game.modules.get(MODULE_ID);
+
+  return {
+    report: {
+      schemaVersion: 1,
+      generatedAt: new Date().toISOString(),
+      privacy: "Excludes account tokens, installation IDs, server/world names and IDs, network addresses, users, and game document content."
+    },
+    foundry: {
+      version: game.version ?? null,
+      build: game.release?.build ?? null,
+      generation: game.release?.generation ?? null,
+      channel: game.release?.channel ?? null
+    },
+    system: packageDiagnostics(game.system),
+    morelordCore: {
+      version: core?.version ?? null,
+      connected: Boolean(game.settings.get(MODULE_ID, SETTINGS.TOKEN)),
+      entitlementCachePresent: Object.keys(getCache()).length > 0,
+      anonymousUsageStatistics: game.settings.get(MODULE_ID, SETTINGS.SHARE_USAGE)
+    },
+    modules: {
+      activeCount: modules.length,
+      active: modules
+    },
+    client: {
+      userAgent: navigator.userAgent,
+      platform: navigator.userAgentData?.platform ?? navigator.platform ?? null,
+      language: navigator.language ?? null,
+      languages: navigator.languages ?? [],
+      hardwareConcurrency: navigator.hardwareConcurrency ?? null,
+      deviceMemoryGiB: navigator.deviceMemory ?? null,
+      screen: {
+        width: screen?.width ?? null,
+        height: screen?.height ?? null,
+        pixelRatio: window.devicePixelRatio ?? null
+      },
+      renderer: getRendererDiagnostics()
+    }
+  };
+}
+
+function exportDiagnostics() {
+  const diagnostics = getDiagnostics();
+  const date = diagnostics.report.generatedAt.slice(0, 10);
+  const worldIndex = String(game.world?.id || "unknown-world")
+    .trim()
+    .replace(/[^a-zA-Z0-9._-]+/g, "-")
+    .replace(/^-+|-+$/g, "") || "unknown-world";
+  foundry.utils.saveDataToFile(
+    JSON.stringify(diagnostics, null, 2),
+    "application/json",
+    `morelord-diagnostics-${worldIndex}-${date}.json`
+  );
+  return diagnostics;
+}
+
 async function disconnect() {
   await game.settings.set(MODULE_ID, SETTINGS.TOKEN, "");
   await game.settings.set(MODULE_ID, SETTINGS.INSTALLATION_ID, "");
@@ -168,7 +265,8 @@ class MorelordConnectionApp extends HandlebarsApplicationMixin(ApplicationV2) {
       connect: MorelordConnectionApp.connect,
       refresh: MorelordConnectionApp.refresh,
       disconnect: MorelordConnectionApp.disconnect,
-      openAccount: MorelordConnectionApp.openAccount
+      openAccount: MorelordConnectionApp.openAccount,
+      exportDiagnostics: MorelordConnectionApp.exportDiagnostics
     }
   };
 
@@ -228,6 +326,19 @@ class MorelordConnectionApp extends HandlebarsApplicationMixin(ApplicationV2) {
     const url = this.activation?.verificationUrl || `${normalizeServerUrl(game.settings.get(MODULE_ID, SETTINGS.SERVER_URL))}/account`;
     window.open(url, "_blank", "noopener,noreferrer");
   }
+
+  static exportDiagnostics(event, target) {
+    event.preventDefault();
+    target.disabled = true;
+    try {
+      exportDiagnostics();
+      notify("info", "Morelord diagnostics downloaded. Attach the JSON file to your support report.");
+    } catch (error) {
+      notify("error", `Could not export diagnostics: ${error.message}`);
+    } finally {
+      target.disabled = false;
+    }
+  }
 }
 
 Hooks.once("init", () => {
@@ -275,7 +386,9 @@ Hooks.once("ready", async () => {
     hasFeature,
     getTier,
     isConnected: () => Boolean(game.settings.get(MODULE_ID, SETTINGS.TOKEN)),
-    disconnect
+    disconnect,
+    getDiagnostics,
+    exportDiagnostics
   };
   game.modules.get(MODULE_ID).api = api;
   globalThis.MorelordCore = api;

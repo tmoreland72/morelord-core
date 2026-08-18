@@ -1,0 +1,24 @@
+{
+  "moduleId": "morelord-core",
+  "moduleTitle": "Morelord Core",
+  "productSlug": "morelord-core",
+  "githubOwner": "tmoreland72",
+  "githubRepo": "morelord-core",
+  "releaseBranch": "main",
+  "archiveName": "morelord-core.zip",
+  "websiteUrl": "https://morelordgaming.com",
+  "requiredPaths": [
+    "module.json",
+    "README.md",
+    "scripts",
+    "styles",
+    "templates"
+  ],
+  "optionalPaths": [
+    "assets",
+    "lang",
+    "LICENSE",
+    "LICENSE.md",
+    "CHANGELOG.md"
+  ]
+}

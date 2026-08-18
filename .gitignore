@@ -1,4 +1,3 @@
-morelord-core.zip
-*.log
-.DS_Store
-Thumbs.db
+# Release tooling
+*.zip
+.release-*
