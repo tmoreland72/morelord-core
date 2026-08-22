@@ -1,51 +1,72 @@
-<div class="morelord-core-app">
-  <header class="mlc-header">
-    <img src="modules/morelord-core/assets/morelord-core.png" alt="Morelord Gaming">
-    <div>
+<div class="ml-app ml-core-account ml-stack" data-gap="4">
+  <header class="ml-hero ml-core-account__header">
+    <img class="ml-core-account__logo" src="modules/morelord-core/assets/morelord-core.png" alt="Morelord Gaming">
+    <div class="ml-hero__body">
       <h2>Morelord Account</h2>
       <p>Shared premium access for Morelord Tools modules.</p>
     </div>
   </header>
 
   {{#if connected}}
-    <section class="mlc-card">
-      <div class="mlc-status connected"><i class="fa-solid fa-circle-check"></i> Connected</div>
-      <dl>
+    <section class="ml-surface ml-stack">
+      <div class="ml-status" data-tone="success"><i class="fa-solid fa-circle-check"></i> Connected</div>
+      <dl class="ml-core-account__details">
         <dt>Installation</dt><dd>{{connectionLabel}}</dd>
-        <dt>Membership</dt><dd class="mlc-tier">{{tier}}</dd>
+        <dt>Membership</dt><dd class="ml-core-account__tier">{{tier}}</dd>
         <dt>Last validated</dt><dd>{{validatedAt}}</dd>
         <dt>Offline access through</dt><dd>{{expiresAt}}</dd>
       </dl>
-      <div class="mlc-actions">
+      <div class="ml-actions">
         <button type="button" data-action="refresh"><i class="fa-solid fa-rotate"></i> Refresh Access</button>
         <button type="button" data-action="openAccount"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open Account</button>
-        <button type="button" class="danger" data-action="disconnect"><i class="fa-solid fa-link-slash"></i> Disconnect</button>
+        <button type="button" class="ml-button" data-tone="danger" data-action="disconnect"><i class="fa-solid fa-link-slash"></i> Disconnect</button>
       </div>
     </section>
   {{else}}
-    <section class="mlc-card">
+    <section class="ml-surface ml-stack">
       {{#if activation}}
-        <div class="mlc-status pending"><i class="fa-solid fa-hourglass-half"></i> Waiting for website approval</div>
-        <div class="mlc-steps">
+        <div class="ml-status" data-tone="warning"><i class="fa-solid fa-hourglass-half"></i> Waiting for website approval</div>
+        <div class="ml-surface ml-stack ml-core-account__steps" data-gap="1">
           <p><strong>1.</strong> The Morelord account page was opened in your browser.</p>
           <p><strong>2.</strong> Confirm that the code below matches the prefilled code on that page.</p>
           <p><strong>3.</strong> Select <em>Approve Foundry Connection</em>, then return here.</p>
         </div>
-        <div class="mlc-code">{{activation.userCode}}</div>
+        <div class="ml-core-account__code">{{activation.userCode}}</div>
         <p class="notes">Foundry is checking for approval automatically. This code expires in 15 minutes.</p>
         <button type="button" data-action="openAccount"><i class="fa-solid fa-arrow-up-right-from-square"></i> Reopen Approval Page</button>
       {{else}}
-        <div class="mlc-status"><i class="fa-solid fa-link"></i> Not connected</div>
+        <div class="ml-status"><i class="fa-solid fa-link"></i> Not connected</div>
         <p>Connect once to unlock premium features across supported Morelord Tools modules in this world.</p>
         <button type="button" data-action="connect"><i class="fa-solid fa-crown"></i> Connect Morelord Account</button>
       {{/if}}
     </section>
   {{/if}}
 
-  <section class="mlc-card mlc-diagnostics">
+  <section class="ml-surface ml-stack ml-core-account__diagnostics">
     <h3><i class="fa-solid fa-stethoscope"></i> Troubleshooting</h3>
     <p>Download a JSON report with Foundry, game system, active module, browser, and graphics details for Morelord support.</p>
     <p class="notes">The report excludes account credentials, installation and world identifiers, network addresses, users, and campaign content.</p>
     <button type="button" data-action="exportDiagnostics"><i class="fa-solid fa-file-arrow-down"></i> Download Diagnostics</button>
+  </section>
+
+  <section class="ml-settings-section ml-stack">
+    <div class="ml-settings-section__heading">
+      <div>
+        <h3><i class="fa-solid fa-gear"></i> Core Settings</h3>
+        <p>Connection and privacy settings shared by Morelord modules.</p>
+      </div>
+    </div>
+    <label class="ml-stack" data-gap="1">
+      <span>Morelord Gaming Website</span>
+      <input type="url" name="serverUrl" value="{{serverUrl}}" required>
+      <small>Website used for account activation and entitlement checks.</small>
+    </label>
+    <label class="ml-cluster">
+      <input type="checkbox" name="shareUsageStatistics" {{checked shareUsageStatistics}}>
+      <span>Share anonymous Morelord Core and Foundry version information during access checks.</span>
+    </label>
+    <div class="ml-actions">
+      <button type="button" data-action="saveSettings"><i class="fa-solid fa-floppy-disk"></i> Save Core Settings</button>
+    </div>
   </section>
 </div>

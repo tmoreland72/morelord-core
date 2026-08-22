@@ -1,0 +1,50 @@
+/*
+ * Morelord's global visual and typography contract.
+ * Tokens are scoped so Core never changes unrelated Foundry applications.
+ */
+.ml-app,
+.ml-window,
+.ml-chat-card {
+  --ml-color-accent: var(--color-warm-1, #d6a34a);
+  --ml-color-accent-strong: var(--color-warm-2, #b98227);
+  --ml-color-success: var(--color-level-success, #4f9f68);
+  --ml-color-info: var(--color-level-info, #6997dc);
+  --ml-color-warning: var(--color-level-warning, #c98b20);
+  --ml-color-danger: var(--color-level-error, #b94b4b);
+  --ml-color-text: var(--color-text-primary, currentColor);
+  --ml-color-muted: var(--color-text-subtle, var(--color-text-dark-secondary, rgb(255 255 255 / 72%)));
+  --ml-color-border: var(--color-border-light-2, var(--color-border-light-primary, rgb(255 255 255 / 18%)));
+  --ml-color-window: color-mix(in srgb, var(--color-cool-5, #18161d) 94%, transparent);
+  --ml-color-footer: #0d0c12;
+  --ml-color-surface: rgb(255 255 255 / 4%);
+  --ml-color-surface-raised: rgb(255 255 255 / 7%);
+  --ml-color-surface-sunken: rgb(0 0 0 / 18%);
+  --ml-color-focus: var(--color-border-highlight, var(--ml-color-accent));
+
+  --ml-font-family-body: var(--font-body, inherit);
+  --ml-font-family-heading: var(--font-h1, var(--ml-font-family-body));
+  --ml-font-size-xs: .75rem;
+  --ml-font-size-sm: .875rem;
+  --ml-font-size-body: 1rem;
+  --ml-font-size-title: 1.35rem;
+  --ml-font-size-display: 2rem;
+  --ml-font-weight-normal: 400;
+  --ml-font-weight-medium: 600;
+  --ml-font-weight-bold: 700;
+  --ml-font-weight-heavy: 800;
+  --ml-line-height-body: 1.45;
+  --ml-line-height-heading: 1.15;
+
+  --ml-space-1: 4px;
+  --ml-space-2: 8px;
+  --ml-space-3: 12px;
+  --ml-space-4: 16px;
+  --ml-space-5: 24px;
+  --ml-radius-sm: 4px;
+  --ml-radius-md: 6px;
+  --ml-radius-lg: 8px;
+  --ml-radius-pill: 999px;
+  --ml-control-height: 34px;
+  --ml-avatar-sm: 32px;
+  --ml-avatar-md: 48px;
+}

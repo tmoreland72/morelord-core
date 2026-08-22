@@ -1,0 +1,8 @@
+{
+  "name": "morelord-core",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check:design-system": "node tools/check-design-system.mjs"
+  }
+}

@@ -1,23 +1,27 @@
-.morelord-core-app { padding: 1rem; color: var(--color-text-primary); }
-.mlc-header { display:flex; gap:1rem; align-items:center; padding-bottom:1rem; border-bottom:2px solid #d49a24; }
-.mlc-header img { width:84px; height:84px; object-fit:contain; }
-.mlc-header h2 { margin:0; color:#d49a24; }
-.mlc-header p { margin:.25rem 0 0; opacity:.8; }
-.mlc-card { margin-top:1rem; padding:1rem; border:1px solid rgba(212,154,36,.55); border-radius:8px; background:rgba(20,16,14,.08); }
-.mlc-status { font-weight:700; font-size:1.05rem; margin-bottom:1rem; }
-.mlc-status.connected { color:#4f9f55; }
-.mlc-status.pending { color:#d49a24; }
-.mlc-card dl { display:grid; grid-template-columns:145px 1fr; gap:.5rem 1rem; }
-.mlc-card dt { font-weight:700; }
-.mlc-card dd { margin:0; }
-.mlc-tier { text-transform:capitalize; }
-.mlc-code { font-size:2rem; font-weight:800; letter-spacing:.18em; text-align:center; padding:1rem; margin:1rem 0; border:2px dashed #d49a24; border-radius:8px; user-select:all; }
-.mlc-actions { display:flex; flex-wrap:wrap; gap:.5rem; margin-top:1rem; }
-.mlc-actions .danger { color:#b3261e; }
+/* Stable entry point for the Morelord design system. Keep import order intentional. */
+@import url("./morelord-tokens.css");
+@import url("./morelord-primitives.css");
+@import url("./morelord-components.css");
 
-.mlc-steps { display:grid; gap:.4rem; margin:.75rem 0; padding:.8rem 1rem; border-left:3px solid #d49a24; background:rgba(212,154,36,.08); }
-.mlc-steps p { margin:0; line-height:1.45; }
-.mlc-steps strong { color:#d49a24; }
-.mlc-steps em { font-weight:700; }
-.mlc-diagnostics h3 { margin-top:0; }
-.mlc-diagnostics p { line-height:1.45; }
+/* Core account-screen layout. Generic styling belongs in the imported layers. */
+.ml-core-account__logo { width: 84px; height: 84px; object-fit: contain; }
+.ml-core-account__header { border-bottom-color: var(--ml-color-accent); border-bottom-width: 2px; }
+.ml-core-account__details { display: grid; grid-template-columns: 145px 1fr; gap: var(--ml-space-2) var(--ml-space-4); }
+.ml-core-account__details dt { font-weight: var(--ml-font-weight-bold); }
+.ml-core-account__details dd { margin: 0; }
+.ml-core-account__tier { text-transform: capitalize; }
+.ml-core-account__code {
+  margin: var(--ml-space-4) 0;
+  padding: var(--ml-space-4);
+  border: 2px dashed var(--ml-color-accent);
+  border-radius: var(--ml-radius-lg);
+  font-size: var(--ml-font-size-display);
+  font-weight: var(--ml-font-weight-heavy);
+  letter-spacing: .18em;
+  text-align: center;
+  user-select: all;
+}
+.ml-core-account__steps { border-left: 3px solid var(--ml-color-accent); }
+.ml-core-account__steps strong { color: var(--ml-color-accent); }
+.ml-core-account__steps em { font-weight: var(--ml-font-weight-bold); }
+.ml-core-account__diagnostics p { margin-block: 0; }

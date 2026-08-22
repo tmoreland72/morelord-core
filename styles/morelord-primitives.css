@@ -1,0 +1,104 @@
+.ml-window .window-content {
+  min-height: 0;
+  color: var(--ml-color-text);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 2%), transparent 160px),
+    var(--ml-color-window);
+  font-family: var(--ml-font-family-body);
+  font-size: var(--ml-font-size-body);
+  line-height: var(--ml-line-height-body);
+}
+
+:where(.ml-app, .ml-chat-card) {
+  box-sizing: border-box;
+  min-height: 0;
+  color: var(--ml-color-text);
+  font-family: var(--ml-font-family-body);
+  font-size: var(--ml-font-size-body);
+  line-height: var(--ml-line-height-body);
+}
+
+.ml-app { width: 100%; padding: var(--ml-space-5); }
+
+.ml-app-shell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ml-space-3);
+  min-width: 0;
+  min-height: 0;
+}
+
+:where(.ml-app, .ml-chat-card) :where(h1, h2, h3, h4) {
+  color: inherit;
+  font-family: var(--ml-font-family-heading);
+  line-height: var(--ml-line-height-heading);
+}
+:where(.ml-app, .ml-window .window-content) h1 { font-size: var(--ml-font-size-display); }
+:where(.ml-app, .ml-window .window-content) h2 { font-size: var(--ml-font-size-title); }
+:where(.ml-app, .ml-window .window-content) h3 { font-size: 1.1rem; }
+
+:where(.ml-app, .ml-chat-card) :where(p, li, dd, label, input, select, textarea, button) { font-family: inherit; }
+:where(.ml-app, .ml-chat-card) :where(.notes, small, [data-text="muted"]) { color: var(--ml-color-muted); }
+
+.ml-stack { display: flex; flex-direction: column; gap: var(--ml-space-3); }
+.ml-stack[data-gap="1"] { gap: var(--ml-space-1); }
+.ml-stack[data-gap="2"] { gap: var(--ml-space-2); }
+.ml-stack[data-gap="4"] { gap: var(--ml-space-4); }
+.ml-cluster { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ml-space-2); }
+.ml-grid { display: grid; gap: var(--ml-space-3); }
+.ml-grid[data-columns="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.ml-grid[data-columns="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.ml-grid[data-columns="auto"] { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+
+:where(.ml-app, .ml-window .window-content) :where(button, [role="button"], a, input, select, textarea):focus-visible {
+  outline: 2px solid var(--ml-color-focus);
+  outline-offset: 2px;
+}
+:where(.ml-app, .ml-window .window-content) :where(button, input, select, textarea):disabled,
+:where(.ml-app, .ml-window .window-content) [aria-disabled="true"] { cursor: not-allowed; opacity: .58; }
+
+.ml-window .window-content :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+  min-height: var(--ml-control-height);
+  border: 1px solid var(--ml-color-border);
+  border-radius: var(--ml-radius-md);
+  background: var(--ml-color-surface-raised);
+  color: var(--ml-color-text);
+}
+.ml-window .window-content select option {
+  background: var(--color-cool-5, #18161d);
+  color: var(--ml-color-text);
+}
+.ml-window .window-content select { color-scheme: dark; }
+.ml-window .window-content select option:disabled { color: var(--ml-color-muted); }
+.ml-window .window-content button {
+  min-height: var(--ml-control-height);
+  border-radius: var(--ml-radius-md);
+  font-weight: var(--ml-font-weight-medium);
+}
+.ml-window .window-content :where(input[type="checkbox"], input[type="radio"]) { accent-color: var(--ml-color-accent); }
+.ml-window .window-content label:has(> :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea)) {
+  display: grid;
+  gap: var(--ml-space-1);
+}
+.ml-window .window-content label:has(> :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea)) > span:first-child {
+  color: var(--ml-color-muted);
+  font-size: var(--ml-font-size-xs);
+  font-weight: var(--ml-font-weight-bold);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 700px) {
+  .ml-app { padding: var(--ml-space-4); }
+  .ml-grid[data-columns="2"],
+  .ml-grid[data-columns="3"] { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ml-app *, .ml-app *::before, .ml-app *::after {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

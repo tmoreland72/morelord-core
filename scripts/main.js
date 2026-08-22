@@ -257,6 +257,7 @@ const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 class MorelordConnectionApp extends HandlebarsApplicationMixin(ApplicationV2) {
   static DEFAULT_OPTIONS = {
     id: "morelord-core-connection",
+    classes: ["ml-window", "ml-core-window"],
     tag: "form",
     window: { title: "Morelord Account", icon: "fa-solid fa-crown", resizable: true },
     position: { width: 620, height: "auto" },
@@ -266,6 +267,7 @@ class MorelordConnectionApp extends HandlebarsApplicationMixin(ApplicationV2) {
       refresh: MorelordConnectionApp.refresh,
       disconnect: MorelordConnectionApp.disconnect,
       openAccount: MorelordConnectionApp.openAccount,
+      saveSettings: MorelordConnectionApp.saveSettings,
       exportDiagnostics: MorelordConnectionApp.exportDiagnostics
     }
   };
@@ -287,6 +289,8 @@ class MorelordConnectionApp extends HandlebarsApplicationMixin(ApplicationV2) {
       validatedAt: core?.validatedAt ? new Date(core.validatedAt).toLocaleString() : null,
       expiresAt: core?.expiresAt ? new Date(core.expiresAt).toLocaleString() : null,
       activation: this.activation,
+      serverUrl: game.settings.get(MODULE_ID, SETTINGS.SERVER_URL),
+      shareUsageStatistics: game.settings.get(MODULE_ID, SETTINGS.SHARE_USAGE),
       accountUrl: this.activation?.verificationUrl || `${normalizeServerUrl(game.settings.get(MODULE_ID, SETTINGS.SERVER_URL))}/account`
     };
   }
@@ -327,6 +331,26 @@ class MorelordConnectionApp extends HandlebarsApplicationMixin(ApplicationV2) {
     window.open(url, "_blank", "noopener,noreferrer");
   }
 
+  static async saveSettings(event, target) {
+    event.preventDefault();
+    const form = target.closest("form") ?? this.element;
+    const data = new FormData(form);
+    const serverUrl = normalizeServerUrl(data.get(SETTINGS.SERVER_URL));
+    if (!/^https?:\/\//i.test(serverUrl)) {
+      notify("error", "Morelord Gaming Website must be an HTTP or HTTPS URL.");
+      return;
+    }
+    target.disabled = true;
+    try {
+      await game.settings.set(MODULE_ID, SETTINGS.SERVER_URL, serverUrl);
+      await game.settings.set(MODULE_ID, SETTINGS.SHARE_USAGE, data.has(SETTINGS.SHARE_USAGE));
+      notify("info", "Morelord Core settings saved.");
+      this.render({ force: true });
+    } finally {
+      target.disabled = false;
+    }
+  }
+
   static exportDiagnostics(event, target) {
     event.preventDefault();
     target.disabled = true;
@@ -346,7 +370,7 @@ Hooks.once("init", () => {
     name: "Morelord Gaming Website",
     hint: "The website used for account activation and entitlement checks.",
     scope: "world",
-    config: true,
+    config: false,
     type: String,
     default: DEFAULT_SERVER,
     restricted: true
@@ -355,7 +379,7 @@ Hooks.once("init", () => {
     name: "Share Anonymous Usage Statistics",
     hint: "Share only the Morelord Core and Foundry version during access checks. No campaign, player, actor, item, or chat data is collected.",
     scope: "world",
-    config: true,
+    config: false,
     type: Boolean,
     default: true,
     restricted: true
@@ -380,6 +404,7 @@ Hooks.once("init", () => {
 
 Hooks.once("ready", async () => {
   const api = {
+    designSystemVersion: "1.0.0",
     open: () => new MorelordConnectionApp().render({ force: true }),
     refresh: refreshEntitlements,
     getEntitlements,
