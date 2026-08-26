@@ -7,6 +7,13 @@
     </div>
   </header>
 
+  <section class="ml-surface ml-stack ml-core-account__diagnostics">
+    <h3><i class="fa-solid fa-stethoscope"></i> Troubleshooting</h3>
+    <p>Download a JSON report with Foundry, game system, active module, browser, and graphics details for Morelord support. No Morelord Gaming account or connection is required.</p>
+    <p class="notes">The report excludes account credentials, installation and world identifiers, network addresses, users, and campaign content.</p>
+    <button type="button" data-action="exportDiagnostics"><i class="fa-solid fa-file-arrow-down"></i> Download Diagnostics</button>
+  </section>
+
   {{#if connected}}
     <section class="ml-surface ml-stack">
       <div class="ml-status" data-tone="success"><i class="fa-solid fa-circle-check"></i> Connected</div>
@@ -41,13 +48,6 @@
       {{/if}}
     </section>
   {{/if}}
-
-  <section class="ml-surface ml-stack ml-core-account__diagnostics">
-    <h3><i class="fa-solid fa-stethoscope"></i> Troubleshooting</h3>
-    <p>Download a JSON report with Foundry, game system, active module, browser, and graphics details for Morelord support.</p>
-    <p class="notes">The report excludes account credentials, installation and world identifiers, network addresses, users, and campaign content.</p>
-    <button type="button" data-action="exportDiagnostics"><i class="fa-solid fa-file-arrow-down"></i> Download Diagnostics</button>
-  </section>
 
   <section class="ml-settings-section ml-stack">
     <div class="ml-settings-section__heading">

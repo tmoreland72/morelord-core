@@ -7,6 +7,7 @@
 .ml-chat-card {
   --ml-color-accent: var(--color-warm-1, #d6a34a);
   --ml-color-accent-strong: var(--color-warm-2, #b98227);
+  --ml-color-on-accent: #17120d;
   --ml-color-success: var(--color-level-success, #4f9f68);
   --ml-color-info: var(--color-level-info, #6997dc);
   --ml-color-warning: var(--color-level-warning, #c98b20);

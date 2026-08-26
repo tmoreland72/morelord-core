@@ -56,7 +56,7 @@ function sourceFiles(path) {
   });
 }
 
-const explicitRoots = process.argv.slice(2).map(resolve);
+const explicitRoots = process.argv.slice(2).map(value => resolve(value));
 const roots = explicitRoots.length
   ? explicitRoots
   : DEFAULT_MODULES.map(name => resolve(CORE_ROOT, "..", name)).filter(existsSync);

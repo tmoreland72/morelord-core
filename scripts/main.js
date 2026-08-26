@@ -400,6 +400,14 @@ Hooks.once("init", () => {
     type: MorelordConnectionApp,
     restricted: true
   });
+  game.settings.registerMenu(MODULE_ID, "troubleshooting", {
+    name: "Troubleshooting",
+    label: "Open Troubleshooting",
+    hint: "Download diagnostics for Morelord support. No Morelord Gaming account or connection is required.",
+    icon: "fa-solid fa-stethoscope",
+    type: MorelordConnectionApp,
+    restricted: true
+  });
 });
 
 Hooks.once("ready", async () => {
