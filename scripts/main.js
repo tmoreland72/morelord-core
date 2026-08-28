@@ -1,4 +1,10 @@
+import { ContextualSocketService } from "./services/contextual-socket-service.js";
+import { WindowGeometryService } from "./services/window-geometry-service.js";
+
 const MODULE_ID = "morelord-core";
+const contextualSocket = new ContextualSocketService();
+contextualSocket.start();
+const windowGeometry = new WindowGeometryService({ moduleId: MODULE_ID, settingKey: "windowGeometry" });
 const PRODUCT_SLUG = "morelord-core";
 const DEFAULT_SERVER = "https://morelordgaming.com";
 const CACHE_GRACE_MS = 7 * 24 * 60 * 60 * 1000;
@@ -366,6 +372,8 @@ class MorelordConnectionApp extends HandlebarsApplicationMixin(ApplicationV2) {
 }
 
 Hooks.once("init", () => {
+  windowGeometry.registerSetting();
+  windowGeometry.start();
   game.settings.register(MODULE_ID, SETTINGS.SERVER_URL, {
     name: "Morelord Gaming Website",
     hint: "The website used for account activation and entitlement checks.",
@@ -412,7 +420,7 @@ Hooks.once("init", () => {
 
 Hooks.once("ready", async () => {
   const api = {
-    designSystemVersion: "1.0.0",
+    designSystemVersion: "1.1.0",
     open: () => new MorelordConnectionApp().render({ force: true }),
     refresh: refreshEntitlements,
     getEntitlements,
@@ -421,7 +429,15 @@ Hooks.once("ready", async () => {
     isConnected: () => Boolean(game.settings.get(MODULE_ID, SETTINGS.TOKEN)),
     disconnect,
     getDiagnostics,
-    exportDiagnostics
+    exportDiagnostics,
+    windowGeometry: Object.freeze({
+      remember: application => windowGeometry.remember(application),
+      reset: windowId => windowGeometry.reset(windowId)
+    }),
+    socket: Object.freeze({
+      get ready() { return contextualSocket.ready; },
+      createChannel: namespace => contextualSocket.createChannel(namespace)
+    })
   };
   game.modules.get(MODULE_ID).api = api;
   globalThis.MorelordCore = api;

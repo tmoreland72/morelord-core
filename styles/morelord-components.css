@@ -51,6 +51,16 @@
 .ml-choice-card { display: grid; grid-template-columns: auto var(--ml-avatar-md) minmax(0, 1fr); align-items: center; gap: var(--ml-space-2); padding: var(--ml-space-2); border: 1px solid var(--ml-color-border); border-radius: var(--ml-radius-md); background: var(--ml-color-surface-sunken); cursor: pointer; }
 .ml-choice-card:has(input:checked), .ml-choice-card[aria-checked="true"] { border-color: var(--ml-color-accent); background: var(--ml-color-surface-raised); }
 
+.ml-field-group { min-width: 0; margin: 0; padding: var(--ml-space-3); border: 1px solid var(--ml-color-border); border-radius: var(--ml-radius-md); background: var(--ml-color-surface-sunken); }
+.ml-field-group > legend { padding: 0 var(--ml-space-2); color: var(--ml-color-muted); font-size: var(--ml-font-size-xs); font-weight: var(--ml-font-weight-bold); letter-spacing: .04em; text-transform: uppercase; }
+.ml-field-group__controls { display: grid; grid-template-columns: repeat(var(--ml-field-columns, 2), minmax(0, 1fr)); gap: var(--ml-space-3); align-items: end; }
+.ml-field-group__controls > label { min-width: 0; }
+
+.ml-callout { display: grid; gap: var(--ml-space-3); padding: var(--ml-space-4); border: 1px solid color-mix(in srgb, var(--ml-color-success) 72%, white); border-left-width: 4px; border-radius: var(--ml-radius-lg); color: white; background: color-mix(in srgb, var(--ml-color-success) 72%, black 28%); }
+.ml-callout > :first-child, .ml-callout > :last-child { margin-block: 0; }
+:is(.ml-window .window-content, .ml-chat-card) .ml-callout[data-tone="success"] :is(button, .ml-button) { border-color: white; color: white; background: transparent; }
+:is(.ml-window .window-content, .ml-chat-card) .ml-callout[data-tone="success"] :is(button, .ml-button):hover { color: var(--ml-color-success); background: white; }
+
 .ml-progress { height: 8px; overflow: hidden; border-radius: var(--ml-radius-pill); background: var(--ml-color-surface-sunken); }
 .ml-progress__fill { display: block; height: 100%; background: var(--ml-color-accent); }
 
@@ -129,4 +139,5 @@
   .ml-access-card { grid-template-columns: auto minmax(0, 1fr); }
   .ml-access-card__actions { grid-column: 1 / -1; flex-flow: row wrap; }
   .ml-data-list > div { grid-template-columns: 1fr; gap: var(--ml-space-1); }
+  .ml-field-group__controls { grid-template-columns: 1fr; }
 }

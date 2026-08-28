@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "check:design-system": "node tools/check-design-system.mjs"
+    "check:design-system": "node tools/check-design-system.mjs",
+    "test": "node --test"
   }
 }
