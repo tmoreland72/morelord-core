@@ -2,7 +2,7 @@
   "id": "morelord-core",
   "title": "Morelord Core",
   "description": "Shared account connection and premium entitlement services for Morelord Tools modules.",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "authors": [
     {
       "name": "Morelord Gaming",
@@ -26,11 +26,13 @@
         "id": "socketlib",
         "type": "module",
         "manifest": "https://github.com/farling42/foundryvtt-socketlib/releases/latest/download/module.json",
-        "compatibility": { "minimum": "1.1.3" }
+        "compatibility": {
+          "minimum": "1.1.3"
+        }
       }
     ]
   },
   "url": "https://github.com/tmoreland72/morelord-core",
   "manifest": "https://raw.githubusercontent.com/tmoreland72/morelord-core/main/module.json",
-  "download": "https://github.com/tmoreland72/morelord-core/releases/download/v0.2.1/morelord-core.zip"
+  "download": "https://github.com/tmoreland72/morelord-core/releases/download/v0.2.2/morelord-core.zip"
 }
