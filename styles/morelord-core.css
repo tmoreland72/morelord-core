@@ -4,7 +4,6 @@
 @import url("./morelord-components.css");
 
 /* Core account-screen layout. Generic styling belongs in the imported layers. */
-.ml-core-account__logo { width: 84px; height: 84px; object-fit: contain; }
 .ml-core-account__header { border-bottom-color: var(--ml-color-accent); border-bottom-width: 2px; }
 .ml-core-account__details { display: grid; grid-template-columns: 145px 1fr; gap: var(--ml-space-2) var(--ml-space-4); }
 .ml-core-account__details dt { font-weight: var(--ml-font-weight-bold); }
