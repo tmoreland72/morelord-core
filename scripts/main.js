@@ -1,10 +1,20 @@
 import { ContextualSocketService } from "./services/contextual-socket-service.js";
 import { WindowGeometryService } from "./services/window-geometry-service.js";
+import { resolveBookLabel } from "./services/source-book-service.js";
+import { CapabilityRegistry } from "./location/capability-registry.js";
+import { LocationService } from "./location/location-service.js";
+import { CAPABILITY_TIERS, SETTLEMENT_TYPES, evaluateRequirements, meetsTier } from "./location/location-domain.js";
+import { LocationManagerApp } from "./location/location-manager-app.js";
+import { renderPreservingScroll } from "./ui/scroll-preservation.js";
+import { listCharacterChoices, participantRecords, primaryPartyGroup, selectedCharacterUuids } from "./ui/actor-participation.js";
 
 const MODULE_ID = "morelord-core";
 const contextualSocket = new ContextualSocketService();
 contextualSocket.start();
 const windowGeometry = new WindowGeometryService({ moduleId: MODULE_ID, settingKey: "windowGeometry" });
+const capabilityRegistry = new CapabilityRegistry();
+const locationService = new LocationService({ moduleId: MODULE_ID, settingKey: "locations" });
+LocationManagerApp.configure({ locationService, capabilityRegistry });
 const PRODUCT_SLUG = "morelord-core";
 const DEFAULT_SERVER = "https://morelordgaming.com";
 const CACHE_GRACE_MS = 7 * 24 * 60 * 60 * 1000;
@@ -372,6 +382,17 @@ class MorelordConnectionApp extends HandlebarsApplicationMixin(ApplicationV2) {
 }
 
 Hooks.once("init", () => {
+  locationService.registerSetting();
+  for (const definition of [
+    { id: "forge", name: "Forge" },
+    { id: "marketplace", name: "Marketplace" },
+    { id: "alchemist", name: "Alchemist" },
+    { id: "library", name: "Library" },
+    { id: "temple", name: "Temple" },
+    { id: "contractor", name: "Contractor" },
+    { id: "instructor", name: "Instructor", supportsSpecialty: true },
+    { id: "workshop", name: "Workshop" }
+  ]) capabilityRegistry.register(definition);
   windowGeometry.registerSetting();
   windowGeometry.start();
   game.settings.register(MODULE_ID, SETTINGS.SERVER_URL, {
@@ -416,6 +437,14 @@ Hooks.once("init", () => {
     type: MorelordConnectionApp,
     restricted: true
   });
+  game.settings.registerMenu(MODULE_ID, "locations", {
+    name: "Morelord Locations",
+    label: "Manage Shared Locations",
+    hint: "Define settlement types, capabilities, and Scene associations shared by Morelord modules.",
+    icon: "fa-solid fa-map-location-dot",
+    type: LocationManagerApp,
+    restricted: true
+  });
 });
 
 Hooks.once("ready", async () => {
@@ -434,10 +463,33 @@ Hooks.once("ready", async () => {
       remember: application => windowGeometry.remember(application),
       reset: windowId => windowGeometry.reset(windowId)
     }),
+    ui: Object.freeze({
+      renderPreservingScroll,
+      participation: Object.freeze({ listCharacterChoices, participantRecords, primaryPartyGroup, selectedCharacterUuids })
+    }),
+    sources: Object.freeze({ resolveBookLabel }),
     socket: Object.freeze({
       get ready() { return contextualSocket.ready; },
       createChannel: namespace => contextualSocket.createChannel(namespace)
-    })
+    }),
+    locations: Object.freeze({
+      settlementTypes: SETTLEMENT_TYPES,
+      capabilityTiers: CAPABILITY_TIERS,
+      meetsTier,
+      registerCapability: definition => capabilityRegistry.register(definition),
+      getCapability: id => capabilityRegistry.get(id),
+      listCapabilities: () => capabilityRegistry.all(),
+      list: () => locationService.list(),
+      get: id => locationService.get(id),
+      forScene: sceneId => locationService.forScene(sceneId),
+      current: () => locationService.current(),
+      save: location => locationService.save(location),
+      remove: id => locationService.remove(id),
+      evaluate: (requirements, context) => locationService.evaluate(requirements, context),
+      evaluateRequirements,
+      open: () => new LocationManagerApp().render({ force: true })
+    }),
+    openLocations: () => new LocationManagerApp().render({ force: true })
   };
   game.modules.get(MODULE_ID).api = api;
   globalThis.MorelordCore = api;

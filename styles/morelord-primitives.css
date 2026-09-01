@@ -1,5 +1,8 @@
 .ml-window .window-content {
   min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-padding-block-end: var(--ml-space-5);
   color: var(--ml-color-text);
   background:
     linear-gradient(180deg, rgb(255 255 255 / 2%), transparent 160px),
@@ -27,6 +30,14 @@
   min-width: 0;
   min-height: 0;
 }
+.ml-window .window-content > .ml-app-shell::after {
+  content: "";
+  display: block;
+  flex: 0 0 var(--ml-space-5);
+  width: 100%;
+  min-height: var(--ml-space-5);
+  pointer-events: none;
+}
 
 :where(.ml-app, .ml-chat-card) :where(h1, h2, h3, h4) {
   color: inherit;
@@ -48,6 +59,7 @@
 .ml-grid { display: grid; gap: var(--ml-space-3); }
 .ml-grid[data-columns="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .ml-grid[data-columns="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.ml-grid[data-columns="4"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .ml-grid[data-columns="auto"] { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
 
 :where(.ml-app, .ml-window .window-content) :where(button, [role="button"], a, input, select, textarea):focus-visible {
@@ -91,7 +103,8 @@
 @media (max-width: 700px) {
   .ml-app { padding: var(--ml-space-4); }
   .ml-grid[data-columns="2"],
-  .ml-grid[data-columns="3"] { grid-template-columns: 1fr; }
+  .ml-grid[data-columns="3"],
+  .ml-grid[data-columns="4"] { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {

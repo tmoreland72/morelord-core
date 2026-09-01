@@ -24,3 +24,34 @@
 .ml-core-account__steps strong { color: var(--ml-color-accent); }
 .ml-core-account__steps em { font-weight: var(--ml-font-weight-bold); }
 .ml-core-account__diagnostics p { margin-block: 0; }
+
+/* Shared Location manager. */
+.ml-location-manager__layout { display: grid; grid-template-columns: 250px minmax(0, 1fr); min-height: 100%; }
+.ml-location-manager__sidebar { padding: var(--ml-space-4); border-right: 1px solid var(--ml-color-border); background: var(--ml-color-surface-subtle); }
+.ml-location-manager__sidebar-heading { justify-content: space-between; }
+.ml-location-manager__sidebar-heading h2 { margin: 0; }
+.ml-location-manager__list { display: grid; gap: var(--ml-space-2); }
+.ml-location-manager__location { display: grid; gap: var(--ml-space-1); width: 100%; padding: var(--ml-space-3); text-align: left; }
+.ml-location-manager__location small { opacity: .75; text-transform: capitalize; }
+.ml-location-manager__location.is-active { border-color: var(--ml-color-accent); box-shadow: inset 3px 0 var(--ml-color-accent); }
+.ml-location-manager__editor { min-width: 0; padding: var(--ml-space-5); overflow-y: auto; }
+.ml-location-manager__fields { display: grid; grid-template-columns: minmax(0, 2fr) minmax(180px, 1fr); gap: var(--ml-space-3); }
+.ml-location-manager__section-heading { align-items: flex-start; justify-content: space-between; }
+.ml-location-manager__section-heading h3,
+.ml-location-manager__section-heading p { margin-block: 0; }
+.ml-location-manager__capability { display: grid; grid-template-columns: 1.2fr 1fr 1.2fr 1.2fr auto; gap: var(--ml-space-2); align-items: end; }
+.ml-location-manager__capability label { display: grid; gap: var(--ml-space-1); }
+.ml-location-manager__capability label span { font-size: var(--ml-font-size-sm); font-weight: var(--ml-font-weight-bold); }
+.ml-location-manager__scenes {
+  --ml-check-min: 280px;
+  column-gap: var(--ml-space-4);
+}
+.ml-location-manager__welcome { align-self: center; margin: auto; max-width: 480px; text-align: center; }
+.ml-location-manager__welcome > i { font-size: 3rem; color: var(--ml-color-accent); }
+
+@media (max-width: 760px) {
+  .ml-location-manager__layout { grid-template-columns: 1fr; }
+  .ml-location-manager__sidebar { border-right: 0; border-bottom: 1px solid var(--ml-color-border); }
+  .ml-location-manager__capability { grid-template-columns: 1fr 1fr; }
+  .ml-location-manager__capability button { justify-self: end; }
+}
