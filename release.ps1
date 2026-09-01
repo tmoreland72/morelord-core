@@ -371,7 +371,7 @@ function Publish-WebsiteRelease {
         $Response = Invoke-RestMethod -Method Post -Uri $Endpoint -Headers $Headers -ContentType 'application/json; charset=utf-8' -Body $Json
     }
     catch {
-        $Details = $_.ErrorDetails.Message
+        $Details = if ($null -ne $_.ErrorDetails) { $_.ErrorDetails.Message } else { $null }
         if ([string]::IsNullOrWhiteSpace($Details)) { $Details = $_.Exception.Message }
         throw "Website release publication failed: $Details"
     }
@@ -387,10 +387,10 @@ function Publish-FoundryRelease {
     $Endpoint = 'https://foundryvtt.com/_api/packages/release_version/'
     $Headers = @{ Authorization = $Token; Accept = 'application/json' }
     try {
-        return Invoke-RestMethod -Method Post -Uri $Endpoint -Headers $Headers -ContentType 'application/json; charset=utf-8' -Body ($Payload | ConvertTo-Json -Depth 20)
+        return Invoke-RestMethod -Method Post -Uri $Endpoint -Headers $Headers -SkipHeaderValidation -ContentType 'application/json; charset=utf-8' -Body ($Payload | ConvertTo-Json -Depth 20)
     }
     catch {
-        $Details = $_.ErrorDetails.Message
+        $Details = if ($null -ne $_.ErrorDetails) { $_.ErrorDetails.Message } else { $null }
         if ([string]::IsNullOrWhiteSpace($Details)) { $Details = $_.Exception.Message }
         throw "Foundry VTT release publication failed: $Details"
     }
