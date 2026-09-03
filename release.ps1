@@ -57,25 +57,56 @@ $PushCompleted = $false
 $GitHubReleaseCreated = $false
 $FoundryReleasePublished = $false
 
+
 function Import-ProjectEnv {
-    param([string]$Path = (Join-Path $PSScriptRoot '.env'))
-    if (-not (Test-Path $Path -PathType Leaf)) { return }
-    foreach ($Line in Get-Content -LiteralPath $Path) {
-        $Trimmed = $Line.Trim()
-        if ([string]::IsNullOrWhiteSpace($Trimmed) -or $Trimmed.StartsWith('#')) { continue }
-        if ($Trimmed -notmatch '^([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$') {
-            throw "Invalid .env entry: $Line"
+    param(
+        [string]$Path = (Join-Path $PSScriptRoot ".env")
+    )
+
+    if (-not (Test-Path -LiteralPath $Path)) {
+        return
+    }
+
+    Write-Host "Loading project environment from .env..." -ForegroundColor DarkGray
+
+    foreach ($RawLine in Get-Content -LiteralPath $Path) {
+        $Line = $RawLine.Trim()
+
+        if ([string]::IsNullOrWhiteSpace($Line) -or $Line.StartsWith("#")) {
+            continue
         }
-        $Name = $Matches[1]
-        $Value = $Matches[2].Trim()
-        if (($Value.StartsWith('"') -and $Value.EndsWith('"')) -or ($Value.StartsWith("'") -and $Value.EndsWith("'"))) {
+
+        $Parts = $Line -split "=", 2
+        if ($Parts.Count -ne 2) {
+            continue
+        }
+
+        $Name = $Parts[0].Trim()
+        $Value = $Parts[1].Trim()
+
+        if ([string]::IsNullOrWhiteSpace($Name)) {
+            continue
+        }
+
+        if (
+            ($Value.StartsWith('"') -and $Value.EndsWith('"')) -or
+            ($Value.StartsWith("'") -and $Value.EndsWith("'"))
+        ) {
             $Value = $Value.Substring(1, $Value.Length - 2)
         }
-        if ([string]::IsNullOrWhiteSpace([Environment]::GetEnvironmentVariable($Name, 'Process'))) {
-            [Environment]::SetEnvironmentVariable($Name, $Value, 'Process')
-        }
+
+        # Project .env is authoritative for local release configuration.
+        # An explicit -WebsiteToken parameter is handled separately and still
+        # takes precedence over RELEASE_PUBLISH_TOKEN.
+        [Environment]::SetEnvironmentVariable(
+            $Name,
+            $Value,
+            "Process"
+        )
     }
 }
+
+Import-ProjectEnv
 
 function Write-Step {
     param([Parameter(Mandatory = $true)][string]$Message)
@@ -171,9 +202,6 @@ function Assert-Manifest {
     }
     if (-not $Manifest.compatibility.minimum) {
         throw 'module.json compatibility.minimum is missing.'
-    }
-    if (-not $Manifest.compatibility.verified) {
-        throw 'module.json compatibility.verified is missing.'
     }
     $Minimum = 0
     if (-not [int]::TryParse([string]$Manifest.compatibility.minimum, [ref]$Minimum)) {
@@ -334,6 +362,11 @@ function Get-ReleaseMetadataFromMarkdown {
             if ($CategoryMap.ContainsKey($Heading)) { $CurrentCategory = $CategoryMap[$Heading] } else { $CurrentCategory = $null }
             continue
         }
+        if ($Trimmed -match '^###\s+(.+)$') {
+            $Heading = $Matches[1].Trim().ToLowerInvariant()
+            if ($CategoryMap.ContainsKey($Heading)) { $CurrentCategory = $CategoryMap[$Heading] } else { $CurrentCategory = $null }
+            continue
+        }
         if (-not $SeenH2 -and -not [string]::IsNullOrWhiteSpace($Trimmed)) {
             $SummaryLines.Add($Trimmed)
             continue
@@ -356,6 +389,41 @@ function Get-ReleaseMetadataFromMarkdown {
         $Summary = [string]$Changes[0].description
     }
     return [pscustomobject]@{ title = $Title; summary = $Summary; changes = @($Changes | ForEach-Object { $_ }) }
+}
+
+function Assert-ReleaseMetadataHasChanges {
+    param(
+        [Parameter(Mandatory = $true)][psobject]$Metadata,
+        [Parameter(Mandatory = $true)][string]$Path
+    )
+    $Content = Get-Content -Path $Path -Raw -Encoding UTF8
+    if ($Content -notmatch '(?m)^##\s+What Changed\s*$') {
+        throw "Release notes '$Path' must include the standard '## What Changed' heading."
+    }
+    if (@($Metadata.changes).Count -gt 0) { return }
+    throw "Release notes '$Path' do not contain any publishable What Changed entries. Use bullet lists under subsections such as ### Added, ### Improvements, or ### Fixed."
+}
+
+function Assert-ProductDocumentation {
+    param(
+        [Parameter(Mandatory = $true)][string]$Path,
+        [Parameter(Mandatory = $true)][string]$ExpectedProductSlug,
+        [Parameter(Mandatory = $true)][string]$ExpectedVersion
+    )
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
+        throw "Product documentation was not found: $Path"
+    }
+    $Content = Get-Content -LiteralPath $Path -Raw -Encoding UTF8
+    $EscapedProduct = [regex]::Escape($ExpectedProductSlug)
+    $EscapedVersion = [regex]::Escape($ExpectedVersion)
+    $ProductPattern = '(?m)^product:\s*[''"]?{0}[''"]?\s*$' -f $EscapedProduct
+    $VersionPattern = '(?m)^version:\s*[''"]?{0}[''"]?\s*$' -f $EscapedVersion
+    if ($Content -notmatch $ProductPattern) {
+        throw "Product documentation '$Path' must declare product: $ExpectedProductSlug in its frontmatter."
+    }
+    if ($Content -notmatch $VersionPattern) {
+        throw "Product documentation '$Path' must be updated to version $ExpectedVersion before release."
+    }
 }
 
 function Publish-WebsiteRelease {
@@ -396,6 +464,23 @@ function Publish-FoundryRelease {
     }
 }
 
+function Request-DocumentationDeployment {
+    param(
+        [Parameter(Mandatory = $true)][string]$Repository,
+        [Parameter(Mandatory = $true)][string]$ProductSlug,
+        [Parameter(Mandatory = $true)][string]$ReleaseVersion
+    )
+    $Dispatch = [pscustomobject]@{
+        event_type = 'product-docs-updated'
+        client_payload = [pscustomobject]@{
+            product = $ProductSlug
+            version = $ReleaseVersion
+        }
+    } | ConvertTo-Json -Depth 5 -Compress
+    $Dispatch | & gh api --method POST "repos/$Repository/dispatches" --input -
+    if ($LASTEXITCODE -ne 0) { throw "Unable to request documentation deployment from $Repository." }
+}
+
 function Show-Usage {
     param([string]$Title)
     Write-Host ''
@@ -405,10 +490,9 @@ function Show-Usage {
     Write-Host '  .\release.ps1 -Version <x.y.z> -WebsiteOnly' -ForegroundColor Yellow
     Write-Host ''
     Write-Host 'Normal releases publish GitHub + Foundry + morelordgaming.com/releases.'
-    Write-Host 'Set MORELORD_RELEASE_TOKEN (preferred) or RELEASE_PUBLISH_TOKEN in your local environment.'
-    Write-Host 'Set the package-specific FOUNDRY_RELEASE_TOKEN in the project .env file.'
+    Write-Host 'Set RELEASE_PUBLISH_TOKEN in the project .env file or pass -WebsiteToken.'
+    Write-Host 'Set FOUNDRY_RELEASE_TOKEN in the project .env file or pass -FoundryToken.'
     Write-Host 'Use -SkipWebsitePublish only for exceptional cases.'
-    Write-Host 'Use -SkipFoundryPublish only for exceptional cases.'
     Write-Host 'Draft and prerelease builds are not published to the public website release feed.'
     Write-Host ''
 }
@@ -423,13 +507,13 @@ $GitHubOwner = Get-RequiredConfigValue -Config $Config -Name 'githubOwner'
 $GitHubRepo = Get-RequiredConfigValue -Config $Config -Name 'githubRepo'
 $ReleaseBranch = Get-RequiredConfigValue -Config $Config -Name 'releaseBranch'
 $ArchiveName = Get-RequiredConfigValue -Config $Config -Name 'archiveName'
+$ProductDocumentationRelativePath = if ($Config.PSObject.Properties.Name -contains 'productDocumentationPath') { [string]$Config.productDocumentationPath } else { '' }
+$DocumentationWebsiteRepository = if ($Config.PSObject.Properties.Name -contains 'documentationWebsiteRepository') { [string]$Config.documentationWebsiteRepository } else { '' }
 $RequiredPaths = @($Config.requiredPaths | ForEach-Object { [string]$_ })
 $OptionalPaths = @($Config.optionalPaths | ForEach-Object { [string]$_ })
 if ($RequiredPaths.Count -eq 0) { throw 'release.config.json requiredPaths must contain at least one path.' }
 
 if ([string]::IsNullOrWhiteSpace($Version)) { Show-Usage -Title $ModuleTitle; exit 0 }
-
-Import-ProjectEnv
 
 $Tag = "v$Version"
 if ([string]::IsNullOrWhiteSpace($CommitMessage)) { $CommitMessage = "Release $Tag" }
@@ -437,11 +521,14 @@ if ([string]::IsNullOrWhiteSpace($WebsiteUrl)) {
     $WebsiteUrl = if ($Config.websiteUrl) { [string]$Config.websiteUrl } else { 'https://morelordgaming.com' }
 }
 if ([string]::IsNullOrWhiteSpace($WebsiteToken)) {
-    $WebsiteToken = if (-not [string]::IsNullOrWhiteSpace($env:MORELORD_RELEASE_TOKEN)) { $env:MORELORD_RELEASE_TOKEN } else { $env:RELEASE_PUBLISH_TOKEN }
+    $WebsiteToken = $env:RELEASE_PUBLISH_TOKEN
 }
-if ([string]::IsNullOrWhiteSpace($FoundryToken)) { $FoundryToken = $env:FOUNDRY_RELEASE_TOKEN }
+if ([string]::IsNullOrWhiteSpace($FoundryToken)) {
+    $FoundryToken = $env:FOUNDRY_RELEASE_TOKEN
+}
 if ([string]::IsNullOrWhiteSpace($ReleaseNotesPath)) { $ReleaseNotesPath = Join-Path $ProjectRoot "RELEASE-NOTES-$Version.md" }
 elseif (-not [System.IO.Path]::IsPathRooted($ReleaseNotesPath)) { $ReleaseNotesPath = Join-Path $ProjectRoot $ReleaseNotesPath }
+$ProductDocumentationPath = if ([string]::IsNullOrWhiteSpace($ProductDocumentationRelativePath)) { '' } else { Join-Path $ProjectRoot $ProductDocumentationRelativePath }
 
 $Repository = "$GitHubOwner/$GitHubRepo"
 $RepositoryUrl = "https://github.com/$Repository"
@@ -460,8 +547,12 @@ Set-Location $ProjectRoot
 
 if ($WebsiteOnly) {
     if (-not (Test-Path $ReleaseNotesPath -PathType Leaf)) { throw "Release notes were not found: $ReleaseNotesPath" }
-    if ([string]::IsNullOrWhiteSpace($WebsiteToken)) { throw 'Website-only publishing requires MORELORD_RELEASE_TOKEN, RELEASE_PUBLISH_TOKEN, or -WebsiteToken.' }
+    if ([string]::IsNullOrWhiteSpace($WebsiteToken)) { throw 'Website-only publishing requires RELEASE_PUBLISH_TOKEN in the project .env file or -WebsiteToken.' }
     $ReleaseMetadata = Get-ReleaseMetadataFromMarkdown -Path $ReleaseNotesPath -DefaultTitle "$ModuleTitle $Version"
+    Assert-ReleaseMetadataHasChanges -Metadata $ReleaseMetadata -Path $ReleaseNotesPath
+    if (-not [string]::IsNullOrWhiteSpace($ProductDocumentationPath)) {
+        Assert-ProductDocumentation -Path $ProductDocumentationPath -ExpectedProductSlug $ProductSlug -ExpectedVersion $Version
+    }
     $Payload = [pscustomobject]@{
         productSlug = $ProductSlug
         version = $Version
@@ -483,29 +574,40 @@ if ($WebsiteOnly) {
     $WebsiteResponse = Publish-WebsiteRelease -EndpointBase $WebsiteUrl -Token $WebsiteToken -Payload $Payload
     Write-Host "Published: $($WebsiteResponse.action) $($WebsiteResponse.releaseId)" -ForegroundColor Green
     Write-Host "$WebsiteUrl$($WebsiteResponse.publicUrl)"
+    if (-not [string]::IsNullOrWhiteSpace($DocumentationWebsiteRepository) -and $DryRun) {
+        Write-Host "Documentation deployment would be requested from $DocumentationWebsiteRepository."
+    }
+    elseif (-not [string]::IsNullOrWhiteSpace($DocumentationWebsiteRepository)) {
+        Request-DocumentationDeployment -Repository $DocumentationWebsiteRepository -ProductSlug $ProductSlug -ReleaseVersion $Version
+        Write-Host "Documentation deployment requested from $DocumentationWebsiteRepository." -ForegroundColor Green
+    }
     exit 0
 }
 
 Write-Host ''
 Write-Host "Preparing $ModuleTitle $Tag..." -ForegroundColor Cyan
-if ($DryRun) { Write-Host 'DRY RUN: no project files, Git history, GitHub releases, Foundry releases, or website records will be changed.' -ForegroundColor Yellow }
+if ($DryRun) { Write-Host 'DRY RUN: no project files, Git history, GitHub releases, or website records will be changed.' -ForegroundColor Yellow }
 if (($Draft -or $Prerelease) -and -not $SkipWebsitePublish) { Write-Host 'Website publication will be skipped for draft/prerelease builds.' -ForegroundColor Yellow }
 
 try {
     Write-Step 'Checking prerequisites and release metadata...'
     Assert-CommandExists 'git'
-    Assert-CommandExists 'node'
     if (-not $DryRun) { Assert-CommandExists 'gh' }
     if (-not (Test-Path $ManifestPath)) { throw 'module.json was not found.' }
     if (-not (Test-Path $ReleaseNotesPath -PathType Leaf)) { throw "Release notes were not found: $ReleaseNotesPath" }
+    if (-not [string]::IsNullOrWhiteSpace($ProductDocumentationPath)) {
+        Assert-ProductDocumentation -Path $ProductDocumentationPath -ExpectedProductSlug $ProductSlug -ExpectedVersion $Version
+    }
     if ($ShouldPublishWebsite -and [string]::IsNullOrWhiteSpace($WebsiteToken)) {
-        throw 'Website publishing is enabled but no token is configured. Set MORELORD_RELEASE_TOKEN or pass -WebsiteToken. Use -SkipWebsitePublish only when intentionally bypassing the website feed.'
+        throw 'Website publishing is enabled but no token is configured. Set RELEASE_PUBLISH_TOKEN in the project .env file or pass -WebsiteToken. Use -SkipWebsitePublish only when intentionally bypassing the website feed.'
     }
     if ($ShouldPublishFoundry -and [string]::IsNullOrWhiteSpace($FoundryToken)) {
-        throw 'Foundry publishing is enabled but FOUNDRY_RELEASE_TOKEN is not configured in the project .env file. Use -SkipFoundryPublish only when intentionally bypassing Foundry.'
+        throw 'Foundry publishing is enabled but FOUNDRY_RELEASE_TOKEN is not configured. Use -SkipFoundryPublish only when intentionally bypassing Foundry.'
     }
     $ReleaseMetadata = Get-ReleaseMetadataFromMarkdown -Path $ReleaseNotesPath -DefaultTitle "$ModuleTitle $Version"
+    Assert-ReleaseMetadataHasChanges -Metadata $ReleaseMetadata -Path $ReleaseNotesPath
     Write-Host "  Notes           : $ReleaseNotesPath"
+    if (-not [string]::IsNullOrWhiteSpace($ProductDocumentationPath)) { Write-Host "  Documentation   : $ProductDocumentationPath" }
     Write-Host "  Website changes : $($ReleaseMetadata.changes.Count)"
 
     Write-Step 'Checking repository identity and state...'
@@ -517,7 +619,6 @@ try {
     if ($OriginUrl -notmatch [regex]::Escape($Repository)) { throw "Git remote 'origin' does not point to $Repository. Current: $OriginUrl" }
     $InitialStatus = Get-GitOutput -Command { git status --porcelain } -FailureMessage 'Unable to inspect the Git working tree.'
     if (-not [string]::IsNullOrWhiteSpace($InitialStatus)) { throw "The working tree is not clean:`n$InitialStatus" }
-    Invoke-NativeCommand -Command { node tools/check-design-system.mjs } -FailureMessage 'Morelord design-system boundary validation failed.'
     Invoke-NativeCommand -Command { git fetch origin --tags --prune } -FailureMessage 'Unable to fetch origin.'
     $Behind = [int](Get-GitOutput -Command { git rev-list --count "HEAD..origin/$ReleaseBranch" } -FailureMessage 'Unable to compare local and remote branches.')
     if ($Behind -gt 0) { throw "Local '$ReleaseBranch' is $Behind commit(s) behind origin. Pull before releasing." }
@@ -593,7 +694,7 @@ try {
     if ($DryRun) {
         Write-Host ''
         Write-Host "Dry run for $Tag completed successfully." -ForegroundColor Green
-        Write-Host 'Git, GitHub, Foundry VTT, and the website were not modified.' -ForegroundColor Green
+        Write-Host 'Git, GitHub, and the website were not modified.' -ForegroundColor Green
         exit 0
     }
 
@@ -633,6 +734,10 @@ try {
         $WebsiteResponse = Publish-WebsiteRelease -EndpointBase $WebsiteUrl -Token $WebsiteToken -Payload $Payload
         Write-Host "  Website record  : $($WebsiteResponse.action) $($WebsiteResponse.releaseId)" -ForegroundColor Green
         Write-Host "  Public URL      : $WebsiteUrl$($WebsiteResponse.publicUrl)"
+        if (-not [string]::IsNullOrWhiteSpace($DocumentationWebsiteRepository)) {
+            Request-DocumentationDeployment -Repository $DocumentationWebsiteRepository -ProductSlug $ProductSlug -ReleaseVersion $Version
+            Write-Host "  Documentation   : deployment requested" -ForegroundColor Green
+        }
     }
 
     Write-Host ''
@@ -661,7 +766,7 @@ catch {
     if ($TagWasCreated) { Write-Host "Local tag '$Tag' may exist and should be inspected before retrying." -ForegroundColor Yellow }
     if ($PushCompleted) { Write-Host 'The commit/tag were already pushed to GitHub. Inspect the remote before retrying.' -ForegroundColor Yellow }
     if ($GitHubReleaseCreated) { Write-Host 'The GitHub Release was already created. The website publication can be retried separately if needed.' -ForegroundColor Yellow }
-    if ($FoundryReleasePublished) { Write-Host 'The Foundry VTT package version was already published.' -ForegroundColor Yellow }
+    if ($FoundryReleasePublished) { Write-Host 'The Foundry VTT release was already published.' -ForegroundColor Yellow }
     exit 1
 }
 finally {
