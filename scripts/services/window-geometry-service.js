@@ -20,13 +20,10 @@ export class WindowGeometryService {
     this.timers = new Map();
   }
 
-  registerSetting() {
-    game.settings.register(this.moduleId, this.settingKey, {
-      scope: "client",
-      config: false,
-      type: Object,
-      default: {}
-    });
+  get storageKey() {
+    const worldId = globalThis.game?.world?.id ?? "world";
+    const userId = globalThis.game?.user?.id ?? "user";
+    return `${this.moduleId}.${this.settingKey}.${worldId}.${userId}`;
   }
 
   start() {
@@ -103,7 +100,7 @@ export class WindowGeometryService {
     if (Object.values(geometry).some(value => value === null) || geometry.width < 100 || geometry.height < 80) return;
     const state = this.all();
     state[key] = geometry;
-    await game.settings.set(this.moduleId, this.settingKey, state);
+    this.#store(state);
   }
 
   fitToViewport(saved) {
@@ -120,13 +117,26 @@ export class WindowGeometryService {
   }
 
   all() {
-    return foundry.utils.deepClone(game.settings.get(this.moduleId, this.settingKey) || {});
+    try {
+      return foundry.utils.deepClone(JSON.parse(globalThis.localStorage?.getItem(this.storageKey) || "{}"));
+    } catch {
+      return {};
+    }
   }
 
   async reset(windowId = null) {
-    if (!windowId) return game.settings.set(this.moduleId, this.settingKey, {});
+    if (!windowId) return this.#store({});
     const state = this.all();
     delete state[windowId];
-    return game.settings.set(this.moduleId, this.settingKey, state);
+    return this.#store(state);
+  }
+
+  #store(state) {
+    try {
+      globalThis.localStorage?.setItem(this.storageKey, JSON.stringify(state));
+    } catch {
+      // Window geometry is optional UI state. Storage failures must never fall
+      // through to a Foundry Setting, which players may not update.
+    }
   }
 }

@@ -66,6 +66,12 @@
 .ml-field-group__controls > label { min-width: 0; }
 
 .ml-callout { display: grid; gap: var(--ml-space-3); padding: var(--ml-space-4); border: 1px solid color-mix(in srgb, var(--ml-color-success) 72%, white); border-left-width: 4px; border-radius: var(--ml-radius-lg); color: white; background: color-mix(in srgb, var(--ml-color-success) 72%, black 28%); }
+.ml-callout:has(> i:first-child) { grid-template-columns: 1.25rem minmax(0, 1fr); align-items: start; column-gap: var(--ml-space-3); row-gap: var(--ml-space-1); }
+.ml-callout > i:first-child { align-self: start; width: 1.25rem; margin: .15em 0 0; font-size: 1.25rem; line-height: 1; text-align: center; }
+.ml-callout:has(> i:first-child) > :not(i:first-child) { grid-column: 2; min-width: 0; }
+.ml-callout > div > :where(strong, h3, h4, p) { margin-block: 0; }
+.ml-callout > div > :where(strong, h3, h4) { display: block; font-size: var(--ml-font-size-title); line-height: var(--ml-line-height-heading); }
+.ml-callout > div > :where(strong, h3, h4) + p { margin-top: var(--ml-space-1); }
 .ml-callout[data-tone="warning"] { border-color: color-mix(in srgb, var(--ml-color-warning) 72%, white); background: color-mix(in srgb, var(--ml-color-warning) 68%, black 32%); }
 .ml-callout[data-tone="danger"] { border-color: color-mix(in srgb, var(--ml-color-danger) 72%, white); background: color-mix(in srgb, var(--ml-color-danger) 68%, black 32%); }
 .ml-callout[data-tone="info"] { border-color: color-mix(in srgb, var(--ml-color-info) 72%, white); background: color-mix(in srgb, var(--ml-color-info) 68%, black 32%); }
@@ -100,6 +106,20 @@
 .ml-data-list > div { display: grid; grid-template-columns: minmax(10rem, .45fr) minmax(0, 1fr); gap: var(--ml-space-3); align-items: baseline; }
 .ml-data-list dt { color: var(--ml-color-muted); font-weight: var(--ml-font-weight-bold); }
 .ml-data-list dd { margin: 0; overflow-wrap: anywhere; }
+
+/* Responsive resource collections shared by suite dashboards. Consumers may
+   override --ml-resource-columns for a different data-column layout. */
+.ml-resource-list { --ml-resource-actions-width: 84px; --ml-resource-columns: minmax(180px, 2fr) repeat(3, minmax(100px, 1fr)); display: grid; gap: 1px; overflow: hidden; border: 1px solid var(--ml-color-border); border-radius: var(--ml-radius-md); }
+.ml-resource-header { display: grid; grid-template-columns: var(--ml-resource-columns) var(--ml-resource-actions-width); gap: var(--ml-space-2); padding: var(--ml-space-2) var(--ml-space-3); color: var(--ml-color-muted); font-size: var(--ml-font-size-xs); font-weight: var(--ml-font-weight-bold); text-transform: uppercase; }
+.ml-resource-item { display: grid; background: var(--ml-color-surface); }
+.ml-resource-row { display: grid; grid-template-columns: minmax(0, 1fr) var(--ml-resource-actions-width); gap: var(--ml-space-2); align-items: stretch; }
+.ml-resource-main { display: grid; grid-template-columns: var(--ml-resource-columns); gap: var(--ml-space-2); align-items: center; width: 100%; padding: var(--ml-space-3); border: 0; border-radius: 0; background: transparent; text-align: left; }
+.ml-resource-main span { min-width: 0; overflow-wrap: anywhere; }
+.ml-resource-main span:first-child { display: grid; gap: var(--ml-space-1); }
+.ml-resource-main small { color: var(--ml-color-muted); }
+.ml-resource-actions { display: flex; justify-content: flex-end; align-items: center; gap: var(--ml-space-1); padding: var(--ml-space-2); }
+.ml-resource-actions button { width: var(--ml-control-height); min-width: var(--ml-control-height); padding: 0; }
+.ml-resource-body { padding: 0 var(--ml-space-3) var(--ml-space-3); }
 .ml-window .form-footer {
   position: static !important;
   z-index: 10;
@@ -180,3 +200,31 @@
 .ml-actor-choice input { margin: 0; }
 .ml-actor-choice img { width: 42px; height: 42px; border: 0; border-radius: 50%; object-fit: cover; }
 .ml-actor-choice span { min-width: 0; font-weight: var(--ml-font-weight-bold); overflow-wrap: anywhere; }
+
+/* Shared product documentation viewer. */
+.ml-documentation__layout { display: grid; grid-template-columns: minmax(190px, 240px) minmax(0, 1fr); gap: var(--ml-space-4); align-items: start; }
+.ml-documentation__navigation { position: sticky; top: 0; display: grid; gap: var(--ml-space-2); padding: var(--ml-space-3); }
+.ml-documentation__navigation .ml-list-button { grid-template-columns: auto minmax(0, 1fr); align-items: center; text-align: left; }
+.ml-documentation__content, .ml-documentation__section { min-width: 0; }
+.ml-documentation__section { scroll-margin-top: var(--ml-space-4); }
+.ml-documentation__section > p { margin-block: 0; line-height: 1.55; }
+.ml-documentation__steps, .ml-documentation__bullets { display: grid; gap: var(--ml-space-3); margin: 0; padding-inline-start: var(--ml-space-5); }
+.ml-documentation__steps li, .ml-documentation__bullets li { padding-inline-start: var(--ml-space-1); }
+.ml-documentation__steps p { margin: var(--ml-space-1) 0 0; color: var(--ml-color-muted); line-height: 1.5; }
+@media (max-width: 720px) { .ml-documentation__layout { grid-template-columns: 1fr; } .ml-documentation__navigation { position: static; } }
+@media (max-width: 760px) {
+  .ml-resource-header { display: none; }
+  .ml-resource-row { grid-template-columns: 1fr; }
+  .ml-resource-main { grid-template-columns: 1fr 1fr; }
+  .ml-resource-actions { justify-content: flex-end; padding-top: 0; }
+}
+
+.ml-field-label { display: inline-flex; align-items: center; gap: var(--ml-space-1); }
+.ml-help-button { appearance: none; width: auto; min-width: 0; min-height: 0; padding: 0; border: 0; background: transparent; color: var(--ml-color-muted); line-height: 1; }
+.ml-help-button:hover, .ml-help-button:focus-visible { color: var(--ml-color-accent); }
+.ml-stepper { display: grid; grid-template-columns: 2.25rem minmax(4rem, 1fr) 2.25rem; align-items: stretch; gap: var(--ml-space-1); }
+.ml-stepper > button { min-height: 2.25rem; padding: 0; }
+.ml-stepper > input { min-width: 0; text-align: center; }
+.ml-list-toolbar { display: flex; width: 100%; justify-content: space-between; align-items: center; gap: var(--ml-space-3); flex-wrap: wrap; }
+.ml-toggle { display: inline-flex; align-items: center; gap: var(--ml-space-2); white-space: nowrap; }
+.ml-toggle > input { margin: 0; }

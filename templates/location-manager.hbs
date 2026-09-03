@@ -11,7 +11,7 @@
         {{#each locations}}
           <button type="button" class="ml-location-manager__location {{#if selected}}is-active{{/if}}" data-action="edit" data-location-id="{{id}}">
             <strong>{{name}}</strong>
-            <small>{{settlementType}} · {{capabilities.length}} capabilities</small>
+            <small>{{settlementType}}</small>
           </button>
         {{/each}}
       </nav>
@@ -76,13 +76,15 @@
           <h3><i class="fa-solid fa-image"></i> Associated Scenes</h3>
           <p>When one of these Scenes is active, it resolves to this Morelord Location.</p>
         </div>
-        <div class="ml-location-manager__scenes ml-check-grid">
-          {{#each scenes}}
-            <label class="ml-check"><input type="checkbox" name="sceneIds" value="{{id}}" {{checked checked}}> <span>{{name}}</span></label>
-          {{else}}
-            <p class="notes">This world has no Scenes.</p>
-          {{/each}}
-        </div>
+        {{#if scenes.length}}
+          <div class="ml-location-manager__scene-picker ml-stack" data-gap="2">
+            <label><span>Filter Scenes</span><input type="search" data-scene-filter placeholder="Type any part of a Scene name" autocomplete="off"></label>
+            <select name="sceneIds" data-scene-select multiple size="12" aria-label="Associated Scenes">
+              {{#each scenes}}<option value="{{id}}" {{#if selected}}selected="selected"{{/if}}>{{name}}</option>{{/each}}
+            </select>
+            <small><span data-scene-count></span> · Click a Scene to toggle its selection.</small>
+          </div>
+        {{else}}<p class="notes">This world has no Scenes.</p>{{/if}}
       </section>
 
       <footer class="ml-actions">

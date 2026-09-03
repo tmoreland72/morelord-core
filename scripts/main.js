@@ -6,7 +6,10 @@ import { LocationService } from "./location/location-service.js";
 import { CAPABILITY_TIERS, SETTLEMENT_TYPES, evaluateRequirements, meetsTier } from "./location/location-domain.js";
 import { LocationManagerApp } from "./location/location-manager-app.js";
 import { renderPreservingScroll } from "./ui/scroll-preservation.js";
+import { DocumentationService } from "./documentation/documentation-service.js";
+import { DocumentationApp } from "./documentation/documentation-app.js";
 import { listCharacterChoices, participantRecords, primaryPartyGroup, selectedCharacterUuids } from "./ui/actor-participation.js";
+import { actorSkillModifier, extractNaturalD20, rollSkill } from "./services/skill-roll-service.js";
 
 const MODULE_ID = "morelord-core";
 const contextualSocket = new ContextualSocketService();
@@ -14,6 +17,8 @@ contextualSocket.start();
 const windowGeometry = new WindowGeometryService({ moduleId: MODULE_ID, settingKey: "windowGeometry" });
 const capabilityRegistry = new CapabilityRegistry();
 const locationService = new LocationService({ moduleId: MODULE_ID, settingKey: "locations" });
+const documentationService = new DocumentationService();
+DocumentationApp.configure(documentationService);
 LocationManagerApp.configure({ locationService, capabilityRegistry });
 const PRODUCT_SLUG = "morelord-core";
 const DEFAULT_SERVER = "https://morelordgaming.com";
@@ -65,6 +70,7 @@ function getCache() {
 }
 
 async function setCache(cache) {
+  if (!game.user?.isGM) return;
   await game.settings.set(MODULE_ID, SETTINGS.ENTITLEMENT_CACHE, cache);
 }
 
@@ -74,6 +80,9 @@ function isCacheUsable(entry) {
 }
 
 async function refreshEntitlements(productSlug = PRODUCT_SLUG, { quiet = false } = {}) {
+  // Entitlements are shared world state. Player clients consume the GM's
+  // cached snapshot and must never attempt to refresh or persist it.
+  if (!game.user?.isGM) return getCache()[productSlug] ?? null;
   const token = game.settings.get(MODULE_ID, SETTINGS.TOKEN);
   if (!token) return null;
 
@@ -393,7 +402,6 @@ Hooks.once("init", () => {
     { id: "instructor", name: "Instructor", supportsSpecialty: true },
     { id: "workshop", name: "Workshop" }
   ]) capabilityRegistry.register(definition);
-  windowGeometry.registerSetting();
   windowGeometry.start();
   game.settings.register(MODULE_ID, SETTINGS.SERVER_URL, {
     name: "Morelord Gaming Website",
@@ -465,9 +473,16 @@ Hooks.once("ready", async () => {
     }),
     ui: Object.freeze({
       renderPreservingScroll,
-      participation: Object.freeze({ listCharacterChoices, participantRecords, primaryPartyGroup, selectedCharacterUuids })
+      participation: Object.freeze({ listCharacterChoices, participantRecords, primaryPartyGroup, selectedCharacterUuids }),
+      documentation: Object.freeze({
+        register: definition => documentationService.register(definition),
+        get: id => documentationService.get(id),
+        list: () => documentationService.list(),
+        open: id => new DocumentationApp({ productId: id }).render({ force: true })
+      })
     }),
     sources: Object.freeze({ resolveBookLabel }),
+    rolls: Object.freeze({ skill: rollSkill, skillModifier: actorSkillModifier, naturalD20: extractNaturalD20 }),
     socket: Object.freeze({
       get ready() { return contextualSocket.ready; },
       createChannel: namespace => contextualSocket.createChannel(namespace)
@@ -487,9 +502,9 @@ Hooks.once("ready", async () => {
       remove: id => locationService.remove(id),
       evaluate: (requirements, context) => locationService.evaluate(requirements, context),
       evaluateRequirements,
-      open: () => new LocationManagerApp().render({ force: true })
+      open: options => new LocationManagerApp(options).render({ force: true })
     }),
-    openLocations: () => new LocationManagerApp().render({ force: true })
+    openLocations: options => new LocationManagerApp(options).render({ force: true })
   };
   game.modules.get(MODULE_ID).api = api;
   globalThis.MorelordCore = api;

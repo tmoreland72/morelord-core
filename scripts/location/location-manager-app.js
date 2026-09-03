@@ -45,13 +45,48 @@ export class LocationManagerApp extends HandlebarsApplicationMixin(ApplicationV2
   selectedId = null;
   draft = null;
 
+  constructor(options = {}) {
+    super(options);
+    if (options.locationId) this.selectedId = String(options.locationId);
+    if (options.createNew) {
+      this.draft = { id: null, name: "", settlementType: "road", sceneIds: [], capabilities: [], notes: "", metadata: {} };
+    }
+  }
+
   render(options = {}) {
     const preserve = game.modules.get("morelord-core")?.api?.ui?.renderPreservingScroll;
     return preserve ? preserve(this, () => super.render(options)) : super.render(options);
   }
 
+  _onRender(context, options) {
+    super._onRender(context, options);
+    const filter = this.element.querySelector("[data-scene-filter]");
+    const select = this.element.querySelector("[data-scene-select]");
+    const count = this.element.querySelector("[data-scene-count]");
+    const selectedSceneIds = new Set(this.draft?.sceneIds ?? []);
+    for (const option of select?.options ?? []) option.selected = selectedSceneIds.has(option.value);
+    const refresh = () => {
+      const query = String(filter?.value ?? "").trim().toLocaleLowerCase();
+      for (const option of select?.options ?? []) option.hidden = Boolean(query) && !option.text.toLocaleLowerCase().includes(query);
+      if (count) count.textContent = `${Array.from(select?.selectedOptions ?? []).length} selected`;
+    };
+    filter?.addEventListener("input", refresh);
+    select?.addEventListener("change", refresh);
+    select?.addEventListener("mousedown", event => {
+      if (!(event.target instanceof HTMLOptionElement)) return;
+      event.preventDefault();
+      event.target.selected = !event.target.selected;
+      select.focus();
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    refresh();
+  }
+
   async _prepareContext() {
     const locations = this.constructor.locationService.list();
+    if (!this.draft && !this.selectedId && locations.length) {
+      this.selectedId = locations[0].id;
+    }
     if (!this.draft && this.selectedId) {
       this.draft = foundry.utils.deepClone(this.constructor.locationService.get(this.selectedId));
     }
@@ -65,11 +100,13 @@ export class LocationManagerApp extends HandlebarsApplicationMixin(ApplicationV2
       settlementTypes: optionMap(SETTLEMENT_TYPES, titleCase),
       capabilityTypes: Object.fromEntries(this.constructor.capabilityRegistry.all().map(type => [type.id, type.name])),
       capabilityTiers: optionMap(CAPABILITY_TIERS, titleCase),
-      scenes: Array.from(game.scenes ?? []).map(scene => ({
-        id: scene.id,
-        name: scene.name,
-        checked: selectedSceneIds.has(scene.id)
-      }))
+      scenes: Array.from(game.scenes ?? [])
+        .map(scene => ({
+          id: scene.id,
+          name: scene.name,
+          selected: selectedSceneIds.has(scene.id)
+        }))
+        .sort((left, right) => Number(right.selected) - Number(left.selected) || left.name.localeCompare(right.name))
     };
   }
 
@@ -118,7 +155,7 @@ export class LocationManagerApp extends HandlebarsApplicationMixin(ApplicationV2
       this.selectedId = saved.id;
       this.draft = saved;
       ui.notifications.info(`${saved.name} saved.`);
-      await this.render({ force: true });
+      await this.close();
     } catch (error) {
       ui.notifications.error(`Could not save location: ${error.message}`);
     } finally {

@@ -1,0 +1,15 @@
+<section class="ml-app ml-app-shell ml-documentation">
+  <header class="ml-hero"><i class="{{product.icon}} ml-hero__icon"></i><div class="ml-hero__body"><p class="ml-eyebrow">Product Documentation</p><h1>{{product.title}}</h1><p>{{product.subtitle}}</p></div></header>
+  <div class="ml-documentation__layout">
+    <nav class="ml-surface ml-documentation__navigation" aria-label="Documentation sections"><strong>Contents</strong>{{#each product.sections}}<button type="button" class="ml-list-button" data-action="jumpToSection" data-section-id="{{id}}"><i class="{{icon}}"></i><span>{{title}}</span></button>{{/each}}</nav>
+    <main class="ml-stack ml-documentation__content" data-gap="4">
+      {{#each product.sections}}<article class="ml-surface ml-stack ml-documentation__section" data-gap="3" data-documentation-section="{{id}}">
+        <div class="ml-section-heading"><div><p class="ml-eyebrow">{{../product.title}}</p><h2><i class="{{icon}}"></i> {{title}}</h2>{{#if introduction}}<p>{{introduction}}</p>{{/if}}</div></div>
+        {{#each paragraphs}}<p>{{this}}</p>{{/each}}
+        {{#if steps}}<ol class="ml-documentation__steps">{{#each steps}}<li><strong>{{title}}</strong><p>{{body}}</p></li>{{/each}}</ol>{{/if}}
+        {{#if bullets}}<ul class="ml-documentation__bullets">{{#each bullets}}<li>{{this}}</li>{{/each}}</ul>{{/if}}
+        {{#each callouts}}<aside class="ml-callout" data-tone="{{tone}}"><i class="{{icon}}"></i><div><strong>{{title}}</strong><p>{{body}}</p></div></aside>{{/each}}
+      </article>{{/each}}
+    </main>
+  </div>
+</section>

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { evaluateRequirements, meetsTier, normalizeLocation } from "../scripts/location/location-domain.js";
+import { evaluateRequirements, meetsTier, normalizeLocation, SETTLEMENT_TYPES } from "../scripts/location/location-domain.js";
 
 test("capability tiers compare from Common through Legendary", () => {
   assert.equal(meetsTier("veryRare", "rare"), true);
@@ -21,4 +21,10 @@ test("specialized capabilities require the matching specialty", () => {
   const location = normalizeLocation({ id: "academy", name: "Academy", settlementType: "city", capabilities: [{ type: "instructor", specialty: "smiths-tools", tier: "rare" }] });
   assert.equal(evaluateRequirements([{ kind: "capability", type: "instructor", specialty: "smiths-tools", tier: "common" }], { location }).passed, true);
   assert.equal(evaluateRequirements([{ kind: "capability", type: "instructor", specialty: "brewers-supplies", tier: "common" }], { location }).passed, false);
+});
+
+test("Other supports special locations such as strongholds and garrisons", () => {
+  assert.equal(SETTLEMENT_TYPES.includes("other"), true);
+  const stronghold = normalizeLocation({ id: "stronghold", name: "The Stronghold", settlementType: "other" });
+  assert.equal(stronghold.settlementType, "other");
 });

@@ -4,7 +4,8 @@ export const SETTLEMENT_TYPES = Object.freeze([
   "village",
   "town",
   "city",
-  "metropolis"
+  "metropolis",
+  "other"
 ]);
 
 export const CAPABILITY_TIERS = Object.freeze([
