@@ -1,0 +1,72 @@
+[
+  {
+    "file": "Morelord-Branding-Guide-v2.2.pdf",
+    "pages": 34,
+    "sources": [
+      "morelord-core/MORELORD-BRAND-GUIDE.md"
+    ]
+  },
+  {
+    "file": "Morelord-Core-Reference.pdf",
+    "pages": 7,
+    "sources": [
+      "morelord-core/README.md",
+      "morelord-core/CORE-GM-PRODUCT-GUIDE.md"
+    ]
+  },
+  {
+    "file": "Morelord-Character-Export-Reference.pdf",
+    "pages": 4,
+    "sources": [
+      "morelord-character-export/README.md"
+    ]
+  },
+  {
+    "file": "Morelord-Craftworks-Reference.pdf",
+    "pages": 79,
+    "sources": [
+      "morelord-craftworks/README.md",
+      "morelord-craftworks/USER-GUIDE.md",
+      "morelord-craftworks/docs/README.md",
+      "morelord-craftworks/docs/gm-manual.md",
+      "morelord-craftworks/docs/player-manual.md"
+    ]
+  },
+  {
+    "file": "Morelord-Downtime-Reference.pdf",
+    "pages": 3,
+    "sources": [
+      "morelord-downtime/README.md"
+    ]
+  },
+  {
+    "file": "Morelord-Encounters-Reference.pdf",
+    "pages": 8,
+    "sources": [
+      "morelord-encounters/README.md",
+      "morelord-encounters/docs/README.md",
+      "morelord-encounters/docs/gm-manual.md"
+    ]
+  },
+  {
+    "file": "Morelord-Journeys-Reference.pdf",
+    "pages": 20,
+    "sources": [
+      "morelord-journeys/README.md",
+      "morelord-journeys/docs/README.md",
+      "morelord-journeys/docs/gm-manual.md",
+      "morelord-journeys/docs/player-guide.md",
+      "morelord-journeys/docs/gm-travel-rules-reference.md"
+    ]
+  },
+  {
+    "file": "Morelord-Marketplace-Reference.pdf",
+    "pages": 33,
+    "sources": [
+      "morelord-marketplace/README.md",
+      "morelord-marketplace/docs/README.md",
+      "morelord-marketplace/docs/gm-manual.md",
+      "morelord-marketplace/docs/player-manual.md"
+    ]
+  }
+]
