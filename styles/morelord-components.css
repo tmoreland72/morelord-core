@@ -54,6 +54,13 @@
 
 .ml-choice-card { display: grid; grid-template-columns: auto var(--ml-avatar-md) minmax(0, 1fr); align-items: center; gap: var(--ml-space-2); padding: var(--ml-space-2); border: 1px solid var(--ml-color-border); border-radius: var(--ml-radius-md); background: var(--ml-color-surface-sunken); cursor: pointer; }
 .ml-choice-card:has(input:checked), .ml-choice-card[aria-checked="true"] { border-color: var(--ml-color-accent); background: var(--ml-color-surface-raised); }
+.ml-actor-identity { display: inline-flex; align-items: center; gap: var(--ml-space-2); min-width: 0; max-width: 100%; vertical-align: middle; text-align: left; }
+.ml-actor-identity > span { min-width: 0; overflow-wrap: anywhere; }
+.ml-actor-identity > .ml-avatar { flex: 0 0 var(--ml-avatar-sm); width: var(--ml-avatar-sm); height: var(--ml-avatar-sm); object-fit: cover; border: 0; border-radius: 50%; }
+.ml-actor-select-field { grid-template-columns: var(--ml-avatar-sm) minmax(0, 1fr); align-items: center; }
+.ml-actor-select-field > span:first-child { grid-column: 1 / -1; }
+.ml-actor-select-field > select { grid-column: 2; grid-row: 2; min-width: 0; }
+.ml-actor-select-field > [data-ml-actor-select-preview] { grid-column: 1; grid-row: 2; }
 .ml-check { display: grid; grid-template-columns: max-content minmax(0, 1fr); align-items: start; gap: var(--ml-space-2); min-width: 0; margin: 0; }
 .ml-check > :where(input[type="checkbox"], input[type="radio"]) { flex: none; margin: .15em 0 0; }
 .ml-check > span { min-width: 0; line-height: 1.35; overflow-wrap: anywhere; }
@@ -89,6 +96,8 @@
 .ml-divider { display: block; width: 100%; min-height: 2px; margin: var(--ml-space-3) 0 var(--ml-space-2); border: 0; border-radius: var(--ml-radius-pill); background: var(--ml-color-accent); box-shadow: 0 1px 0 rgb(255 255 255 / 18%); }
 .ml-section { display: flex; flex-direction: column; gap: var(--ml-space-3); }
 .ml-section-heading { margin: var(--ml-space-2) 0 0; padding-bottom: var(--ml-space-2); border-bottom: 1px solid var(--ml-color-border); }
+.ml-section-heading :where(h2, h3, h4) { margin-block: 0; }
+.ml-section-heading p { margin-block: var(--ml-space-2) 0; }
 .ml-card {
   padding: var(--ml-space-3);
   border: 1px solid var(--ml-color-border);

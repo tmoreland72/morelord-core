@@ -1,4 +1,5 @@
 .ml-window .window-content {
+  padding: 0;
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -52,6 +53,7 @@
 :where(.ml-app, .ml-chat-card) :where(.notes, small, [data-text="muted"]) { color: var(--ml-color-muted); }
 
 .ml-stack { display: flex; flex-direction: column; gap: var(--ml-space-3); }
+.ml-stack > :where(p, h2, h3, h4) { margin-block: 0; }
 .ml-stack[data-gap="1"] { gap: var(--ml-space-1); }
 .ml-stack[data-gap="2"] { gap: var(--ml-space-2); }
 .ml-stack[data-gap="4"] { gap: var(--ml-space-4); }

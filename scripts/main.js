@@ -1,3 +1,4 @@
+import { actorIdentity, decorateActorSelect } from "./ui/actor-identity.js";
 import { ContextualSocketService } from "./services/contextual-socket-service.js";
 import { WindowGeometryService } from "./services/window-geometry-service.js";
 import { resolveBookLabel } from "./services/source-book-service.js";
@@ -472,6 +473,8 @@ Hooks.once("ready", async () => {
       reset: windowId => windowGeometry.reset(windowId)
     }),
     ui: Object.freeze({
+      actorIdentity,
+      decorateActorSelect,
       renderPreservingScroll,
       participation: Object.freeze({ listCharacterChoices, participantRecords, primaryPartyGroup, selectedCharacterUuids }),
       documentation: Object.freeze({
