@@ -879,3 +879,12 @@ The module reference PDFs preserve source-document version labels. Some manuals 
 Known documentation differences resolved for branding: Core's older account-only description omitted shared services; Encounters copy omitted custom and published encounters; the prior guide omitted Downtime and Character Export; the Marketplace README's old family list still mentions Drakkenheim Harvesting and Character Manager. Those historical names do not define the current nine-folder inventory.
 
 Maintain one canonical guide. Update its inventory, requirements, product copy, and access claims together when a release changes them; regenerate the PDF and visually verify every page. The legacy marketing file is a redirect, not a second source of truth.
+# Page sections
+
+Section headers must use Downtime's exact structure: `<div class="ml-section-heading"><div><h2>Section title</h2><p>Section subtitle</p></div></div>`. Always provide a descriptive subtitle. Keep both text elements inside the header so Core's divider appears below the complete title/subtitle block, never between them. Do not apply `ml-section-heading` directly to an `h3` or add module-specific typography or divider rules.
+
+Use Morelord Downtime as the reference for initial module page sections. Group each section's heading, help text, and controls inside Core's `ml-surface ml-stack` with `data-gap="3"`. Use `ml-section-heading` inside the surface, and `ml-card` for individual items within it. Section borders, backgrounds, padding, and spacing must come from Core rather than module-specific copies. Encounters applies this pattern to Encounter Settings, Verify Party, and Encounter Source.
+
+# Initial module page headers
+
+Use Morelord Downtime's dashboard as the reference for every initial module page: a `header.ml-hero` containing the product's accent-colored `i.ml-hero__icon`, a `div.ml-hero__body` with an `h1` product title and concise `p` subtitle, and a right-aligned `div.ml-actions` with a book-open **Documentation** button sized to its contents. Use Core's shared hero typography, spacing, and divider; avoid module-specific header overrides. Documentation buttons open the module's registered Core documentation. Place unrelated page actions below the header.

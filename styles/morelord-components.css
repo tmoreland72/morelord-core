@@ -13,6 +13,8 @@
 .ml-hero__body p { margin: var(--ml-space-1) 0 0; color: var(--ml-color-muted); }
 .ml-hero__actions { margin-left: auto; }
 .ml-hero__icon { flex: none; font-size: 2.25rem; color: var(--ml-color-accent); }
+.ml-hero > .ml-actions { flex: 0 0 auto; margin-left: auto; }
+.ml-hero > .ml-actions > button { flex: 0 0 auto; width: auto; }
 .ml-eyebrow { margin: 0; color: var(--ml-color-accent); font-size: var(--ml-font-size-sm); font-weight: var(--ml-font-weight-bold); letter-spacing: .04em; text-transform: uppercase; }
 
 .ml-actions, .ml-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ml-space-2); }
