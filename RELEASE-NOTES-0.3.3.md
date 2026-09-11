@@ -4,7 +4,7 @@ Shared module headers keep their Documentation action right-aligned and sized to
 
 ## What Changed
 
-### Improved
+### Improvements
 
 - Keep hero Documentation buttons right-aligned without stretching.
 - Document the shared landing-page header and section-card pattern, including heading size, subtitles, and divider placement.
