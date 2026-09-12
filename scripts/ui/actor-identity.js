@@ -12,7 +12,7 @@ export function actorIdentity(identity = {}) {
 }
 
 /** Native options are text-only; keep the selected actor's portrait alongside the select. */
-export function decorateActorSelect(select) {
+export function decorateActorSelect(select, resolveUuid = value => value) {
   if (select.parentElement?.tagName === "LABEL") select.parentElement.classList.add("ml-actor-select-field");
   let preview = select.nextElementSibling;
   if (!preview?.hasAttribute("data-ml-actor-select-preview")) {
@@ -20,9 +20,9 @@ export function decorateActorSelect(select) {
     preview.dataset.mlActorSelectPreview = "";
     preview.setAttribute("aria-hidden", "true");
     select.after(preview);
-    select.addEventListener("change", () => decorateActorSelect(select));
+    select.addEventListener("change", () => decorateActorSelect(select, resolveUuid));
   }
   preview.hidden = !select.value;
-  preview.innerHTML = select.value ? actorIdentity({ actorUuid: select.value, name: select.selectedOptions[0]?.textContent }) : "";
+  preview.innerHTML = select.value ? actorIdentity({ actorUuid: resolveUuid(select.value), name: select.selectedOptions[0]?.textContent }) : "";
   preview.querySelector(".ml-actor-identity > span")?.remove();
 }

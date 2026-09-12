@@ -97,7 +97,14 @@ export class LocationManagerApp extends HandlebarsApplicationMixin(ApplicationV2
       hasLocations: locations.length > 0,
       draft,
       isExisting: Boolean(draft?.id && this.constructor.locationService.get(draft.id)),
-      settlementTypes: optionMap(SETTLEMENT_TYPES, titleCase),
+      settlementTypes: {
+        ...optionMap(SETTLEMENT_TYPES, titleCase),
+        hamlet: "Hamlet (1–100 people)",
+        village: "Village (101–1,000 people)",
+        town: "Town (1,001–6,000 people)",
+        city: "City (6,001–25,000 people)",
+        metropolis: "Metropolis (25,001+ people)"
+      },
       capabilityTypes: Object.fromEntries(this.constructor.capabilityRegistry.all().map(type => [type.id, type.name])),
       capabilityTiers: optionMap(CAPABILITY_TIERS, titleCase),
       scenes: Array.from(game.scenes ?? [])

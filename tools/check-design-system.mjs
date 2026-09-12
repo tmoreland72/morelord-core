@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -7,7 +7,9 @@ const DEFAULT_MODULES = [
   "morelord-marketplace",
   "morelord-journeys",
   "morelord-craftworks",
-  "morelord-encounters"
+  "morelord-encounters",
+  "morelord-downtime",
+  "morelord-character-export"
 ];
 const PROTECTED = [
   "app",
@@ -68,12 +70,12 @@ const CHAT_CARD_ROOTS = new Set([
   "ml-marketplace-card",
   "ml-journeys-chat-card",
   "ml-craftworks-award-card",
-  "ml-craftworks-chat-card"
+  "ml-craftworks-chat-card",
+  "ml-source-item-chat"
 ]);
 
 for (const root of roots) {
   const styles = join(root, "styles");
-  if (!existsSync(styles) || !statSync(styles).isDirectory()) continue;
   for (const file of sourceFiles(styles).filter(file => file.endsWith(".css"))) {
     const text = readFileSync(file, "utf8");
     for (const match of text.matchAll(protectedPattern)) {
@@ -108,7 +110,7 @@ for (const root of roots) {
       failures.push(`${file}:${line}: feature settings must be managed by the module Configure application`);
     }
     for (const match of text.matchAll(/classes\s*:\s*\[([\s\S]*?)\]/g)) {
-      if (!/\bml-(?:marketplace|journeys|craftworks|encounters)-(?:module|dialog|window)\b/.test(match[1])) continue;
+      if (!/\bml-(?:marketplace|journeys|craftworks|encounters|downtime|character-export)-(?:module|dialog|window)\b/.test(match[1])) continue;
       if (/['"]ml-window['"]/.test(match[1])) continue;
       const line = text.slice(0, match.index).split(/\r?\n/).length;
       failures.push(`${file}:${line}: Morelord application and dialog classes must include ml-window`);
@@ -121,7 +123,13 @@ for (const root of roots) {
       failures.push(`${file}:${line}: Morelord chat-card roots must include ml-chat-card`);
     }
     if (/\.(?:hbs|html)$/.test(file)) {
-      if (/\.hbs$/.test(file) && !/[\\/](?:parts|partials)[\\/]/.test(file)) {
+      if (/\.hbs$/.test(file) && /[\\/]chat[\\/]/.test(file)) {
+        const firstElement = text.match(/<(?:div|section|form|article)\b[^>]*>/i);
+        if (firstElement && !/\bml-chat-card\b/.test(firstElement[0])) {
+          failures.push(`${file}:${text.slice(0, firstElement.index).split(/\r?\n/).length}: chat templates must use the ml-chat-card root`);
+        }
+      }
+      if (/\.hbs$/.test(file) && !/[\\/](?:parts|partials|chat)[\\/]/.test(file)) {
         const firstElement = text.match(/<(?:div|section|form|article)\b[^>]*>/i);
         if (firstElement && !/\bml-app\b/.test(firstElement[0])) {
           const line = text.slice(0, firstElement.index).split(/\r?\n/).length;
