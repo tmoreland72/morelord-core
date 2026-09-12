@@ -12,6 +12,11 @@ const DEFAULT_MODULES = [
 const PROTECTED = [
   "app",
   "app-shell",
+  "page-layout",
+  "page-body",
+  "page-flow",
+  "page-footer",
+  "item-row",
   "stack",
   "cluster",
   "grid",
@@ -34,17 +39,11 @@ const PROTECTED = [
   "settings-section",
   "access-card",
   "choice-card",
+  "actor-identity",
+  "avatar",
+  "actor-select-field",
   "progress"
 ];
-
-function cssFiles(path) {
-  if (!existsSync(path)) return [];
-  return readdirSync(path, { withFileTypes: true }).flatMap(entry => {
-    const child = join(path, entry.name);
-    if (entry.isDirectory()) return cssFiles(child);
-    return entry.isFile() && entry.name.endsWith(".css") ? [child] : [];
-  });
-}
 
 function sourceFiles(path) {
   if (!existsSync(path)) return [];
@@ -75,7 +74,7 @@ const CHAT_CARD_ROOTS = new Set([
 for (const root of roots) {
   const styles = join(root, "styles");
   if (!existsSync(styles) || !statSync(styles).isDirectory()) continue;
-  for (const file of cssFiles(styles)) {
+  for (const file of sourceFiles(styles).filter(file => file.endsWith(".css"))) {
     const text = readFileSync(file, "utf8");
     for (const match of text.matchAll(protectedPattern)) {
       const before = text.slice(0, match.index);

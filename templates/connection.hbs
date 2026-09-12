@@ -1,9 +1,11 @@
 <div class="ml-app ml-core-account ml-stack" data-gap="4">
-  <header class="ml-hero ml-core-account__header">
+  <header class="ml-hero">
+    <i class="fa-solid fa-link ml-hero__icon"></i>
     <div class="ml-hero__body">
-      <h2>Morelord Account</h2>
+      <h1>Morelord Core</h1>
       <p>Shared premium access for Morelord Tools modules.</p>
     </div>
+    <div class="ml-actions"><button type="button" data-action="openDocumentation"><i class="fa-solid fa-book-open"></i> Documentation</button></div>
   </header>
 
   <section class="ml-surface ml-stack ml-core-account__diagnostics">
@@ -64,6 +66,22 @@
       <input type="checkbox" name="shareUsageStatistics" {{checked shareUsageStatistics}}>
       <span>Share anonymous Morelord Core and Foundry version information during access checks.</span>
     </label>
+    <label class="ml-cluster">
+      <input type="checkbox" name="developerMode" {{checked developerMode}}>
+      <span>Enable Developer Mode</span>
+    </label>
+    <label class="ml-stack" data-gap="1">
+      <span>Test Subscription Level</span>
+      <select name="developerTier">
+        {{#each developerTiers}}
+          <option value="{{value}}" {{#if selected}}selected{{/if}} {{#if disabled}}disabled{{/if}}>{{label}}</option>
+        {{/each}}
+      </select>
+      <small>Applies to all Morelord modules in this world while Developer Mode is enabled. Standard disables paid access everywhere. Higher levels remain capped by the connected account and each module's actual access.</small>
+    </label>
+    {{#if developerMode}}
+      <p class="ml-status" data-tone="warning">Developer Mode is enabled for all Morelord modules. Subscription limit: {{effectiveTier}}. Reopen module windows after saving to update their displays.</p>
+    {{/if}}
     <div class="ml-actions">
       <button type="button" data-action="saveSettings"><i class="fa-solid fa-floppy-disk"></i> Save Core Settings</button>
     </div>

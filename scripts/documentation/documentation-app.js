@@ -1,3 +1,5 @@
+import { renderPreservingScroll } from "../ui/scroll-preservation.js";
+
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 export class DocumentationApp extends HandlebarsApplicationMixin(ApplicationV2) {
@@ -18,8 +20,7 @@ export class DocumentationApp extends HandlebarsApplicationMixin(ApplicationV2) 
   }
 
   render(options = {}) {
-    const preserve = game.modules.get("morelord-core")?.api?.ui?.renderPreservingScroll;
-    return preserve ? preserve(this, () => super.render(options)) : super.render(options);
+    return renderPreservingScroll(this, () => super.render(options));
   }
 
   async _prepareContext(options) {

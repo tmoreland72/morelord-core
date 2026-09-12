@@ -1,6 +1,6 @@
 .ml-window .window-content {
-  padding: 0;
   min-height: 0;
+  padding: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
   scroll-padding-block-end: var(--ml-space-5);
@@ -36,6 +36,41 @@
   display: block;
   flex: 0 0 var(--ml-space-5);
   width: 100%;
+  min-height: var(--ml-space-5);
+  pointer-events: none;
+}
+
+/* The page is the only scrollport; action footers occupy their own grid row. */
+.ml-window .window-content.ml-page-layout {
+  display: grid !important;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 0;
+  min-height: 0;
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+.ml-window .window-content.ml-page-layout > .ml-page-body {
+  height: auto !important;
+  max-height: none !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding: var(--ml-space-4) !important;
+  scrollbar-gutter: stable;
+  overscroll-behavior: contain;
+}
+.ml-page-body > * { flex-shrink: 0; }
+.ml-window .ml-page-body .ml-page-flow {
+  height: auto !important;
+  max-height: none !important;
+  min-height: min-content !important;
+  flex-shrink: 0;
+  overflow: visible !important;
+}
+.ml-window .ml-page-body::after {
+  content: "";
+  display: block;
+  flex: 0 0 var(--ml-space-5);
   min-height: var(--ml-space-5);
   pointer-events: none;
 }

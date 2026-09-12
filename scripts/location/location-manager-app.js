@@ -1,4 +1,5 @@
 import { CAPABILITY_TIERS, SETTLEMENT_TYPES } from "./location-domain.js";
+import { renderPreservingScroll } from "../ui/scroll-preservation.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -54,8 +55,7 @@ export class LocationManagerApp extends HandlebarsApplicationMixin(ApplicationV2
   }
 
   render(options = {}) {
-    const preserve = game.modules.get("morelord-core")?.api?.ui?.renderPreservingScroll;
-    return preserve ? preserve(this, () => super.render(options)) : super.render(options);
+    return renderPreservingScroll(this, () => super.render(options));
   }
 
   _onRender(context, options) {

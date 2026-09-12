@@ -98,14 +98,16 @@
 .ml-section-heading { margin: var(--ml-space-2) 0 0; padding-bottom: var(--ml-space-2); border-bottom: 1px solid var(--ml-color-border); }
 .ml-section-heading :where(h2, h3, h4) { margin-block: 0; }
 .ml-section-heading p { margin-block: var(--ml-space-2) 0; }
-.ml-card {
+.ml-card,
+.ml-window .window-content .ml-card {
   padding: var(--ml-space-3);
   border: 1px solid var(--ml-color-border);
   border-radius: var(--ml-radius-lg);
   background: var(--ml-color-surface);
   transition: border-color 120ms ease, background-color 120ms ease;
 }
-.ml-card:is(button, a, label):hover { border-color: color-mix(in srgb, var(--ml-color-accent) 65%, var(--ml-color-border)); background: var(--ml-color-surface-raised); }
+.ml-card:is(button, a, label):hover,
+.ml-window .window-content .ml-card:is(button, a, label):hover { border-color: color-mix(in srgb, var(--ml-color-accent) 65%, var(--ml-color-border)); background: var(--ml-color-surface-raised); }
 
 .ml-details { overflow: clip; border: 1px solid var(--ml-color-border); border-radius: var(--ml-radius-md); }
 .ml-details > summary { cursor: pointer; padding: var(--ml-space-3); font-weight: var(--ml-font-weight-bold); list-style-position: inside; user-select: none; }
@@ -131,7 +133,12 @@
 .ml-resource-actions { display: flex; justify-content: flex-end; align-items: center; gap: var(--ml-space-1); padding: var(--ml-space-2); }
 .ml-resource-actions button { width: var(--ml-control-height); min-width: var(--ml-control-height); padding: 0; }
 .ml-resource-body { padding: 0 var(--ml-space-3) var(--ml-space-3); }
-.ml-window .form-footer {
+.ml-item-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ml-space-3); min-width: 0; }
+.ml-item-row > img { width: var(--ml-avatar-md); height: var(--ml-avatar-md); object-fit: cover; border: 0; border-radius: var(--ml-radius-md); }
+.ml-item-row > .ml-stack { flex: 1 1 150px; min-width: 0; overflow-wrap: anywhere; }
+.ml-item-row > label { flex: 0 1 100px; min-width: 0; }
+.ml-window .form-footer,
+.ml-window .ml-page-footer {
   position: static !important;
   z-index: 10;
   flex: 0 0 auto;
@@ -143,6 +150,14 @@
   opacity: 1;
   isolation: isolate;
   box-shadow: 0 -8px 18px rgb(0 0 0 / 28%);
+}
+.ml-window .ml-page-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  margin: 0;
+  min-width: 0;
 }
 .ml-window .form-footer::before,
 .ml-window .form-footer::after { background: var(--ml-color-footer) !important; }

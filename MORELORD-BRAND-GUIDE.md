@@ -138,6 +138,14 @@ Dialog content and footer are separate layout rows:
 - Footer actions remain visible at every scroll position.
 - Content reserves no fake transparent overlay space.
 
+The same rule applies to every application page. Put page-level bottom actions in
+`<footer class="ml-page-footer ml-actions">`. Core's render hook moves that footer
+beside the `.ml-app-shell` body and provides the single page scrollbar, bottom
+spacing, and opaque footer. Form submit buttons retain their form association.
+Inline item actions remain with their item. Do not add pane scrollbars, sticky
+action overlays, or module-owned page/footer padding. Core exposes the same
+behavior as `MorelordCore.ui.applyPageLayout(application)` for custom renderers.
+
 ## Typography
 
 - Body text uses `--ml-font-family-body`.
@@ -168,6 +176,9 @@ Never use a raw red, green, amber, or blue to represent application state. Domai
 | Need | Component |
 | --- | --- |
 | Window content root | `.ml-app .ml-app-shell` |
+| Page-level bottom actions | `.ml-page-footer .ml-actions` |
+| Item image, label, and controls | `.ml-item-row` |
+| Character participation choices | `.ml-actor-choice-grid`, `.ml-actor-choice` |
 | Product/workflow header | `.ml-hero`, `.ml-hero__body`, `.ml-hero__actions` |
 | Bordered content region | `.ml-surface` |
 | Reusable interactive/content card | `.ml-card` |
@@ -231,6 +242,8 @@ Preserve module IDs, stored setting keys, flags, pack IDs, and public API identi
 Feature-module configuration should use one Configure application, with implementation settings registered using `config: false` and existing keys preserved. Core currently exposes separate account, troubleshooting, and shared Location menus, plus its usage-statistics setting. These are existing shared-service entry points; do not remove them to force a single menu. Character Export is a sheet action and Compendium is a content package, so neither needs an empty Configure application.
 
 ## Accessibility
+
+Character names in product content must be paired with their avatar. Use Core's `ml-actor-identity` / `ml-avatar` component and `ui.actorIdentity` renderer for rows, role assignments, summaries, pending checks, and results. Resolve identities by actor UUID, preserving saved names/portraits where available; missing actors use a neutral portrait. Avatars are circular (`border-radius: 50%`) with a square frame and `object-fit: cover`, and decorative beside the readable name (`alt=""`). Keep names at body size in supply manifests; use ordinary rows rather than small badges for item and character identities. Native character selectors retain their accessible text options and show the selected identity beside the control through `ui.decorateActorSelect`. Native window titles, accessibility labels, and system-owned plain-text messages remain text.
 
 - All interactive controls are keyboard reachable.
 - Focus is visibly indicated.

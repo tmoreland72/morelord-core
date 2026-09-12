@@ -1,5 +1,6 @@
-import { actorIdentity, decorateActorSelect } from "./ui/actor-identity.js";
 import { ContextualSocketService } from "./services/contextual-socket-service.js";
+import { IGNORED_USERS_SETTING, isIgnored, listUsers, activePlayerForActor } from "./services/user-service.js";
+import { IgnoredUsersApp } from "./ui/ignored-users-app.js";
 import { WindowGeometryService } from "./services/window-geometry-service.js";
 import { resolveBookLabel } from "./services/source-book-service.js";
 import { CapabilityRegistry } from "./location/capability-registry.js";
@@ -7,12 +8,17 @@ import { LocationService } from "./location/location-service.js";
 import { CAPABILITY_TIERS, SETTLEMENT_TYPES, evaluateRequirements, meetsTier } from "./location/location-domain.js";
 import { LocationManagerApp } from "./location/location-manager-app.js";
 import { renderPreservingScroll } from "./ui/scroll-preservation.js";
+import { applyPageLayout } from "./ui/page-layout.js";
+import { actorIdentity, decorateActorSelect } from "./ui/actor-identity.js";
 import { DocumentationService } from "./documentation/documentation-service.js";
 import { DocumentationApp } from "./documentation/documentation-app.js";
 import { listCharacterChoices, participantRecords, primaryPartyGroup, selectedCharacterUuids } from "./ui/actor-participation.js";
 import { actorSkillModifier, extractNaturalD20, rollSkill } from "./services/skill-roll-service.js";
+import { SUBSCRIPTION_TIERS, normalizeSubscriptionTier, capSubscriptionTier, applySubscriptionTesting } from "./services/subscription-testing.js";
 
 const MODULE_ID = "morelord-core";
+Hooks.on("renderApplicationV2", applyPageLayout);
+Hooks.on("renderApplication", applyPageLayout);
 const contextualSocket = new ContextualSocketService();
 contextualSocket.start();
 const windowGeometry = new WindowGeometryService({ moduleId: MODULE_ID, settingKey: "windowGeometry" });
@@ -31,7 +37,9 @@ const SETTINGS = Object.freeze({
   INSTALLATION_ID: "installationId",
   CONNECTION_LABEL: "connectionLabel",
   ENTITLEMENT_CACHE: "entitlementCache",
-  SHARE_USAGE: "shareUsageStatistics"
+  SHARE_USAGE: "shareUsageStatistics",
+  DEVELOPER_MODE: "developerMode",
+  DEVELOPER_TIER: "developerTier"
 });
 
 function notify(level, message) {
@@ -83,7 +91,7 @@ function isCacheUsable(entry) {
 async function refreshEntitlements(productSlug = PRODUCT_SLUG, { quiet = false } = {}) {
   // Entitlements are shared world state. Player clients consume the GM's
   // cached snapshot and must never attempt to refresh or persist it.
-  if (!game.user?.isGM) return getCache()[productSlug] ?? null;
+  if (!game.user?.isGM) return getEntitlements(productSlug);
   const token = game.settings.get(MODULE_ID, SETTINGS.TOKEN);
   if (!token) return null;
 
@@ -101,22 +109,37 @@ async function refreshEntitlements(productSlug = PRODUCT_SLUG, { quiet = false }
     const cache = getCache();
     cache[productSlug] = result;
     await setCache(cache);
-    Hooks.callAll("morelordCoreEntitlementsUpdated", productSlug, foundry.utils.deepClone(result));
-    return result;
+    const effective = getEntitlements(productSlug);
+    Hooks.callAll("morelordCoreEntitlementsUpdated", productSlug, effective);
+    return effective;
   } catch (error) {
     const cached = getCache()[productSlug];
     if (isCacheUsable(cached)) {
       if (!quiet) notify("warn", "Morelord Gaming could not be reached. Cached premium access remains available during the offline grace period.");
-      return cached;
+      return getEntitlements(productSlug);
     }
     if (!quiet) notify("error", error.message);
     return null;
   }
 }
 
-function getEntitlements(productSlug = PRODUCT_SLUG) {
+function getActualEntitlements(productSlug = PRODUCT_SLUG) {
   const entry = getCache()[productSlug];
   return isCacheUsable(entry) ? entry : null;
+}
+
+function getEntitlements(productSlug = PRODUCT_SLUG) {
+  return applySubscriptionTesting(getActualEntitlements(productSlug), {
+    enabled: game.settings.get(MODULE_ID, SETTINGS.DEVELOPER_MODE),
+    tier: game.settings.get(MODULE_ID, SETTINGS.DEVELOPER_TIER),
+    actualTier: getActualEntitlements()?.tier
+  });
+}
+
+function notifySubscriptionTestingChanged() {
+  for (const product of new Set([PRODUCT_SLUG, ...Object.keys(getCache())])) {
+    Hooks.callAll("morelordCoreEntitlementsUpdated", product, getEntitlements(product));
+  }
 }
 
 function hasFeature(featureKey, productSlug = PRODUCT_SLUG) {
@@ -294,7 +317,8 @@ class MorelordConnectionApp extends HandlebarsApplicationMixin(ApplicationV2) {
       disconnect: MorelordConnectionApp.disconnect,
       openAccount: MorelordConnectionApp.openAccount,
       saveSettings: MorelordConnectionApp.saveSettings,
-      exportDiagnostics: MorelordConnectionApp.exportDiagnostics
+      exportDiagnostics: MorelordConnectionApp.exportDiagnostics,
+      openDocumentation: MorelordConnectionApp.openDocumentation
     }
   };
 
@@ -306,12 +330,21 @@ class MorelordConnectionApp extends HandlebarsApplicationMixin(ApplicationV2) {
 
   async _prepareContext() {
     const token = game.settings.get(MODULE_ID, SETTINGS.TOKEN);
-    const core = getEntitlements(PRODUCT_SLUG);
+    const core = getActualEntitlements(PRODUCT_SLUG);
+    const actualTier = normalizeSubscriptionTier(core?.tier);
+    const developerTier = capSubscriptionTier(game.settings.get(MODULE_ID, SETTINGS.DEVELOPER_TIER), actualTier);
     return {
       connected: Boolean(token),
       connectionLabel: game.settings.get(MODULE_ID, SETTINGS.CONNECTION_LABEL),
       tier: core?.tier ?? "standard",
       features: core?.features ?? [],
+      developerMode: game.settings.get(MODULE_ID, SETTINGS.DEVELOPER_MODE),
+      effectiveTier: getTier(),
+      developerTiers: SUBSCRIPTION_TIERS.map(value => ({
+        value, label: value[0].toUpperCase() + value.slice(1),
+        selected: value === developerTier,
+        disabled: capSubscriptionTier(value, actualTier) !== value
+      })),
       validatedAt: core?.validatedAt ? new Date(core.validatedAt).toLocaleString() : null,
       expiresAt: core?.expiresAt ? new Date(core.expiresAt).toLocaleString() : null,
       activation: this.activation,
@@ -359,6 +392,7 @@ class MorelordConnectionApp extends HandlebarsApplicationMixin(ApplicationV2) {
 
   static async saveSettings(event, target) {
     event.preventDefault();
+    if (!game.user?.isGM) return;
     const form = target.closest("form") ?? this.element;
     const data = new FormData(form);
     const serverUrl = normalizeServerUrl(data.get(SETTINGS.SERVER_URL));
@@ -370,7 +404,10 @@ class MorelordConnectionApp extends HandlebarsApplicationMixin(ApplicationV2) {
     try {
       await game.settings.set(MODULE_ID, SETTINGS.SERVER_URL, serverUrl);
       await game.settings.set(MODULE_ID, SETTINGS.SHARE_USAGE, data.has(SETTINGS.SHARE_USAGE));
-      notify("info", "Morelord Core settings saved.");
+      await game.settings.set(MODULE_ID, SETTINGS.DEVELOPER_TIER,
+        capSubscriptionTier(data.get(SETTINGS.DEVELOPER_TIER), getActualEntitlements()?.tier));
+      await game.settings.set(MODULE_ID, SETTINGS.DEVELOPER_MODE, data.has(SETTINGS.DEVELOPER_MODE));
+      notify("info", "Morelord Core settings saved. Reopen module windows to update access displays.");
       this.render({ force: true });
     } finally {
       target.disabled = false;
@@ -389,9 +426,33 @@ class MorelordConnectionApp extends HandlebarsApplicationMixin(ApplicationV2) {
       target.disabled = false;
     }
   }
+
+  static openDocumentation() {
+    documentationService.register({
+      id: "morelord-core", title: "Morelord Core", icon: "fa-solid fa-link",
+      subtitle: "Shared premium access for Morelord Tools modules.",
+      sections: [
+        { id: "account", title: "Morelord Account", icon: "fa-solid fa-user", introduction: "Use this page to connect your Morelord account and review the membership and access information shared by Morelord Tools modules." },
+        { id: "diagnostics", title: "Troubleshooting", icon: "fa-solid fa-stethoscope", introduction: "Download Diagnostics creates a report for Morelord support. It includes Foundry, game system, module, browser, and graphics details. It excludes account credentials, installation and world identifiers, network addresses, users, and campaign content." }
+      ]
+    });
+    return new DocumentationApp({ productId: "morelord-core" }).render({ force: true });
+  }
 }
 
 Hooks.once("init", () => {
+  for (const [key, type, defaultValue] of [
+    [SETTINGS.DEVELOPER_MODE, Boolean, false],
+    [SETTINGS.DEVELOPER_TIER, String, "standard"]
+  ]) {
+    game.settings.register(MODULE_ID, key, {
+      scope: "world", config: false, type, default: defaultValue,
+      restricted: true, onChange: notifySubscriptionTestingChanged
+    });
+  }
+  game.settings.register(MODULE_ID, IGNORED_USERS_SETTING, {
+    scope: "world", config: false, type: Array, default: [], restricted: true
+  });
   locationService.registerSetting();
   for (const definition of [
     { id: "forge", name: "Forge" },
@@ -438,13 +499,10 @@ Hooks.once("init", () => {
     type: MorelordConnectionApp,
     restricted: true
   });
-  game.settings.registerMenu(MODULE_ID, "troubleshooting", {
-    name: "Troubleshooting",
-    label: "Open Troubleshooting",
-    hint: "Download diagnostics for Morelord support. No Morelord Gaming account or connection is required.",
-    icon: "fa-solid fa-stethoscope",
-    type: MorelordConnectionApp,
-    restricted: true
+  game.settings.registerMenu(MODULE_ID, "ignoredUsers", {
+    name: "Ignored Users", label: "Select Ignored Users",
+    hint: "Exclude accounts such as OBS from Morelord user lists and form delivery.",
+    icon: "fa-solid fa-user-slash", type: IgnoredUsersApp, restricted: true
   });
   game.settings.registerMenu(MODULE_ID, "locations", {
     name: "Morelord Locations",
@@ -454,10 +512,19 @@ Hooks.once("init", () => {
     type: LocationManagerApp,
     restricted: true
   });
+  game.settings.registerMenu(MODULE_ID, "troubleshooting", {
+    name: "Troubleshooting",
+    label: "Open Troubleshooting",
+    hint: "Download diagnostics for Morelord support. No Morelord Gaming account or connection is required.",
+    icon: "fa-solid fa-stethoscope",
+    type: MorelordConnectionApp,
+    restricted: true
+  });
 });
 
 Hooks.once("ready", async () => {
   const api = {
+    users: Object.freeze({ isIgnored, list: listUsers, activePlayerForActor }),
     designSystemVersion: "1.1.0",
     open: () => new MorelordConnectionApp().render({ force: true }),
     refresh: refreshEntitlements,
@@ -475,6 +542,7 @@ Hooks.once("ready", async () => {
     ui: Object.freeze({
       actorIdentity,
       decorateActorSelect,
+      applyPageLayout,
       renderPreservingScroll,
       participation: Object.freeze({ listCharacterChoices, participantRecords, primaryPartyGroup, selectedCharacterUuids }),
       documentation: Object.freeze({

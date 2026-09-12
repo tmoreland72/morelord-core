@@ -1,4 +1,4 @@
-export async function renderPreservingScroll(application, renderOperation, { selector = ".window-content" } = {}) {
+export async function renderPreservingScroll(application, renderOperation, { selector = ".window-content, .ml-page-body" } = {}) {
   const positions = Array.from(application.element?.querySelectorAll?.(selector) ?? [], element => ({
     key: element.dataset.mlScrollKey ?? null,
     top: element.scrollTop,

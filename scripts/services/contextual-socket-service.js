@@ -1,3 +1,5 @@
+import { isIgnored, listUsers } from "./user-service.js";
+
 class SerialExecutor {
   #tails = new Map();
 
@@ -63,15 +65,23 @@ export class ContextualSocketService {
   }
 
   async #emit(namespace, type, data, { targetUserId = null, target = "others", context = {} } = {}) {
+    if (isIgnored(game.user) || isIgnored(targetUserId)) return undefined;
     if (!this.#ready || !this.#socket) throw new Error("Morelord Core socket transport is not ready.");
     const payload = { namespace, type, data: foundry.utils.deepClone(data ?? {}), context: foundry.utils.deepClone(context ?? {}), senderUserId: game.user.id, targetUserId, target, sentAt: Date.now(), messageId: createSocketMessageId() };
     if (targetUserId) return this.#socket.executeAsUser("dispatch", targetUserId, payload);
-    if (target === "gm") return this.#socket.executeAsGM("dispatch", payload);
-    if (target === "everyone") return this.#socket.executeForEveryone("dispatch", payload);
-    return this.#socket.executeForOthers("dispatch", payload);
+    if (target === "gm") {
+      const gm = listUsers().find(user => user.active && user.isGM);
+      if (!gm) throw new Error("No active, non-ignored GM is available.");
+      return this.#socket.executeAsUser("dispatch", gm.id, payload);
+    }
+    const recipients = listUsers()
+      .filter(user => user.active && (target === "everyone" || user.id !== game.user.id))
+      .map(user => user.id);
+    return this.#socket.executeForUsers("dispatch", recipients, payload);
   }
 
   async #receive(payload) {
+    if (isIgnored(game.user) || isIgnored(payload?.senderUserId)) return undefined;
     if (!payload?.namespace || !payload?.type) return undefined;
     if (payload.targetUserId && payload.targetUserId !== game.user.id) return undefined;
     const key = `${payload.namespace}:${payload.type}`;
@@ -85,6 +95,7 @@ export class ContextualSocketService {
   }
 
   async #invoke(payload) {
+    if (isIgnored(game.user) || isIgnored(payload?.senderUserId)) return undefined;
     const registration = this.#handlers.get(`${payload.namespace}:${payload.type}`);
     if (!registration) return undefined;
     const execution = Object.freeze({ ...payload.context, namespace: payload.namespace, type: payload.type, messageId: payload.messageId, senderUserId: payload.senderUserId, targetUserId: payload.targetUserId, localUserId: game.user.id, localUserIsGM: game.user.isGM, sentAt: payload.sentAt, receivedAt: Date.now() });
