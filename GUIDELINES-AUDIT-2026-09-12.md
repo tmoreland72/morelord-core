@@ -91,7 +91,7 @@ Craftworks' [scroll-preserving-application-mixin.mjs](../morelord-craftworks/scr
 
 These are opportunities to fulfill the Core-first guideline. They are not proven drop-in replacements: Craftworks handles arbitrary nested scroll regions and deferred restoration, while Journeys also resets position between phases. Preserve those requirements, extending Core only where a demonstrated shared need exists, then remove redundant local mechanisms after live verification.
 
-Marketplace's existing [shared-component audit](../morelord-marketplace/docs/shared-component-audit.md) also records remaining nested-scroll, actor-identity, and custom-presentation work. Some findings in that older report have since changed, such as the Core minimum version; do not treat the entire historical report as current without checking it.
+Marketplace's existing [shared-component audit](../morelord-marketplace/SHARED-COMPONENT-AUDIT.md) also records remaining nested-scroll, actor-identity, and custom-presentation work. Some findings in that older report have since changed, such as the Core minimum version; do not treat the entire historical report as current without checking it.
 
 ### 6. Release and documentation safeguards are uneven
 
