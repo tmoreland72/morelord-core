@@ -166,3 +166,7 @@ Core keeps checkbox descriptions beside their controls, allowing text to wrap wi
 Settings rows use `label.ml-setting-row` with a `span` containing the label and optional `small` description, followed by the input or select. Core owns responsive control layout and checkbox alignment. Settings templates must use the full Core hero and page footer; the design-system check enforces both.
 
 The shared release validator supports required runtime files (including root main.js) and preserves numbered LevelDB transaction logs under packs/<pack>/. Stop Foundry before packaging compendium databases; ordinary diagnostic .log files remain rejected.
+
+## Shared Item rarity readers
+
+`scripts/services/item-rarity.js` exports `itemRarities(system)` and `itemRarity(system)`. They accept legacy rarity strings/choice objects and D&D 5e v6 rarity arrays/Sets without modifying data. An explicitly empty v6 collection is mundane. Single-rarity workflows use the lowest listed rarity, matching the v6 Item getter. Compendium consumers must request both `system.rarity` and `system.rarities`.
