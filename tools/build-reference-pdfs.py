@@ -1,4 +1,4 @@
-"""Render the canonical brand guide and module source manuals in Campaign Manager style.
+"""Render the canonical brand guide and module source manuals in the shared Morelord document style.
 
 Usage: python tools/build-reference-pdfs.py --node PATH --marked PATH
 Requires ReportLab, Pillow, pypdf, and the marked Node package.
@@ -214,7 +214,7 @@ def build(name,title,files,brand=False):
         m=json.loads((files[0].parent/'module.json').read_text(encoding='utf-8-sig'))
         story.append(para('Local manifest version: <b>'+esc(m['version'])+'</b>. This PDF collects the source documents listed below. Original manual version labels are preserved; older manuals may not cover newer README changes. This conversion does not establish current public release availability.'))
         story.append(table([[para('<b>Included source</b>','cell'),para('<b>Document</b>','cell')]]+[[para(esc(str(p.relative_to(ROOT.parent)).replace('\\','/')),'cell'),para(esc(next((x['text'] for x in lex(p) if x['type']=='heading'),p.stem)),'cell')] for p in files],[WIDTH*.5,WIDTH*.5]))
-    story.append(Spacer(1,12));story.append(para('Prepared in the visual style of the Campaign Manager Product Summary v1.4 and Product and Development Plan v1.0. Use PDF bookmarks to navigate sections.','small'))
+    story.append(Spacer(1,12));story.append(para('Prepared in the shared Morelord document style. Use PDF bookmarks to navigate sections.','small'))
     for path in files:
         story.append(PageBreak())
         ts=lex(path)
@@ -252,7 +252,7 @@ def export_foundry_descriptions():
         target.write_text(listing+'\n',encoding='utf-8')
         files.append(target.name)
     if len(files)!=8: raise ValueError(f'Expected eight HTML descriptions, found {len(files)}')
-    (folder/'README.md').write_text('# Foundry HTML descriptions\n\nCopy the contents of a module HTML file into the Foundry description editor\'s HTML/source view. Each fragment is generated from the Foundry Description section in `../../MORELORD-BRAND-GUIDE.md`; edit that source and rebuild to keep the document and snippets synchronized.\n\nBoth the PDF and Markdown show literal HTML code with visible tags. These files contain the same HTML without code fences for direct reuse. No package manifest or public listing has been changed. Compendium is a draft for the existing v13 content package; confirm its distribution scope before public use. Campaign Manager is planned and has no installable Foundry listing.\n\n'+''.join('- ['+f+']('+f+')\n' for f in files),encoding='utf-8')
+    (folder/'README.md').write_text('# Foundry HTML descriptions\n\nCopy the contents of a module HTML file into the Foundry description editor\'s HTML/source view. Each fragment is generated from the Foundry Description section in `../../MORELORD-BRAND-GUIDE.md`; edit that source and rebuild to keep the document and snippets synchronized.\n\nBoth the PDF and Markdown show literal HTML code with visible tags. These files contain the same HTML without code fences for direct reuse. No package manifest or public listing has been changed. Compendium is a draft for the existing v13 content package; confirm its distribution scope before public use.\n\n'+''.join('- ['+f+']('+f+')\n' for f in files),encoding='utf-8')
 
 export_foundry_descriptions()
 items=[build('Morelord-Branding-Guide.pdf','Morelord Branding Guide',[ROOT/'MORELORD-BRAND-GUIDE.md'],True)]

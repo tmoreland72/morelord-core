@@ -1,8 +1,8 @@
 # Morelord PDF reference library
 
-Generated September 7, 2026 in the style of the Campaign Manager Product Summary v1.4 and Product and Development Plan v1.0: Arial, US Letter, white pages, pale-blue table headers, muted running labels, and numbered pages.
+Generated September 7, 2026 using the shared Morelord document style: Arial, US Letter, white pages, pale-blue table headers, muted running labels, and numbered pages.
 
-- [Consolidated branding guide](Morelord-Branding-Guide-v2.2.pdf): identity, product inventory, UI contract, marketing copy, and governance for all nine reviewed Morelord folders.
+- [Consolidated branding guide](Morelord-Branding-Guide-v2.2.pdf): identity, product inventory, UI contract, marketing copy, and governance for all eight reviewed Morelord folders.
 - [Core reference](Morelord-Core-Reference.pdf): README and GM Product Guide.
 - [Character Export reference](Morelord-Character-Export-Reference.pdf): README, usage, export format, and release instructions.
 - [Craftworks reference](Morelord-Craftworks-Reference.pdf): README, User Guide, documentation landing page, GM manual, and player manual.
@@ -15,6 +15,6 @@ The branding guide is updated and consolidated. The module PDFs are conversions 
 
 Branding guide v2.2 uses a top-level Suite Copy section with module headings beneath it and regular body paragraphs throughout the copy. Each installed module has a literal Foundry HTML code block; matching [HTML fragments](../foundry-descriptions/README.md) can be copied directly into a listing editor. Use the builder's `--brand-only` option to refresh the guide and fragments without re-exporting module manuals.
 
-Compendium has no README or user guide in the reviewed folder; its manifest-level role and compatibility are included in the branding guide. Campaign Manager's existing planning PDFs already use the requested styling. Historical release notes, architecture audits, development plans, and content-pack format references are outside this user/GM reference collection.
+Compendium has no README or user guide in the reviewed folder; its manifest-level role and compatibility are included in the branding guide. Historical release notes, architecture audits, development plans, and content-pack format references are outside this user/GM reference collection.
 
 Edit `../../MORELORD-BRAND-GUIDE.md` for future brand changes. `../../MORELORD-MARKETING-BRANDING.md` is a compatibility redirect. Regenerate this library with `../../tools/build-reference-pdfs.py`, passing `--node` and `--marked` paths for the available Node runtime and marked package. The builder requires Python packages ReportLab, Pillow, and pypdf, and Windows Arial fonts. `build-manifest.json` records the complete source inventory and output page counts. Re-render and visually review PDFs after regeneration.

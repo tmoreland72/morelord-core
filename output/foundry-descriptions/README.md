@@ -2,7 +2,7 @@
 
 Copy the contents of a module HTML file into the Foundry description editor's HTML/source view. Each fragment is generated from the Foundry Description section in `../../MORELORD-BRAND-GUIDE.md`; edit that source and rebuild to keep the document and snippets synchronized.
 
-Both the PDF and Markdown show literal HTML code with visible tags. These files contain the same HTML without code fences for direct reuse. No package manifest or public listing has been changed. Compendium is a draft for the existing v13 content package; confirm its distribution scope before public use. Campaign Manager is planned and has no installable Foundry listing.
+Both the PDF and Markdown show literal HTML code with visible tags. These files contain the same HTML without code fences for direct reuse. No package manifest or public listing has been changed. Compendium is a draft for the existing v13 content package; confirm its distribution scope before public use.
 
 - [morelord-marketplace.html](morelord-marketplace.html)
 - [morelord-journeys.html](morelord-journeys.html)

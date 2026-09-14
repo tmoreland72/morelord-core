@@ -4,7 +4,7 @@ Version 2.2 | September 7, 2026 | Consolidated brand, product UI, and marketing 
 
 This is the canonical guide for Morelord Gaming's product identity, shared Foundry interface, and channel copy. It supersedes the separate Product UI Brand Guide and Marketing & Branding Guide. Use this editable Markdown as the source for the matching PDF.
 
-The September 2026 review covers all nine local Morelord folders. Product claims below describe the inspected local manifests, READMEs, manuals, and selected implementation files. Local version numbers do not establish public release availability. Campaign Manager remains a proposal; Compendium has a separate legacy compatibility baseline.
+The September 2026 review covers all eight local Morelord folders. Product claims below describe the inspected local manifests, READMEs, manuals, and selected implementation files. Local version numbers do not establish public release availability. Compendium has a separate legacy compatibility baseline.
 
 ## Brand architecture and naming
 
@@ -12,7 +12,7 @@ The September 2026 review covers all nine local Morelord folders. Product claims
 - Use each full product name on first mention; the short product name is appropriate afterward.
 - Use **Morelord Tools** where it names an existing access product. Preserve **Standard**, **Premium**, and **Champion** access labels without inventing new bundles or prices.
 - Keep package IDs, stored keys, APIs, and filenames stable. Display-name cleanup does not authorize a data migration.
-- Character Manager is the destination named by Character Export documentation. It is not another installed module in this inventory, and it must not be silently renamed Campaign Manager.
+- Character Manager is the destination named by Character Export documentation. It is not another installed module in this inventory.
 - Use existing approved artwork when supplied. These sources do not define a master logo, logo clear space, or a licensed marketing font; do not invent those as established brand rules.
 
 ## Reviewed product inventory
@@ -27,7 +27,6 @@ The September 2026 review covers all nine local Morelord folders. Product claims
 | Morelord Encounters | 0.1.9 | Generated, custom, and supported published encounter rosters. |
 | Morelord Journeys | 0.3.1 | Persistent travel, expedition supplies, camp, and optional integrations. |
 | Morelord Marketplace | 0.9.2 | Catalog, Buy/Sell carts, approvals, and Premium scene-shop management. |
-| Morelord Campaign Manager | Planning only | Product Summary v1.4 and Development Plan v1.0; no module manifest in the reviewed folder. |
 
 ## Compatibility and dependency snapshot
 
@@ -43,13 +42,12 @@ Read the actual package manifest before publishing installation requirements. De
 | Encounters | 14 only; verified 14.365 | dnd5e 5.3+; Core 0.1.0+ |
 | Journeys | 14 only; verified 14.365 | dnd5e 5.3+; Core 0.3.0+ |
 | Marketplace | Minimum/verified 14 | Core 0.1.0+; README specifies a compatible dnd5e system, without a manifest system minimum |
-| Campaign Manager | Not established | Proposed website workspace and Foundry integration; no installable package claim |
 
 Downtime recommends Journeys, Craftworks, and Marketplace. Journeys recommends Encounters in its manifest and documents an optional Craftworks integration. Optional integrations must not be presented as universal prerequisites. System-neutral internals do not establish support for every game system.
 
 ## PDF and document visual standard
 
-Match the Campaign Manager Product Summary v1.4 and Product and Development Plan v1.0: US Letter portrait, white paper, black Arial body text, generous margins, bold section headings, muted blue-gray running labels, and right-aligned page numbers. Use approximately 10.5 pt body text, 27 pt cover titles, 18 pt section headings, and 12 pt subheadings. Tables use pale-blue headers and alternating very light blue rows, with wrapped text and repeated headers over page breaks.
+Use the shared Morelord document style: US Letter portrait, white paper, black Arial body text, generous margins, bold section headings, muted blue-gray running labels, and right-aligned page numbers. Use approximately 10.5 pt body text, 27 pt cover titles, 18 pt section headings, and 12 pt subheadings. Tables use pale-blue headers and alternating very light blue rows, with wrapped text and repeated headers over page breaks.
 
 Keep headings with their following text. Preserve searchable text, useful links, figure proportions, and source/version notes. The document palette is for readable print; application windows continue to use Core's theme-aware tokens.
 
@@ -229,7 +227,6 @@ Use readable feature prefixes:
 - `ml-encounters-*`
 - `ml-downtime-*`
 - `ml-character-export-*` for new exporter-owned UI
-- `ml-campaign-manager-*` for future Foundry bridge UI; website styling follows its own implementation
 
 Core-owned cross-suite components, such as the existing `ml-location-manager-*`, retain their shared namespaces. Compendium content does not need an application shell unless it adds a custom application.
 
@@ -312,7 +309,7 @@ Use the shared body paragraph style for all copy below. Reserve bold for heading
 
 ## Morelord Gaming suite
 
-The Foundry Description under each module is complete HTML listing copy. Both the PDF and Markdown show literal HTML source code, including tags. Copy the code into the Foundry description editor in HTML/source mode. Matching `.html` files are provided in `output/foundry-descriptions/` for direct copying. These are editorial deliverables; package manifests are not changed. Campaign Manager remains planned and has no installable Foundry description.
+The Foundry Description under each module is complete HTML listing copy. Both the PDF and Markdown show literal HTML source code, including tags. Copy the code into the Foundry description editor in HTML/source mode. Matching `.html` files are provided in `output/foundry-descriptions/` for direct copying. These are editorial deliverables; package manifests are not changed.
 
 
 ### Micro — up to 80 characters
@@ -763,20 +760,6 @@ This is a manifest-level description. Its manifest declares Foundry 13 as minimu
 
 Editorial status: content-package description draft. Confirm distribution scope before using it as a public listing.
 
-## Morelord Campaign Manager - planned product
-
-### Proposed hook
-
-Keep the campaign's story connected from preparation to play.
-
-### Planning copy
-
-Morelord Campaign Manager is a proposed campaign workspace that would connect adventure sources, character context, session notes, and GM-reviewed campaign records. The planned experience combines source-backed chat and proposed changes with explicit GM approval, read-only player views, and Foundry encounter requests.
-
-The current baseline is Product Summary v1.4 and Development Plan v1.0. The website is proposed to own contextual records and approved history; Foundry owns mechanics and live play. Core transport, encounter requests, supported imports, and campaign identity mapping still require implementation evidence. Planned BYO-AI, pricing, cost estimates, and delivery schedules are not available-product claims.
-
-Use a roadmap or product-review context. Do not use an Install CTA, package description, release announcement, or unqualified capability promise until a release establishes them.
-
 # Channel templates
 
 ### Foundry package listing
@@ -880,16 +863,15 @@ Organize Sessions and Projects with Downtime. Plan the road with Journeys, popul
 - Channel templates are editorial instructions, not finished public copy. Insert verified destination links and final timestamps before publishing; never publish template fields.
 - The reviewed working copies are evidence of local implementation, not proof of public release availability. Confirm release status separately.
 - Do not imply Premium includes third-party source books; users need the relevant installed content.
-- Keep Campaign Manager in planned-product language until its release is verified.
 - Character Export has no declared Core dependency. Do not claim every Morelord package requires an account connection.
 
 # Evidence and maintenance
 
-Reviewed September 7, 2026: all eight module manifests; the seven available root READMEs; Core's GM Product Guide, token CSS, shared-service registration, and design-system checker; Craftworks and Marketplace user/GM documentation; Journeys travel documentation; Encounters GM manual; Downtime's current implementation description; and Campaign Manager's Product Summary v1.4 and Development Plan v1.0.
+Reviewed September 7, 2026: all eight module manifests; the seven available root READMEs; Core's GM Product Guide, token CSS, shared-service registration, and design-system checker; Craftworks and Marketplace user/GM documentation; Journeys travel documentation; Encounters GM manual; and Downtime's current implementation description.
 
 The module reference PDFs preserve source-document version labels. Some manuals predate the local manifest: for example, Craftworks manuals identify 0.4.4 and Marketplace manuals identify 0.6.0. They are reference snapshots, not newly validated manuals for every current workflow. Use the current README and this inventory to understand newer changes, and refresh manuals as part of the next release.
 
-Known documentation differences resolved for branding: Core's older account-only description omitted shared services; Encounters copy omitted custom and published encounters; the prior guide omitted Downtime and Character Export; the Marketplace README's old family list still mentions Drakkenheim Harvesting and Character Manager. Those historical names do not define the current nine-folder inventory.
+Known documentation differences resolved for branding: Core's older account-only description omitted shared services; Encounters copy omitted custom and published encounters; the prior guide omitted Downtime and Character Export; the Marketplace README's old family list still mentions Drakkenheim Harvesting and Character Manager. Those historical names do not define the current eight-folder inventory.
 
 Maintain one canonical guide. Update its inventory, requirements, product copy, and access claims together when a release changes them; regenerate the PDF and visually verify every page. The legacy marketing file is a redirect, not a second source of truth.
 # Page sections

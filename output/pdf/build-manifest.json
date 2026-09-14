@@ -1,14 +1,14 @@
 [
   {
-    "file": "Morelord-Branding-Guide-v2.2.pdf",
-    "pages": 34,
+    "file": "Morelord-Branding-Guide.pdf",
+    "pages": 35,
     "sources": [
       "morelord-core/MORELORD-BRAND-GUIDE.md"
     ]
   },
   {
     "file": "Morelord-Core-Reference.pdf",
-    "pages": 7,
+    "pages": 8,
     "sources": [
       "morelord-core/README.md",
       "morelord-core/CORE-GM-PRODUCT-GUIDE.md"
@@ -16,14 +16,14 @@
   },
   {
     "file": "Morelord-Character-Export-Reference.pdf",
-    "pages": 4,
+    "pages": 5,
     "sources": [
       "morelord-character-export/README.md"
     ]
   },
   {
     "file": "Morelord-Craftworks-Reference.pdf",
-    "pages": 79,
+    "pages": 66,
     "sources": [
       "morelord-craftworks/README.md",
       "morelord-craftworks/USER-GUIDE.md",
@@ -41,7 +41,7 @@
   },
   {
     "file": "Morelord-Encounters-Reference.pdf",
-    "pages": 8,
+    "pages": 9,
     "sources": [
       "morelord-encounters/README.md",
       "morelord-encounters/docs/README.md",
@@ -50,7 +50,7 @@
   },
   {
     "file": "Morelord-Journeys-Reference.pdf",
-    "pages": 20,
+    "pages": 21,
     "sources": [
       "morelord-journeys/README.md",
       "morelord-journeys/docs/README.md",
