@@ -1,13 +1,25 @@
-function characterMembers(group) {
-  const direct = Array.from(group?.system?.playerCharacters ?? []).filter(actor => actor?.type === "character");
-  if (direct.length) return direct;
-  return Array.from(group?.system?.members ?? []).map(member => member?.actor ?? member).filter(actor => actor?.type === "character");
+function characterMembers(group, actors) {
+  const resolve = member => {
+    const candidate = member?.actor ?? member;
+    if (candidate?.type === "character") return candidate;
+    const id = typeof candidate === "string" ? candidate : candidate?.actorUuid ?? candidate?.uuid ?? candidate?.actorId ?? candidate?.id ?? candidate?._id;
+    return Array.from(actors ?? []).find(actor => actor.type === "character" && (actor.uuid === id || actor.id === id));
+  };
+  return [...(group?.system?.playerCharacters ?? []), ...(group?.system?.members ?? [])].map(resolve).filter(Boolean);
 }
 
 export function primaryPartyGroup(actors = game.actors) {
   const groups = Array.from(actors ?? []).filter(actor => actor.type === "group");
   const ordered = [actors?.party, ...groups].filter((group, index, entries) => group && entries.indexOf(group) === index);
-  return ordered.find(group => characterMembers(group).length) ?? null;
+  return ordered.find(group => characterMembers(group, actors).length) ?? null;
+}
+
+export function listCharacterActors({ ownedOnly = false, defaultParty = true, actors = game.actors } = {}) {
+  const party = defaultParty ? primaryPartyGroup(actors) : null;
+  const candidates = [...characterMembers(party, actors), ...Array.from(actors ?? []).filter(actor => actor.type === "character" && actor.hasPlayerOwner)];
+  return [...new Map(candidates.map(actor => [actor.uuid, actor])).values()]
+    .filter(actor => !ownedOnly || actor.isOwner)
+    .sort((left, right) => left.name.localeCompare(right.name));
 }
 
 /** Shared character participation model for Morelord workflows. */
@@ -15,14 +27,8 @@ export function listCharacterChoices({ selectedUuids = null, ownedOnly = false, 
   const explicitSelection = selectedUuids !== null;
   const selected = new Set(Array.from(selectedUuids ?? [], String));
   const party = defaultParty ? primaryPartyGroup(actors) : null;
-  const partyMemberUuids = new Set(characterMembers(party).map(actor => actor.uuid));
-  const candidates = new Map();
-  for (const actor of characterMembers(party)) candidates.set(actor.uuid, actor);
-  for (const actor of Array.from(actors ?? []).filter(actor => actor.type === "character" && actor.hasPlayerOwner)) candidates.set(actor.uuid, actor);
-  for (const actor of Array.from(actors ?? []).filter(actor => actor.type === "character" && selected.has(actor.uuid))) candidates.set(actor.uuid, actor);
-  if (ownedOnly) for (const [uuid, actor] of candidates) if (!actor.isOwner) candidates.delete(uuid);
-  return Array.from(candidates.values())
-    .sort((left, right) => left.name.localeCompare(right.name))
+  const partyMemberUuids = new Set(characterMembers(party, actors).map(actor => actor.uuid));
+  return listCharacterActors({ ownedOnly, defaultParty, actors })
     .map(actor => ({
       uuid: actor.uuid,
       name: actor.name,

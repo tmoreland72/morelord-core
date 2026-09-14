@@ -27,6 +27,9 @@ const PROTECTED = [
   "section",
   "section-heading",
   "card",
+  "card__body",
+  "card__summary",
+  "card__footer",
   "dialog-shell",
   "hero",
   "actions",
@@ -39,6 +42,7 @@ const PROTECTED = [
   "empty-state",
   "empty-message",
   "settings-section",
+  "setting-row",
   "access-card",
   "choice-card",
   "actor-identity",
@@ -123,6 +127,11 @@ for (const root of roots) {
       failures.push(`${file}:${line}: Morelord chat-card roots must include ml-chat-card`);
     }
     if (/\.(?:hbs|html)$/.test(file)) {
+      if (/[\\/]templates[\\/][^\\/]*settings\.hbs$/.test(file)) {
+        const hero = text.match(/<header\b[^>]*class=["'][^"']*\bml-hero\b[^"']*["'][^>]*>[\s\S]*?<\/header>/)?.[0] ?? "";
+        if (!["ml-hero__icon", "ml-hero__body", "<h1", "<p"].every(part => hero.includes(part))) failures.push(`${file}: settings pages require the complete Core hero (icon, body, title, description)`);
+        if (!/<footer\b[^>]*class=["'][^"']*\bml-page-footer\b[^"']*["']/.test(text)) failures.push(`${file}: settings pages require the Core page footer`);
+      }
       if (/\.hbs$/.test(file) && /[\\/]chat[\\/]/.test(file)) {
         const firstElement = text.match(/<(?:div|section|form|article)\b[^>]*>/i);
         if (firstElement && !/\bml-chat-card\b/.test(firstElement[0])) {

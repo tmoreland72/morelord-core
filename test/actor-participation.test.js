@@ -32,3 +32,15 @@ test("an explicit saved selection overrides party defaults", () => {
   const choices = listCharacterChoices({ actors, selectedUuids: [outsider.uuid] });
   assert.deepEqual(choices.filter(choice => choice.checked).map(choice => choice.uuid), ["Actor.Outsider"]);
 });
+
+
+test("eligible choices combine player ownership with resolved party membership", () => {
+  const owned = character("Owned");
+  const member = character("Member", { player: false });
+  const excluded = character("Excluded", { player: false });
+  const party = { type: "group", system: { members: [{ uuid: member.uuid }, { actor: owned }] } };
+  const actors = [party, owned, member, excluded]; actors.party = party;
+  assert.deepEqual(listCharacterChoices({ actors }).map(choice => choice.uuid), [member.uuid, owned.uuid]);
+  assert.deepEqual(listCharacterChoices({ actors, ownedOnly: true }).map(choice => choice.uuid), [owned.uuid]);
+  assert.deepEqual(listCharacterChoices({ actors, selectedUuids: [excluded.uuid] }).filter(choice => choice.checked), []);
+});

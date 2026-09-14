@@ -1,13 +1,13 @@
-<div class="ml-app-shell">
-  <p>Ignore recording or observer accounts in Morelord user lists and form delivery. Their Foundry permissions are unchanged.</p>
-  <fieldset>
+<div class="ml-app ml-app-shell">
+  <header class="ml-hero"><i class="fa-solid fa-user-slash ml-hero__icon"></i><div class="ml-hero__body"><h1>Ignored Users</h1><p>Exclude recording or observer accounts from Morelord user lists and form delivery.</p></div></header>
+  <fieldset class="ml-field-group">
     <legend>Ignored users</legend>
     {{#each users}}
-    <label class="form-group">
+    <label class="ml-check">
       <span>{{name}}</span>
       <input type="checkbox" name="ignoredUserIds" value="{{id}}" {{checked ignored}}>
     </label>
     {{/each}}
   </fieldset>
-  <button type="submit"><i class="fa-solid fa-save"></i> Save</button>
+  <footer class="ml-page-footer ml-actions"><button type="submit"><i class="fa-solid fa-save"></i> Save</button></footer>
 </div>

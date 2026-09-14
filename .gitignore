@@ -2,3 +2,6 @@
 *.zip
 .release-*
 .env
+
+# Local document render previews
+/tmp/

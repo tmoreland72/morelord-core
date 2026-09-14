@@ -1,0 +1,29 @@
+<div class="ml-app ml-app-shell ml-stack" data-gap="4">
+  <header class="ml-hero">
+    <i class="fa-solid fa-file-export ml-hero__icon"></i>
+    <div class="ml-hero__body">
+      <h1>Morelord Settings</h1>
+      <p>Save or restore configuration across your Morelord modules.</p>
+    </div>
+  </header>
+  <section class="ml-surface ml-stack">
+    <div class="ml-section-heading"><div>
+      <h2>Included Configuration</h2>
+      <p>World settings and this browser’s preferences for enabled modules. Account credentials, campaign records, and window positions are excluded.</p>
+    </div></div>
+    {{#each modules}}
+      <div class="ml-item-row"><strong>{{name}}</strong><span>{{count}} settings</span></div>
+    {{else}}<p>No module configuration is available.</p>{{/each}}
+  </section>
+  <section class="ml-surface ml-stack">
+    <div class="ml-section-heading"><div>
+      <h2>Import Configuration</h2>
+      <p>Matching settings will be replaced. Missing or disabled modules and unknown settings are skipped. Actor and user references retain their original IDs.</p>
+    </div></div>
+    <label><span>Settings File</span><input type="file" name="configurationFile" accept=".json,application/json"></label>
+  </section>
+  <footer class="ml-page-footer ml-actions">
+    <button type="button" data-action="exportSettings"><i class="fa-solid fa-file-export"></i> Export Settings</button>
+    <button type="button" data-action="importSettings"><i class="fa-solid fa-file-import"></i> Import Settings</button>
+  </footer>
+</div>

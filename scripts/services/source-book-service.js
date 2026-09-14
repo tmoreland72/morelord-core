@@ -23,6 +23,37 @@ function localized(value, i18n) {
   return i18n?.localize?.(value) || String(value);
 }
 
+/** Label a source choice using its book, declared adventure folder, and pack title. */
+export function resolvePackLabel({ pack, packageCollection = game.modules, system = game.system, i18n = game.i18n, ...options } = {}) {
+  const collection = pack?.collection ?? "";
+  const packageName = pack?.metadata?.packageName ?? pack?.metadata?.package ?? collection.split(".")[0];
+  const owner = packageCollection?.get?.(packageName);
+  const packName = pack?.metadata?.name ?? collection.slice(collection.indexOf(".") + 1);
+  const findFolder = folders => {
+    for (const folder of folders ?? []) {
+      const nested = findFolder(folder.folders);
+      if (nested) return nested;
+      if (folder.packs?.some(id => id === packName || id === collection)) return localized(folder.name, i18n);
+    }
+    return "";
+  };
+  const book = resolveBookLabel({ ...options, pack, packageCollection, system, i18n });
+  const source = book !== "Unknown Source" ? book : pack?.metadata?.packageType === "world" ? "Current world" : packageName === system?.id ? system.title : packageName;
+  const folder = findFolder(owner?.packFolders);
+  const label = localized(pack?.title || pack?.metadata?.label || collection, i18n);
+  const generic = value => GENERIC_LABELS.test(value) || /^(?:bestiary|journal entries)$/i.test(value);
+  const normalized = value => String(value).toLowerCase().replace(/[’‘]/g, "'").replace(/[^a-z0-9]+/g, " ").trim();
+  const titles = [];
+  for (const part of [source, folder, label].filter(Boolean)) {
+    if (part !== source && generic(part)) continue;
+    const key = normalized(part);
+    if (titles.some(title => (` ${normalized(title)} `).includes(` ${key} `))) continue;
+    titles.push(part);
+  }
+  const type = generic(label) ? label : ({Actor: "Actors", JournalEntry: "Journals", Adventure: "Adventure"}[pack?.documentName ?? pack?.metadata?.type] ?? "");
+  return titles.join(" — ") + (type ? ` (${type})` : "");
+}
+
 /** Resolve a human-facing source-book name without exposing generic pack labels. */
 export function resolveBookLabel({ book = "", custom = "", pack = null, packageCollection = game.modules, system = game.system, config = globalThis.CONFIG, i18n = game.i18n } = {}) {
   const collection = pack?.collection ?? "";

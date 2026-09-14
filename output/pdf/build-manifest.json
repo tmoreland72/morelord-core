@@ -1,14 +1,14 @@
 [
   {
     "file": "Morelord-Branding-Guide.pdf",
-    "pages": 35,
+    "pages": 36,
     "sources": [
       "morelord-core/MORELORD-BRAND-GUIDE.md"
     ]
   },
   {
     "file": "Morelord-Core-Reference.pdf",
-    "pages": 8,
+    "pages": 10,
     "sources": [
       "morelord-core/README.md",
       "morelord-core/CORE-GM-PRODUCT-GUIDE.md"

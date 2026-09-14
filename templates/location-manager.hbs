@@ -1,8 +1,8 @@
-<div class="ml-app ml-location-manager__layout">
+<div class="ml-app ml-app-shell ml-location-manager__layout">
   <aside class="ml-location-manager__sidebar ml-stack" data-gap="2">
     <div class="ml-cluster ml-location-manager__sidebar-heading">
       <h2><i class="fa-solid fa-map-location-dot"></i> Locations</h2>
-      <button type="button" class="ml-button ml-button--icon" data-action="create" title="Create Location" aria-label="Create Location">
+      <button type="button" class="ml-icon-button" data-action="create" title="Create Location" aria-label="Create Location">
         <i class="fa-solid fa-plus"></i>
       </button>
     </div>
@@ -65,7 +65,7 @@
             <label><span>Tier</span><select name="capabilities.{{@index}}.tier">{{selectOptions ../capabilityTiers selected=tier}}</select></label>
             <label><span>Specialty</span><input type="text" name="capabilities.{{@index}}.specialty" value="{{specialty}}" placeholder="Optional"></label>
             <label><span>Source</span><input type="text" name="capabilities.{{@index}}.source" value="{{source}}" placeholder="Optional"></label>
-            <button type="button" class="ml-button ml-button--icon" data-tone="danger" data-action="removeCapability" data-index="{{@index}}" title="Remove Capability" aria-label="Remove Capability"><i class="fa-solid fa-trash"></i></button>
+            <button type="button" class="ml-icon-button" data-action="removeCapability" data-index="{{@index}}" title="Remove Capability" aria-label="Remove Capability"><i class="fa-solid fa-trash"></i></button>
           </div>
         {{else}}
           <p class="notes">This location currently provides no registered capabilities.</p>
@@ -88,16 +88,16 @@
         {{else}}<p class="notes">This world has no Scenes.</p>{{/if}}
       </section>
 
-      <footer class="ml-actions">
+      <footer class="ml-page-footer ml-actions">
         <button type="button" data-action="save"><i class="fa-solid fa-floppy-disk"></i> Save Location</button>
-        {{#if isExisting}}<button type="button" class="ml-button" data-tone="danger" data-action="delete"><i class="fa-solid fa-trash"></i> Delete</button>{{/if}}
+        {{#if isExisting}}<button type="button" data-action="delete"><i class="fa-solid fa-trash"></i> Delete</button>{{/if}}
       </footer>
     {{else}}
       <div class="ml-empty-state ml-location-manager__welcome">
         <i class="fa-solid fa-map-location-dot"></i>
         <h2>Shared Morelord Locations</h2>
         <p>Create a location to define its settlement type, capabilities, and associated Scenes.</p>
-        <button type="button" data-action="create"><i class="fa-solid fa-plus"></i> Create First Location</button>
+        <footer class="ml-page-footer ml-actions"><button type="button" data-action="create"><i class="fa-solid fa-plus"></i> Create First Location</button></footer>
       </div>
     {{/if}}
   </main>

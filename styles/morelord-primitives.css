@@ -94,6 +94,7 @@
 .ml-stack[data-gap="4"] { gap: var(--ml-space-4); }
 .ml-cluster { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ml-space-2); }
 .ml-grid { display: grid; gap: var(--ml-space-3); }
+.ml-grid > * { min-width: 0; }
 .ml-grid[data-columns="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .ml-grid[data-columns="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .ml-grid[data-columns="4"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -118,6 +119,11 @@
   color: var(--ml-color-text);
 }
 .ml-window .window-content select { color-scheme: dark; }
+.ml-window .window-content select[multiple] { height: auto; }
+.ml-window .window-content select[multiple] option:checked {
+  background: var(--ml-color-accent);
+  color: var(--ml-color-on-accent);
+}
 .ml-window .window-content select option:disabled { color: var(--ml-color-muted); }
 .ml-window .window-content button {
   min-height: var(--ml-control-height);

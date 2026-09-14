@@ -1,24 +1,31 @@
+import { SettingsTransferApp } from "./ui/settings-transfer-app.js";
 import { ContextualSocketService } from "./services/contextual-socket-service.js";
 import { IGNORED_USERS_SETTING, isIgnored, listUsers, activePlayerForActor } from "./services/user-service.js";
 import { IgnoredUsersApp } from "./ui/ignored-users-app.js";
 import { WindowGeometryService } from "./services/window-geometry-service.js";
-import { resolveBookLabel } from "./services/source-book-service.js";
+import { resolveBookLabel, resolvePackLabel } from "./services/source-book-service.js";
 import { CapabilityRegistry } from "./location/capability-registry.js";
 import { LocationService } from "./location/location-service.js";
 import { CAPABILITY_TIERS, SETTLEMENT_TYPES, evaluateRequirements, meetsTier } from "./location/location-domain.js";
 import { LocationManagerApp } from "./location/location-manager-app.js";
 import { renderPreservingScroll } from "./ui/scroll-preservation.js";
 import { applyPageLayout } from "./ui/page-layout.js";
+import { activateCardSelection } from "./ui/card-selection.js";
+import { activateCollapsibleSections, createCollapsibleSection } from "./ui/collapsible-section.js";
 import { actorIdentity, decorateActorSelect } from "./ui/actor-identity.js";
 import { DocumentationService } from "./documentation/documentation-service.js";
 import { DocumentationApp } from "./documentation/documentation-app.js";
-import { listCharacterChoices, participantRecords, primaryPartyGroup, selectedCharacterUuids } from "./ui/actor-participation.js";
+import { listCharacterActors, listCharacterChoices, participantRecords, primaryPartyGroup, selectedCharacterUuids } from "./ui/actor-participation.js";
 import { actorSkillModifier, extractNaturalD20, rollSkill } from "./services/skill-roll-service.js";
 import { SUBSCRIPTION_TIERS, normalizeSubscriptionTier, capSubscriptionTier, applySubscriptionTesting } from "./services/subscription-testing.js";
 
 const MODULE_ID = "morelord-core";
 Hooks.on("renderApplicationV2", applyPageLayout);
 Hooks.on("renderApplication", applyPageLayout);
+Hooks.on("renderApplicationV2", activateCardSelection);
+Hooks.on("renderApplication", activateCardSelection);
+Hooks.on("renderApplicationV2", activateCollapsibleSections);
+Hooks.on("renderApplication", activateCollapsibleSections);
 const contextualSocket = new ContextualSocketService();
 contextualSocket.start();
 const windowGeometry = new WindowGeometryService({ moduleId: MODULE_ID, settingKey: "windowGeometry" });
@@ -317,7 +324,6 @@ class MorelordConnectionApp extends HandlebarsApplicationMixin(ApplicationV2) {
       disconnect: MorelordConnectionApp.disconnect,
       openAccount: MorelordConnectionApp.openAccount,
       saveSettings: MorelordConnectionApp.saveSettings,
-      exportDiagnostics: MorelordConnectionApp.exportDiagnostics,
       openDocumentation: MorelordConnectionApp.openDocumentation
     }
   };
@@ -415,15 +421,15 @@ class MorelordConnectionApp extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   static exportDiagnostics(event, target) {
-    event.preventDefault();
-    target.disabled = true;
+    event?.preventDefault();
+    if (target) target.disabled = true;
     try {
       exportDiagnostics();
       notify("info", "Morelord diagnostics downloaded. Attach the JSON file to your support report.");
     } catch (error) {
       notify("error", `Could not export diagnostics: ${error.message}`);
     } finally {
-      target.disabled = false;
+      if (target) target.disabled = false;
     }
   }
 
@@ -433,10 +439,18 @@ class MorelordConnectionApp extends HandlebarsApplicationMixin(ApplicationV2) {
       subtitle: "Shared premium access for Morelord Tools modules.",
       sections: [
         { id: "account", title: "Morelord Account", icon: "fa-solid fa-user", introduction: "Use this page to connect your Morelord account and review the membership and access information shared by Morelord Tools modules." },
-        { id: "diagnostics", title: "Troubleshooting", icon: "fa-solid fa-stethoscope", introduction: "Download Diagnostics creates a report for Morelord support. It includes Foundry, game system, module, browser, and graphics details. It excludes account credentials, installation and world identifiers, network addresses, users, and campaign content." }
+        { id: "diagnostics", title: "Troubleshooting", icon: "fa-solid fa-stethoscope", introduction: "Use Download Troubleshooting File in Core’s settings list to create a report for Morelord support. It includes Foundry, game system, module, browser, and graphics details. It excludes account credentials, installation and world identifiers, network addresses, users, and campaign content." }
       ]
     });
     return new DocumentationApp({ productId: "morelord-core" }).render({ force: true });
+  }
+}
+
+// Foundry settings menus instantiate an Application and call render. This action only downloads.
+class MorelordDiagnosticsDownloadApp extends ApplicationV2 {
+  render() {
+    if (game.user?.isGM) MorelordConnectionApp.exportDiagnostics();
+    return this;
   }
 }
 
@@ -512,12 +526,17 @@ Hooks.once("init", () => {
     type: LocationManagerApp,
     restricted: true
   });
+  game.settings.registerMenu(MODULE_ID, "settingsTransfer", {
+    name: "Morelord Configuration", label: "Export / Import Settings",
+    hint: "Transfer configuration for all enabled Morelord modules using a JSON file.",
+    icon: "fa-solid fa-file-export", type: SettingsTransferApp, restricted: true
+  });
   game.settings.registerMenu(MODULE_ID, "troubleshooting", {
     name: "Troubleshooting",
-    label: "Open Troubleshooting",
+    label: "Download Troubleshooting File",
     hint: "Download diagnostics for Morelord support. No Morelord Gaming account or connection is required.",
     icon: "fa-solid fa-stethoscope",
-    type: MorelordConnectionApp,
+    type: MorelordDiagnosticsDownloadApp,
     restricted: true
   });
 });
@@ -543,8 +562,11 @@ Hooks.once("ready", async () => {
       actorIdentity,
       decorateActorSelect,
       applyPageLayout,
+      activateCardSelection,
+      activateCollapsibleSections,
+      createCollapsibleSection,
       renderPreservingScroll,
-      participation: Object.freeze({ listCharacterChoices, participantRecords, primaryPartyGroup, selectedCharacterUuids }),
+      participation: Object.freeze({ listCharacterActors, listCharacterChoices, participantRecords, primaryPartyGroup, selectedCharacterUuids }),
       documentation: Object.freeze({
         register: definition => documentationService.register(definition),
         get: id => documentationService.get(id),
@@ -552,7 +574,7 @@ Hooks.once("ready", async () => {
         open: id => new DocumentationApp({ productId: id }).render({ force: true })
       })
     }),
-    sources: Object.freeze({ resolveBookLabel }),
+    sources: Object.freeze({ resolveBookLabel, resolvePackLabel }),
     rolls: Object.freeze({ skill: rollSkill, skillModifier: actorSkillModifier, naturalD20: extractNaturalD20 }),
     socket: Object.freeze({
       get ready() { return contextualSocket.ready; },

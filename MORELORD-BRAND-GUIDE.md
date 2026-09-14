@@ -12,7 +12,7 @@ The September 2026 review covers all eight local Morelord folders. Product claim
 - Use each full product name on first mention; the short product name is appropriate afterward.
 - Use **Morelord Tools** where it names an existing access product. Preserve **Standard**, **Premium**, and **Champion** access labels without inventing new bundles or prices.
 - Keep package IDs, stored keys, APIs, and filenames stable. Display-name cleanup does not authorize a data migration.
-- Character Manager is the destination named by Character Export documentation. It is not another installed module in this inventory.
+- My Characters on the Morelord Gaming website is the import destination for Character Export. GMs and players can register for a free website account to import their exported characters. It is not another installed module in this inventory.
 - Use existing approved artwork when supplied. These sources do not define a master logo, logo clear space, or a licensed marketing font; do not invent those as established brand rules.
 
 ## Reviewed product inventory
@@ -144,6 +144,10 @@ Inline item actions remain with their item. Do not add pane scrollbars, sticky
 action overlays, or module-owned page/footer padding. Core exposes the same
 behavior as `MorelordCore.ui.applyPageLayout(application)` for custom renderers.
 
+For fixed-height description cards, Core's `ml-card__body[data-scroll]` is an
+explicit exception: complete text scrolls inside the card while card actions
+remain visible. Give the body `tabindex="0"` and an accessible description label.
+
 ## Typography
 
 - Body text uses `--ml-font-family-body`.
@@ -175,6 +179,7 @@ Never use a raw red, green, amber, or blue to represent application state. Domai
 | --- | --- |
 | Window content root | `.ml-app .ml-app-shell` |
 | Page-level bottom actions | `.ml-page-footer .ml-actions` |
+| Settings description and control | `label.ml-setting-row` with a text `span` and sibling control |
 | Item image, label, and controls | `.ml-item-row` |
 | Character participation choices | `.ml-actor-choice-grid`, `.ml-actor-choice` |
 | Product/workflow header | `.ml-hero`, `.ml-hero__body`, `.ml-hero__actions` |
@@ -680,46 +685,49 @@ Take your character beyond the Foundry character sheet.
 
 ### Micro
 
-Export D&D 5e characters with portable data and embedded artwork.
+Export D&D 5e characters to My Characters on Morelord Gaming with a free website account.
 
 ### Foundry package description
 
-Export D&D 5e character Actors from supported Foundry VTT v14 sheets to portable JSON for Morelord Character Manager. Include source data, prepared display values, and a deduplicated image library.
+GMs and players can export D&D 5e characters from supported Foundry VTT v14 sheets and import them into My Characters on the Morelord Gaming website after registering for a free account. Each portable JSON file includes character data, prepared sheet values, and available artwork.
 
 ### Website short
 
-Morelord Character Export adds a Morelord Export action to supported character sheets. Download character data, prepared values, and available character and item artwork in one portable file.
+Bring your Foundry characters to My Characters on the Morelord Gaming website. GMs and players can choose Morelord Export on a supported D&D 5e character sheet, download the character file, and import it after registering for a free website account.
 
 ### Website long
 
-Carry the character's source data and a snapshot of its prepared sheet values into a portable Morelord character file. The exporter includes embedded Items, activities, Active Effects, and an image library that avoids storing the same artwork repeatedly.
+GMs and players can take their D&D 5e characters beyond Foundry with Morelord Character Export. Register for a free account on the Morelord Gaming website, then import your exported character file into My Characters.
+
+Each portable file carries the character's source data and a snapshot of its prepared sheet values. The exporter includes embedded Items, activities, Active Effects, and an image library that avoids storing the same artwork repeatedly.
 
 Use the Morelord Export sheet action or the macro API. Exports record their Foundry and system versions. This is a file export workflow, not live synchronization or a guarantee that every destination can interpret every system field.
 
 ### Video and search copy
 
-**Video:** Export a D&D 5e character from a supported Foundry v14 sheet and review the resulting portable character file and artwork coverage.
+**Video:** Show GMs and players how to export a D&D 5e character from Foundry v14, register for a free Morelord Gaming account, and import the file into My Characters.
 
 **Title:** Morelord Character Export - Portable D&D 5e Character Files
 
-**Meta:** Export Foundry VTT D&D 5e characters to portable Morelord JSON with source data, prepared values, and embedded artwork.
+**Meta:** GMs and players: export D&D 5e characters from Foundry VTT and import them into My Characters on Morelord Gaming with a free website account.
 
 
 ### Foundry Description (HTML)
 
 ```html
 <h3>Your character has a story beyond the open sheet.</h3>
-<p>Bring the character's details and artwork along. Morelord Character Export adds a Morelord Export action to supported D&amp;D 5e character sheets in Foundry VTT, creating a portable JSON file intended for Morelord Character Manager.</p>
+<p>Bring your Foundry characters to My Characters on the Morelord Gaming website. Morelord Character Export lets GMs and players export D&D characters directly from their character sheets and import them into My Characters after registering for a free website account.</p>
 <ul>
-  <li><strong>Export from the sheet.</strong> Open a supported character sheet and choose Morelord Export from its title-bar controls.</li>
+  <li><strong>Export from the sheet.</strong> Open any character sheet and choose Morelord Export from its title-bar controls.</li>
+  <li><strong>Import into My Characters.</strong> Register for a free account on the Morelord Gaming website, open My Characters, and import your downloaded character JSON file.</li>
   <li><strong>Carry the character's underlying detail.</strong> Include source Actor data, embedded Items, item activities, and Active Effects.</li>
   <li><strong>Preserve the prepared snapshot.</strong> Include display-ready values already calculated by Foundry and D&amp;D 5e.</li>
   <li><strong>Bring available artwork.</strong> Embed character and Item images in a library that avoids storing the same asset repeatedly.</li>
   <li><strong>Keep the source context.</strong> Record the Foundry and system versions with the export.</li>
 </ul>
-<p>This is a portable file export, not live synchronization. Destination tools determine how they use its fields. Morelord Core and a shared account connection are not required by the exporter manifest.</p>
+<p>Exports are character snapshots, not live synchronization. Exporting from Foundry does not require Morelord Core or an account connection; importing into My Characters requires a free Morelord Gaming website account.</p>
 <p>Requires Foundry VTT v14 and a supported D&amp;D 5e ApplicationV2 character sheet. The manifest records D&amp;D 5e 5.3.3 as verified; legacy ApplicationV1 sheets are not supported.</p>
-<p>Take the next snapshot of your character's journey. <a href="https://morelordgaming.com">Learn more at Morelord Gaming.</a></p>
+<p>Take your character's journey beyond the table. <a href="https://morelordgaming.com">Register for a free Morelord Gaming account</a> and import your export into My Characters.</p>
 ```
 
 ## Morelord Compendium
@@ -883,3 +891,40 @@ Use Morelord Downtime as the reference for initial module page sections. Group e
 # Initial module page headers
 
 Use Morelord Downtime's dashboard as the reference for every initial module page: a `header.ml-hero` containing the product's accent-colored `i.ml-hero__icon`, a `div.ml-hero__body` with an `h1` product title and concise `p` subtitle, and a right-aligned `div.ml-actions` with a book-open **Documentation** button sized to its contents. Use Core's shared hero typography, spacing, and divider; avoid module-specific header overrides. Documentation buttons open the module's registered Core documentation. Place unrelated page actions below the header.
+
+## Collapsible sections
+
+Use Core's native disclosure component for sections that can be hidden:
+
+~~~html
+<details class="ml-surface ml-collapsible-section" data-ml-section-key="module-id.section-name" open>
+  <summary>
+    <div class="ml-section-heading"><div><h2>Section title</h2><p>Descriptive subtitle.</p></div></div>
+    <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+  </summary>
+  <div class="ml-collapsible-section__body ml-stack">Section controls and content</div>
+</details>
+~~~
+
+Sections start expanded. Core automatically restores and saves their last state per user and world in the current browser, like window geometry. Use a stable, module-prefixed section key, not a journey or document ID. Collapsing only hides the body; it does not reset controls. Native summary activation supports mouse and keyboard. If browser storage is unavailable, toggling still works but cannot persist. Custom renderers can call MorelordCore.ui.activateCollapsibleSections(application) after inserting content. Journey Steps is the first consumer.
+
+For dynamically generated sections, use `ui.createCollapsibleSection({ key, title, description, content })` and initialize after insertion. Core owns its heading, description, chevron, spacing, and persistence. Compact item/quantity lists use `dl.ml-quantity-list` with alternating `dt` and `dd` children inside `ml-card`. Party selection with extra controls uses `ml-card.ml-item-row[data-ml-selectable-card]`, a labeled checkbox and shared actor identity inside `ml-stack`, and a sibling labeled control.
+
+
+Character selectors must retrieve eligible actors through `ui.participation.listCharacterActors()` or `listCharacterChoices()`. Eligibility includes player-owned characters and members of the primary party Group; preserve the operation’s ownership and inventory checks. Use the shared actor choice component for checkbox selection and Core actor-select initialization for dropdowns.
+
+
+Checkbox labels keep the checkbox and its description side by side at every width. Text may wrap within its own column, but must never start beneath the checkbox. Core enforces this for labels containing a checkbox, including checkbox-first and checkbox-last settings rows. Use `ml-check` for new checkbox labels; put descriptive text in a sibling `span`. Actor choice cards retain their shared portrait columns.
+
+
+Settings pages use the complete `ml-hero` header (icon, body, h1 title, and description), `ml-surface.ml-stack` sections with `ml-section-heading`, and the shared page footer. Use `ml-card.ml-item-row` with a `ml-stack` content child for content-pack entries; status badges use `ml-badge[data-tone]`. Do not style settings headers, cards, rows, or badges in a feature module. The design-system check rejects incomplete settings headers and missing footers.
+
+# Generative AI Content Declaration
+
+Morelord Gaming uses generative AI tools to assist with software development, including code generation, debugging, testing, and documentation. The developer understands the submitted code and can explain, modify, troubleshoot, and maintain it independently of AI tools. Morelord Gaming retains full responsibility for each module's functionality, quality, and ongoing maintenance.
+
+## Foundry policy reference
+
+Checked September 13, 2026 against the [Foundry AI Content Policy](https://foundryvtt.com/article/ai-policy/), revised March 18, 2026. Permitted AI assistance no longer requires disclosure under that policy; use the blurb above if the submission form still requests it.
+
+AI-assisted code is permitted subject to the author's understanding and maintenance responsibilities. Prepared content has separate restrictions. Foundry package descriptions must be human-written; rewrite AI-generated listing drafts yourself before submission. A declaration does not override these requirements. Recheck the linked policy for each submission.

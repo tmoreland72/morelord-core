@@ -34,6 +34,8 @@
 
 :is(.ml-window .window-content, .ml-chat-card) .ml-button[data-tone="danger"] { color: var(--ml-color-danger); border-color: color-mix(in srgb, var(--ml-color-danger) 65%, transparent); }
 :is(.ml-window .window-content, .ml-chat-card) .ml-button[data-tone="accent"] { background: var(--ml-color-accent); border-color: var(--ml-color-accent-strong); color: var(--ml-color-on-accent); font-weight: var(--ml-font-weight-bold); }
+:is(.ml-window .window-content, .ml-chat-card) .ml-button[data-tone="accent"][data-variant="outline"] { background: transparent; color: var(--ml-color-accent); }
+:is(.ml-window .window-content, .ml-chat-card) .ml-button[data-tone="accent"][data-variant="outline"]:not(:disabled):is(:hover, :focus-visible) { background: var(--ml-color-accent); color: var(--ml-color-on-accent); }
 
 .ml-empty-state { display: grid; justify-items: center; gap: var(--ml-space-2); padding: var(--ml-space-5); text-align: center; }
 .ml-empty-state > i { font-size: 2rem; color: var(--ml-color-muted); }
@@ -61,7 +63,12 @@
 .ml-actor-select-field > span:first-child { grid-column: 1 / -1; }
 .ml-actor-select-field > select { grid-column: 2; grid-row: 2; min-width: 0; }
 .ml-actor-select-field > [data-ml-actor-select-preview] { grid-column: 1; grid-row: 2; }
-.ml-check { display: grid; grid-template-columns: max-content minmax(0, 1fr); align-items: start; gap: var(--ml-space-2); min-width: 0; margin: 0; }
+.ml-check,
+.ml-window .window-content label:has(> input[type="checkbox"]):not(.ml-actor-choice, .ml-choice-card) { display: grid; grid-template-columns: max-content minmax(0, 1fr); align-items: start; gap: var(--ml-space-2); min-width: 0; margin: 0; white-space: normal; }
+/* Trailing checkboxes keep their text in the flexible column. Choice cards already own their portrait columns. */
+.ml-window .window-content label:has(> input[type="checkbox"]):not(.ml-actor-choice, .ml-choice-card):has(> input:last-child):not(:has(> input:first-child)) { grid-template-columns: minmax(0, 1fr) max-content; }
+.ml-window .window-content label:has(> input[type="checkbox"]):not(.ml-actor-choice, .ml-choice-card) > input[type="checkbox"] { margin: .15em 0 0; }
+.ml-window .window-content label:has(> input[type="checkbox"]):not(.ml-actor-choice, .ml-choice-card) > :not(input) { min-width: 0; overflow-wrap: anywhere; }
 .ml-check > :where(input[type="checkbox"], input[type="radio"]) { flex: none; margin: .15em 0 0; }
 .ml-check > span { min-width: 0; line-height: 1.35; overflow-wrap: anywhere; }
 .ml-check-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(var(--ml-check-min, 190px), 1fr)); gap: var(--ml-space-2) var(--ml-space-3); }
@@ -98,6 +105,13 @@
 .ml-section-heading { margin: var(--ml-space-2) 0 0; padding-bottom: var(--ml-space-2); border-bottom: 1px solid var(--ml-color-border); }
 .ml-section-heading :where(h2, h3, h4) { margin-block: 0; }
 .ml-section-heading p { margin-block: var(--ml-space-2) 0; }
+.ml-collapsible-section > summary { display: flex; align-items: start; gap: var(--ml-space-3); cursor: pointer; list-style: none; }
+.ml-collapsible-section > summary::-webkit-details-marker { display: none; }
+.ml-collapsible-section > summary > .ml-section-heading { flex: 1; min-width: 0; margin: 0; }
+.ml-collapsible-section > summary > i { color: var(--ml-color-accent); margin-top: var(--ml-space-1); }
+.ml-collapsible-section[open] > summary > i { transform: rotate(90deg); }
+.ml-collapsible-section > summary:focus-visible { outline: 2px solid var(--ml-color-accent); outline-offset: var(--ml-space-1); }
+.ml-collapsible-section > .ml-collapsible-section__body { margin-top: var(--ml-space-3); }
 .ml-card,
 .ml-window .window-content .ml-card {
   padding: var(--ml-space-3);
@@ -107,7 +121,19 @@
   transition: border-color 120ms ease, background-color 120ms ease;
 }
 .ml-card:is(button, a, label):hover,
-.ml-window .window-content .ml-card:is(button, a, label):hover { border-color: color-mix(in srgb, var(--ml-color-accent) 65%, var(--ml-color-border)); background: var(--ml-color-surface-raised); }
+.ml-window .window-content .ml-card:is(button, a, label):hover,
+.ml-window .window-content .ml-card[data-ml-selectable-card]:hover { border-color: color-mix(in srgb, var(--ml-color-accent) 65%, var(--ml-color-border)); background: var(--ml-color-surface-raised); }
+.ml-card[data-ml-selectable-card] { cursor: pointer; }
+.ml-window .window-content .ml-card[data-ml-selectable-card]:has(input:checked) { border-color: var(--ml-color-accent); box-shadow: inset 3px 0 var(--ml-color-accent); }
+.ml-card[data-ml-selectable-card]:has(input:disabled) { cursor: default; }
+.ml-card[data-size="large"] { box-sizing: border-box; height: 26rem; display: flex; flex-direction: column; gap: var(--ml-space-3); }
+.ml-card[data-size="large"] > * { flex-shrink: 0; min-width: 0; }
+.ml-card[data-size="large"] > .ml-card__body { flex: 1 1 0; min-height: 0; overflow: hidden; }
+.ml-card[data-size="large"] > .ml-check strong,
+.ml-card__summary { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; }
+.ml-card__footer { margin-top: auto; }
+.ml-card { min-width: 0; overflow-wrap: anywhere; }
+.ml-card__body { min-width: 0; overflow-wrap: anywhere; }
 
 .ml-details { overflow: clip; border: 1px solid var(--ml-color-border); border-radius: var(--ml-radius-md); }
 .ml-details > summary { cursor: pointer; padding: var(--ml-space-3); font-weight: var(--ml-font-weight-bold); list-style-position: inside; user-select: none; }
@@ -137,6 +163,9 @@
 .ml-item-row > img { width: var(--ml-avatar-md); height: var(--ml-avatar-md); object-fit: cover; border: 0; border-radius: var(--ml-radius-md); }
 .ml-item-row > .ml-stack { flex: 1 1 150px; min-width: 0; overflow-wrap: anywhere; }
 .ml-item-row > label { flex: 0 1 100px; min-width: 0; }
+.ml-quantity-list { display: grid; grid-template-columns: minmax(0, 1fr) max-content; gap: var(--ml-space-1) var(--ml-space-3); margin: 0; }
+.ml-quantity-list > dt { min-width: 0; overflow-wrap: anywhere; }
+.ml-quantity-list > dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
 .ml-window .form-footer,
 .ml-window .ml-page-footer {
   position: static !important;
@@ -254,3 +283,17 @@
 .ml-list-toolbar { display: flex; width: 100%; justify-content: space-between; align-items: center; gap: var(--ml-space-3); flex-wrap: wrap; }
 .ml-toggle { display: inline-flex; align-items: center; gap: var(--ml-space-2); white-space: nowrap; }
 .ml-toggle > input { margin: 0; }
+
+/* Opt-in scrolling for full descriptions inside fixed-size cards. */
+.ml-card[data-size="large"] > .ml-card__body[data-scroll] {
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+}
+
+/* Shared settings rows: description plus control, with checkbox columns owned by ml-check. */
+.ml-window .window-content label.ml-setting-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(120px, 240px); align-items: start; gap: var(--ml-space-3); padding-block: var(--ml-space-2); border-bottom: 1px solid var(--ml-color-border); }
+.ml-window .window-content label.ml-setting-row > span:first-child { display: grid; gap: var(--ml-space-1); min-width: 0; color: inherit; font-size: inherit; font-weight: inherit; letter-spacing: normal; text-transform: none; }
+.ml-window .window-content label.ml-setting-row:has(> input[type="checkbox"]) { grid-template-columns: minmax(0, 1fr) max-content; }
+.ml-window .window-content label.ml-setting-row:has(> input[type="checkbox"]:first-child) { grid-template-columns: max-content minmax(0, 1fr); }
+@media (max-width: 620px) { .ml-window .window-content label.ml-setting-row:not(:has(> input[type="checkbox"])) { grid-template-columns: minmax(0, 1fr); } }
