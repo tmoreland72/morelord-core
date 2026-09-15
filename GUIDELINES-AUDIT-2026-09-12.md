@@ -2,7 +2,7 @@
 
 ## Remediation update
 
-The findings below are the original audit snapshot. Following the owner's clarification, Character Export and Downtime are explicitly exempt from standard production release steps until production-ready; their shared UI obligations remain in force. Their missing release setup is therefore a deferred requirement, not a current compliance failure.
+The findings below are the original audit snapshot. Following the owner's clarification, Character Export and Downtime are explicitly exempt from standard production release steps until production-ready; their shared UI obligations remain in force. That exemption is historical: Character Export and Downtime now follow standard release requirements. Downtime release tooling and documentation were added on 2026-09-15; publication still requires Foundry approval and live compatibility verification.
 
 Completed in the follow-up:
 

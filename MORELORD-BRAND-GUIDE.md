@@ -134,6 +134,7 @@ Dialog content and footer are separate layout rows:
 - The scrollbar must stop above the footer.
 - The footer is fully opaque and never overlays visible content.
 - Footer actions remain visible at every scroll position.
+- Footer buttons share equal widths and stretch to the height required by the longest wrapped label. Use Core's shared footer sizing, not individual button heights.
 - Content reserves no fake transparent overlay space.
 
 The same rule applies to every application page. Put page-level bottom actions in
@@ -208,7 +209,9 @@ Add the shared class alongside a readable module class. The shared class owns co
 - Field labels use the shared uppercase eyebrow treatment.
 - Checkbox and radio accents use the Core accent color.
 - Buttons containing only an icon require an accessible name.
+- Delete and other destructive actions use standard Core buttons, never red button variants. Danger colors are for status and feedback, not buttons.
 - Content-sized buttons must use `height: auto`, `max-height: none`, and normal wrapping when labels can wrap or be localized.
+- Clickable item results use `button.ml-card.ml-item-row` with an image and `.ml-stack` text child. Core owns their content-sized height, left alignment, and wrapping; never apply fixed control heights to card or list buttons.
 
 ## Spacing and responsive behavior
 
@@ -914,7 +917,7 @@ For dynamically generated sections, use `ui.createCollapsibleSection({ key, titl
 Character selectors must retrieve eligible actors through `ui.participation.listCharacterActors()` or `listCharacterChoices()`. Eligibility includes player-owned characters and members of the primary party Group; preserve the operation’s ownership and inventory checks. Use the shared actor choice component for checkbox selection and Core actor-select initialization for dropdowns.
 
 
-Checkbox labels keep the checkbox and its description side by side at every width. Text may wrap within its own column, but must never start beneath the checkbox. Core enforces this for labels containing a checkbox, including checkbox-first and checkbox-last settings rows. Use `ml-check` for new checkbox labels; put descriptive text in a sibling `span`. Actor choice cards retain their shared portrait columns.
+Checkbox labels keep the checkbox and its description side by side at every width. Checkbox descriptions remain on one line. Let the containing action or item row wrap as a unit rather than splitting its label. Core enforces this for labels containing a checkbox, including checkbox-first and checkbox-last settings rows. Use `ml-check` for new checkbox labels; put descriptive text in a sibling `span`. Actor choice cards retain their shared portrait columns.
 
 
 Settings pages use the complete `ml-hero` header (icon, body, h1 title, and description), `ml-surface.ml-stack` sections with `ml-section-heading`, and the shared page footer. Use `ml-card.ml-item-row` with a `ml-stack` content child for content-pack entries; status badges use `ml-badge[data-tone]`. Do not style settings headers, cards, rows, or badges in a feature module. The design-system check rejects incomplete settings headers and missing footers.

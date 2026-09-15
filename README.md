@@ -81,7 +81,7 @@ https://raw.githubusercontent.com/tmoreland72/morelord-core/main/module.json
 Morelord Core can report only the installed Core version and Foundry version during entitlement refreshes. This is enabled by default and can be disabled by a GM in Module Settings with **Share Anonymous Usage Statistics**. Disabling it does not affect account linking, entitlement checks, or premium access. No campaign, player, actor, item, chat, or world-name data is added to the analytics report.
 ## Standard release workflow
 
-Production Morelord Foundry modules use the same `release.ps1`. Character Export follows these release steps; Downtime remains excluded. Project-specific values are stored in `release.config.json`, so improvements to the workflow can be copied between repositories without editing module logic.
+Production Morelord Foundry modules use the same `release.ps1`. Character Export and Downtime follow these release steps. Project-specific values are stored in `release.config.json`, so improvements to the workflow can be copied between repositories without editing module logic.
 
 Before a normal release, create `RELEASE-NOTES-x.y.z.md`. The same Markdown file is used for the GitHub Release and parsed into the public Morelord Gaming `/releases` feed. Recognized headings are `Added`, `Features`, `Improvements`, `Changed`, `Fixed`, `Breaking Changes`, and `Security`. Prefix a bullet with `[Premium]` or `[Champion]` when the change is tier-specific; otherwise it is treated as Standard.
 
@@ -170,3 +170,9 @@ The shared release validator supports required runtime files (including root mai
 ## Shared Item rarity readers
 
 `scripts/services/item-rarity.js` exports `itemRarities(system)` and `itemRarity(system)`. They accept legacy rarity strings/choice objects and D&D 5e v6 rarity arrays/Sets without modifying data. An explicitly empty v6 collection is mundane. Single-rarity workflows use the lowest listed rarity, matching the v6 Item getter. Compendium consumers must request both `system.rarity` and `system.rarities`.
+
+## Shared source filtering and item selection
+
+`MorelordCore.sources.filter` exposes the shared `Dnd5eSourceFilterService` used by Craftworks and Marketplace. It honors D&D5e Configure Sources and canonical SRD provenance on copied documents. `ItemPickerApp` in `scripts/ui/item-picker-app.js` searches enabled physical Item compendiums and calls `onSelect(item)` with the selected document. Downtime commissions consume this Core UI.
+
+Locations stay open after Save. Shared field labels align their controls at the top, checkbox labels remain on one line, resource rows have room for multi-line descriptions, and dialog buttons grow to fit their text.

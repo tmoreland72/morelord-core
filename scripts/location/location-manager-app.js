@@ -162,7 +162,7 @@ export class LocationManagerApp extends HandlebarsApplicationMixin(ApplicationV2
       this.selectedId = saved.id;
       this.draft = saved;
       ui.notifications.info(`${saved.name} saved.`);
-      await this.close();
+      await this.render({ force: true });
     } catch (error) {
       ui.notifications.error(`Could not save location: ${error.message}`);
     } finally {

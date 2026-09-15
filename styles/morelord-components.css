@@ -32,7 +32,6 @@
 :where(.ml-status, .ml-badge, .ml-text)[data-tone="danger"] { color: var(--ml-color-danger); }
 :where(.ml-status, .ml-badge, .ml-text)[data-tone="premium"] { color: var(--ml-color-accent); }
 
-:is(.ml-window .window-content, .ml-chat-card) .ml-button[data-tone="danger"] { color: var(--ml-color-danger); border-color: color-mix(in srgb, var(--ml-color-danger) 65%, transparent); }
 :is(.ml-window .window-content, .ml-chat-card) .ml-button[data-tone="accent"] { background: var(--ml-color-accent); border-color: var(--ml-color-accent-strong); color: var(--ml-color-on-accent); font-weight: var(--ml-font-weight-bold); }
 :is(.ml-window .window-content, .ml-chat-card) .ml-button[data-tone="accent"][data-variant="outline"] { background: transparent; color: var(--ml-color-accent); }
 :is(.ml-window .window-content, .ml-chat-card) .ml-button[data-tone="accent"][data-variant="outline"]:not(:disabled):is(:hover, :focus-visible) { background: var(--ml-color-accent); color: var(--ml-color-on-accent); }
@@ -64,13 +63,14 @@
 .ml-actor-select-field > select { grid-column: 2; grid-row: 2; min-width: 0; }
 .ml-actor-select-field > [data-ml-actor-select-preview] { grid-column: 1; grid-row: 2; }
 .ml-check,
-.ml-window .window-content label:has(> input[type="checkbox"]):not(.ml-actor-choice, .ml-choice-card) { display: grid; grid-template-columns: max-content minmax(0, 1fr); align-items: start; gap: var(--ml-space-2); min-width: 0; margin: 0; white-space: normal; }
+.ml-window .window-content label:has(> input[type="checkbox"]):not(.ml-actor-choice, .ml-choice-card) { display: grid; grid-template-columns: max-content minmax(0, 1fr); align-items: start; gap: var(--ml-space-2); min-width: min-content; margin: 0; white-space: nowrap; }
 /* Trailing checkboxes keep their text in the flexible column. Choice cards already own their portrait columns. */
 .ml-window .window-content label:has(> input[type="checkbox"]):not(.ml-actor-choice, .ml-choice-card):has(> input:last-child):not(:has(> input:first-child)) { grid-template-columns: minmax(0, 1fr) max-content; }
 .ml-window .window-content label:has(> input[type="checkbox"]):not(.ml-actor-choice, .ml-choice-card) > input[type="checkbox"] { margin: .15em 0 0; }
-.ml-window .window-content label:has(> input[type="checkbox"]):not(.ml-actor-choice, .ml-choice-card) > :not(input) { min-width: 0; overflow-wrap: anywhere; }
+.ml-window .window-content label:has(> input[type="checkbox"]):not(.ml-actor-choice, .ml-choice-card) > :not(input) { min-width: 0; overflow-wrap: normal; white-space: nowrap; }
 .ml-check > :where(input[type="checkbox"], input[type="radio"]) { flex: none; margin: .15em 0 0; }
-.ml-check > span { min-width: 0; line-height: 1.35; overflow-wrap: anywhere; }
+.ml-check > span { min-width: 0; line-height: 1.35; overflow-wrap: normal; white-space: nowrap; }
+.ml-window .window-content label:has(> input[type="checkbox"]) small { white-space: normal; overflow-wrap: anywhere; }
 .ml-check-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(var(--ml-check-min, 190px), 1fr)); gap: var(--ml-space-2) var(--ml-space-3); }
 .ml-list-button { display: grid; gap: var(--ml-space-1); width: 100%; text-align: left; }
 .ml-list-button small { color: var(--ml-color-muted); }
@@ -133,6 +133,7 @@
 .ml-card__summary { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; }
 .ml-card__footer { margin-top: auto; }
 .ml-card { min-width: 0; overflow-wrap: anywhere; }
+.ml-window .window-content button:is(.ml-card, .ml-list-button) { height: auto; max-height: none; flex-shrink: 0; white-space: normal; text-align: left; line-height: var(--ml-line-height-body); }
 .ml-card__body { min-width: 0; overflow-wrap: anywhere; }
 
 .ml-details { overflow: clip; border: 1px solid var(--ml-color-border); border-radius: var(--ml-radius-md); }
@@ -152,7 +153,8 @@
 .ml-resource-header { display: grid; grid-template-columns: var(--ml-resource-columns) var(--ml-resource-actions-width); gap: var(--ml-space-2); padding: var(--ml-space-2) var(--ml-space-3); color: var(--ml-color-muted); font-size: var(--ml-font-size-xs); font-weight: var(--ml-font-weight-bold); text-transform: uppercase; }
 .ml-resource-item { display: grid; background: var(--ml-color-surface); }
 .ml-resource-row { display: grid; grid-template-columns: minmax(0, 1fr) var(--ml-resource-actions-width); gap: var(--ml-space-2); align-items: stretch; }
-.ml-resource-main { display: grid; grid-template-columns: var(--ml-resource-columns); gap: var(--ml-space-2); align-items: center; width: 100%; padding: var(--ml-space-3); border: 0; border-radius: 0; background: transparent; text-align: left; }
+.ml-resource-main { display: grid; grid-template-columns: var(--ml-resource-columns); gap: var(--ml-space-2); align-items: center; width: 100%; height: auto; max-height: none; padding: var(--ml-space-4) var(--ml-space-3); border: 0; border-radius: 0; background: transparent; text-align: left; }
+.ml-window .window-content .ml-resource-main { height: auto; max-height: none; padding: var(--ml-space-4) var(--ml-space-3); }
 .ml-resource-main span { min-width: 0; overflow-wrap: anywhere; }
 .ml-resource-main span:first-child { display: grid; gap: var(--ml-space-1); }
 .ml-resource-main small { color: var(--ml-color-muted); }
@@ -162,7 +164,7 @@
 .ml-item-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ml-space-3); min-width: 0; }
 .ml-item-row > img { width: var(--ml-avatar-md); height: var(--ml-avatar-md); object-fit: cover; border: 0; border-radius: var(--ml-radius-md); }
 .ml-item-row > .ml-stack { flex: 1 1 150px; min-width: 0; overflow-wrap: anywhere; }
-.ml-item-row > label { flex: 0 1 100px; min-width: 0; }
+.ml-item-row > label { flex: 0 1 auto; min-width: 0; }
 .ml-quantity-list { display: grid; grid-template-columns: minmax(0, 1fr) max-content; gap: var(--ml-space-1) var(--ml-space-3); margin: 0; }
 .ml-quantity-list > dt { min-width: 0; overflow-wrap: anywhere; }
 .ml-quantity-list > dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
@@ -297,3 +299,7 @@
 .ml-window .window-content label.ml-setting-row:has(> input[type="checkbox"]) { grid-template-columns: minmax(0, 1fr) max-content; }
 .ml-window .window-content label.ml-setting-row:has(> input[type="checkbox"]:first-child) { grid-template-columns: max-content minmax(0, 1fr); }
 @media (max-width: 620px) { .ml-window .window-content label.ml-setting-row:not(:has(> input[type="checkbox"])) { grid-template-columns: minmax(0, 1fr); } }
+
+.ml-window :is(.form-footer, .ml-page-footer):has(> button ~ button) { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); align-items: stretch; }
+.ml-window :is(.form-footer, .ml-page-footer) > button { height: auto; max-height: none; min-width: 0; min-height: var(--ml-control-height); align-self: stretch; white-space: normal; line-height: var(--ml-line-height-body); padding: var(--ml-space-2) var(--ml-space-3); }
+.ml-window :is(.form-footer, .ml-page-footer):has(> button ~ button) > button { width: 100%; }

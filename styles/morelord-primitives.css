@@ -134,6 +134,7 @@
 .ml-window .window-content label:has(> :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea)) {
   display: grid;
   gap: var(--ml-space-1);
+  align-content: start;
 }
 .ml-window .window-content label:has(> :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea)) > span:first-child {
   color: var(--ml-color-muted);

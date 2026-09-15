@@ -3,6 +3,7 @@ import { ContextualSocketService } from "./services/contextual-socket-service.js
 import { IGNORED_USERS_SETTING, isIgnored, listUsers, activePlayerForActor } from "./services/user-service.js";
 import { IgnoredUsersApp } from "./ui/ignored-users-app.js";
 import { WindowGeometryService } from "./services/window-geometry-service.js";
+import { Dnd5eSourceFilterService } from "./services/dnd5e-source-filter-service.js";
 import { resolveBookLabel, resolvePackLabel } from "./services/source-book-service.js";
 import { CapabilityRegistry } from "./location/capability-registry.js";
 import { LocationService } from "./location/location-service.js";
@@ -574,7 +575,7 @@ Hooks.once("ready", async () => {
         open: id => new DocumentationApp({ productId: id }).render({ force: true })
       })
     }),
-    sources: Object.freeze({ resolveBookLabel, resolvePackLabel }),
+    sources: Object.freeze({ resolveBookLabel, resolvePackLabel, filter: new Dnd5eSourceFilterService() }),
     rolls: Object.freeze({ skill: rollSkill, skillModifier: actorSkillModifier, naturalD20: extractNaturalD20 }),
     socket: Object.freeze({
       get ready() { return contextualSocket.ready; },

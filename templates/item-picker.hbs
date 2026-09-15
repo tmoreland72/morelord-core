@@ -1,0 +1,14 @@
+<section class="ml-app ml-app-shell">
+  <header class="ml-hero"><i class="fa-solid fa-box ml-hero__icon"></i><div class="ml-hero__body"><h1>Select an Item</h1><p>Search physical items in enabled D&amp;D compendiums.</p></div></header>
+  <section class="ml-surface ml-stack">
+    <div class="ml-grid" data-columns="2">
+      <label><span>Compendium</span><select name="itemPack"><option value="">All enabled compendiums</option>{{#each packs}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+      <label><span>Item Name</span><input type="search" name="itemSearch" value="{{query}}" placeholder="At least 2 characters"></label>
+    </div>
+    <div class="ml-actions"><button type="button" data-action="search"><i class="fa-solid fa-magnifying-glass"></i> Search</button></div>
+  </section>
+  <div class="ml-stack">
+    {{#each results}}<button type="button" class="ml-card ml-item-row" data-action="choose" data-uuid="{{uuid}}"><img src="{{img}}" alt=""><span class="ml-stack" data-gap="1"><strong>{{name}}</strong><small>{{source}} · {{rarity}}</small></span></button>
+    {{else}}<p class="notes">{{#if searched}}No matching items.{{else}}Enter an item name and search.{{/if}}</p>{{/each}}
+  </div>
+</section>
