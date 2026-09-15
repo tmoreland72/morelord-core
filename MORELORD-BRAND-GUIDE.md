@@ -660,7 +660,7 @@ Training supports instructors and persistent proficiency progress. Source Item c
 
 **Meta:** Organize downtime Sessions, Training, and persistent character Projects in Foundry VTT, with player time allocation and GM-controlled activities.
 
-Access tiers for Downtime are not established by the reviewed README or manifest; do not invent a Standard/Premium split.
+Downtime is a Premium module, included with Tools Premium and Tools Champion. It has no Standard feature offering.
 
 
 ### Foundry Description (HTML)
