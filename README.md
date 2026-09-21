@@ -1,5 +1,9 @@
 # Morelord Core
 
+User-facing history and result logs must use readable text. `scripts/ui/log-formatting.js` provides `logLabel` and `logValue` for plain-text fallback formatting of structured values; prefer domain-specific sentences and resolved names when available. Escape these strings when inserting HTML. JSON remains appropriate for storage, exports, and developer diagnostics.
+
+User-facing history and result logs must use readable text. `scripts/ui/log-formatting.js` provides `logLabel` and `logValue` for plain-text fallback formatting of structured values; prefer domain-specific sentences and resolved names when available. Escape these strings when inserting HTML. JSON remains appropriate for storage, exports, and developer diagnostics.
+
 Shared account activation and entitlement services for Morelord Tools Foundry VTT modules.
 
 ## GM setup
@@ -33,17 +37,29 @@ if (core?.hasFeature("marketplace.gm-approvals", "morelord-marketplace")) {
 
 Cached entitlements remain usable through the server-provided expiration plus a seven-day offline grace period. Existing world data is never deleted when access expires.
 
+## Discord community
+
+Select **Join Discord** under **Discord Community** in Core’s Module Settings to open the [Morelord Gaming Discord server](https://discord.gg/B5YKQf579E) for support, feature requests, and general discussions. The button is available to GMs and players without connecting a Morelord account.
+
 ## Troubleshooting diagnostics
 
 GMs can select **Download Troubleshooting File** under Troubleshooting in Core’s settings list to immediately download a JSON support report. **Connect or Manage Account** contains only account and Core configuration controls. It includes Foundry, game-system, active-module, browser, display, and graphics-renderer versions and capabilities. The sanitized world index is included in the filename to keep reports from different worlds distinct, but not in the JSON. The report excludes account credentials, installation and world identifiers, network addresses, users, and campaign content.
 
 Other Morelord modules can reuse the report builder or start the download through the Core API:
 
+Schema 2 adds `moduleDiagnostics`. Craftworks contributes enabled/access-checked Content Packs, material/recipe counts, known compendium availability and source filtering, sync signature status and recent sync/harvest outcomes. Export **before Sync with Compendiums**, and again afterward, to compare the failing state with the repaired catalog. Recent outcomes cover only the exporting client since its last reload; this is not a console history or a retrospective error log.
+
+Modules may expose a synchronous `api.getDiagnostics()` returning a JSON-safe snapshot. This is a trusted provider contract: include only explicitly selected counts, booleans, fixed identifiers/reason codes and timestamps; never return credentials, raw settings, raw sync signatures, document identifiers/content, or exception messages/stacks. Core skips older modules without this optional API and isolates provider failures. The report is collected locally without syncing content or sending telemetry.
+
 ```js
 const core = game.modules.get("morelord-core")?.api;
 const report = core?.getDiagnostics();
 core?.exportDiagnostics();
 ```
+
+## Development testing
+
+Run `npm test` for isolated code tests. The opt-in [in-game regression suite](IN-GAME-TESTING.md) runs inside a loaded Foundry world and records exact environment versions, recipient routing, and a real Core window's render/interaction checks. Run it on both GM and player clients when validating Foundry updates; the guide lists remaining workflow coverage and how modules can reuse the runner.
 
 ## Release workflow
 
@@ -76,9 +92,9 @@ Foundry manifest URL:
 https://raw.githubusercontent.com/tmoreland72/morelord-core/main/module.json
 ```
 
-## Anonymous usage statistics
+## Usage and error reporting
 
-Morelord Core can report only the installed Core version and Foundry version during entitlement refreshes. This is enabled by default and can be disabled by a GM in Module Settings with **Share Anonymous Usage Statistics**. Disabling it does not affect account linking, entitlement checks, or premium access. No campaign, player, actor, item, chat, or world-name data is added to the analytics report.
+Core Settings provides independent **Share feature usage** and **Share error reports** choices, available without an account connection. The broader reports require a fresh explicit choice; existing version-only consent does not enable them. Reports use a random world reporting ID and exclude campaign content and credentials. Developer Mode suppresses reporting. The legacy version-only entitlement headers remain governed by the existing stored sharing preference until changed. See [TELEMETRY.md](TELEMETRY.md) for event coverage, privacy, counting limitations and deployment requirements. The reporting website and database migrations were deployed on September 20, 2026.
 ## Standard release workflow
 
 Production Morelord Foundry modules use the same `release.ps1`. Character Export and Downtime follow these release steps. Project-specific values are stored in `release.config.json`, so improvements to the workflow can be copied between repositories without editing module logic.
@@ -155,6 +171,8 @@ Dynamic sections can use `core.ui.createCollapsibleSection({ key, title, descrip
 
 
 Character eligibility is centralized in `MorelordCore.ui.participation.listCharacterActors()` and `listCharacterChoices()`: player-owned characters plus character members of the primary party Group, deduplicated. Party members may be Actor documents or stored Actor references. `ownedOnly` further limits the result to characters the current user owns. Modules should use these helpers for character selection and retain their operation-specific permissions.
+
+`listCharacterActors({ includePartyNpcs: true })` also includes NPC members of the primary party, including an NPC-only party. NPCs elsewhere remain excluded. The default remains character-only for existing consumers; `ownedOnly` and `defaultParty` still apply. Encounters uses this option for combat companions.
 
 
 Core account settings, Ignored Users, and the Location editor use the shared page footer. Save actions remain outside the scrolling content, with native form submission preserved.

@@ -1,6 +1,6 @@
 // Hidden configuration is explicitly included; campaign records and account secrets are not.
 const CONFIGURATION_KEYS = {
-  "morelord-core": "serverUrl shareUsageStatistics developerMode developerTier ignoredUserIds",
+  "morelord-core": "serverUrl developerMode developerTier ignoredUserIds",
   "morelord-marketplace": "buyRate sellRate enableSelling enableBuying requireSellApproval requireBuyApproval postTransactionCards",
   "morelord-journeys": "dayEncounterDie journeyPlannerDefaults phaseWeather phasePace phaseEncounters phaseDiscovery phaseNavigation phasePressOn phaseForaging phaseCamp suppressSleepDeprivationExhaustion enableNightEncounters enableSleepAndShelter skipDiceAnimation dcConfiguration",
   "morelord-encounters": "lastEncounterSources defaultEncounterConfiguration defaultEncounterConfigurationV2 defaultsConfigured defaultDifficulty defaultPartyUuids defaultSourceIds defaultEncounterSource defaultDrakkenheimTableId",
@@ -15,6 +15,7 @@ function requireGM() {
 export function transferableSettings() {
   return Array.from(game.settings.settings.values()).filter(setting => {
     const { namespace, key } = setting;
+    if (namespace === "morelord-core" && ["shareUsageStatistics", "shareErrorReports", "telemetryConsentVersion", "telemetryWorldId", "telemetryCredentials"].includes(key)) return false;
     if (!namespace.startsWith("morelord-") || !game.modules.get(namespace)?.active) return false;
     return CONFIGURATION_KEYS[namespace]?.split(" ").includes(key)
       || (namespace === "morelord-craftworks" && key.startsWith("recipePackEnabled_"))

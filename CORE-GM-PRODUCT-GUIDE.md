@@ -107,9 +107,11 @@ To change the setting:
 2. Enable or disable **Share Anonymous Usage Statistics**.
 3. Save your changes.
 
-During the separate account-connection process, Foundry supplies installation and world information needed to label and approve that connection. The anonymous usage-statistics setting applies only to the optional version report sent during access checks.
+During the separate account-connection process, Foundry supplies installation and world information needed to label and approve that connection. Core Settings also offers independent feature-usage and error-reporting choices without account connection. Broader reporting requires a fresh explicit choice; prior version-only consent does not enable it. Reports use a separate random world ID, fixed feature codes and sanitized error code locations, excluding campaign content and credentials. Developer Mode suppresses reporting. See [TELEMETRY.md](TELEMETRY.md) for coverage, privacy and the website deployment prerequisite.
 
 ## Troubleshooting
+
+For missing Craftworks components, download a troubleshooting file **before** using **Sync with Compendiums**, then another afterward. Updated Core and Craftworks include pack configuration/access, material and recipe counts, source availability, sync status, and recent sync/harvest outcome codes. Recent outcomes cover only this client since reload; no character names, campaign documents, or raw error messages are included.
 
 ### The approval page did not open
 
@@ -153,4 +155,3 @@ If needed, disconnect and reconnect the world to create a fresh account connecti
 | Manage the web account | Morelord Account window | **Open Account** |
 | Stop version reporting | Morelord Core module settings | Disable **Share Anonymous Usage Statistics** |
 | Remove the connection | Morelord Account window | **Disconnect** |
-

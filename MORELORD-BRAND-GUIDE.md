@@ -220,6 +220,7 @@ Use `--ml-space-1` through `--ml-space-5`; avoid introducing near-duplicate spac
 - Two- and three-column shared grids collapse at 700px.
 - Cards must grow with their content and must never allow labels or descriptions to escape their borders.
 - Actions wrap instead of clipping.
+- Use `.ml-grid` with `data-columns="2"` for equal-width card columns, including incomplete rows. `.ml-check-grid` wraps long checkbox labels within their columns; `.ml-cluster` keeps short checkbox options together while wrapping whole options.
 - Wide domain layouts may remain wide, but shell padding and visual hierarchy stay consistent.
 - At 200% zoom, every control must remain reachable and no sticky footer may cover focused content.
 
@@ -931,3 +932,17 @@ Morelord Gaming uses generative AI tools to assist with software development, in
 Checked September 13, 2026 against the [Foundry AI Content Policy](https://foundryvtt.com/article/ai-policy/), revised March 18, 2026. Permitted AI assistance no longer requires disclosure under that policy; use the blurb above if the submission form still requests it.
 
 AI-assisted code is permitted subject to the author's understanding and maintenance responsibilities. Prepared content has separate restrictions. Foundry package descriptions must be human-written; rewrite AI-generated listing drafts yourself before submission. A declaration does not override these requirements. Recheck the linked policy for each submission.
+
+
+Section header subtitles are short descriptions, not instructions. Put actionable guidance in the section body; use a Core callout for important explanations.
+
+For compact labels with quantities, use `<span class="ml-badge" data-truncate title="Full name"><span class="ml-badge__label">Name</span><span class="ml-badge__value">2/4</span></span>`. Core limits the pill width and truncates only the label; the trailing value stays visible. Existing badges are unchanged unless they opt in with `data-truncate`.
+
+Checkbox option groups with variable-length names should use `ml-cluster` containing `label.ml-check` with an input and sibling span. Whole options wrap between rows. Keep checkbox labels concise and put longer explanations in a wrapping helper below, associated with `aria-describedby`.
+## Compact tool panels and roll controls
+
+Use `.ml-tabs` with keyboard-accessible `[role="tab"]` links and `aria-selected` for a compact tab strip. Use `.ml-compact` on a panel to reduce body and control text while keeping a separate hero unchanged. Columns within a single surface can use `.ml-stack` and a plain label; they do not require nested surfaces or section headings.
+
+Use `.ml-roll-controls` for three skill-roll buttons in DIS / Roll / ADV order; the center control is wider. Core `rolls.skill` accepts optional `advantage` and `disadvantage` booleans. Omitted or false values leave automatic system rules untouched; true adds that modifier and the native system handles cancellation.
+
+Soundboard actions may opt into .ml-action-pad (96px rounded square). Use data-size=image for a 40px image-only macro button with an accessible name. A .ml-action-pad-group pairs the pad with a trailing .ml-icon-button delete control. Existing controls retain their dimensions.

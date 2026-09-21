@@ -55,11 +55,21 @@
       <input type="url" name="serverUrl" value="{{serverUrl}}" required>
       <small>Website used for account activation and entitlement checks.</small>
     </label>
-    <label class="ml-cluster">
-      <input type="checkbox" name="shareUsageStatistics" {{checked shareUsageStatistics}}>
-      <span>Share anonymous Morelord Core and Foundry version information during access checks.</span>
-    </label>
-    <label class="ml-cluster">
+    <div class="ml-stack" data-gap="1">
+      <label class="ml-check">
+        <input type="checkbox" name="shareUsageStatistics" aria-describedby="ml-core-version-sharing-help" {{checked shareUsageStatistics}}>
+        <span>Share feature usage</span>
+      </label>
+      <small id="ml-core-version-sharing-help">Shares feature actions, active module versions, Foundry and system versions, and GM/player role. A random world reporting ID and a separate reporting credential identify reports. No account connection required; no campaign content is sent.</small>
+    </div>
+    <div class="ml-stack" data-gap="1">
+      <label class="ml-check">
+        <input type="checkbox" name="shareErrorReports" aria-describedby="ml-core-error-sharing-help" {{checked shareErrorReports}}>
+        <span>Share error reports</span>
+      </label>
+      <small id="ml-core-error-sharing-help">Shares error types, Morelord code locations, failed operations and versions using the same random reporting ID. Recent feature actions are included only when feature sharing is enabled. Custom error text, campaign content and account credentials are excluded. Developer Mode pauses both reports.</small>
+    </div>
+    <label class="ml-check">
       <input type="checkbox" name="developerMode" {{checked developerMode}}>
       <span>Enable Developer Mode</span>
     </label>

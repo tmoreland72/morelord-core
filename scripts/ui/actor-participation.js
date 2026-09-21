@@ -1,22 +1,23 @@
-function characterMembers(group, actors) {
+function characterMembers(group, actors, includeNpcs = false) {
+  const eligible = actor => actor?.type === "character" || (includeNpcs && actor?.type === "npc");
   const resolve = member => {
     const candidate = member?.actor ?? member;
-    if (candidate?.type === "character") return candidate;
+    if (eligible(candidate)) return candidate;
     const id = typeof candidate === "string" ? candidate : candidate?.actorUuid ?? candidate?.uuid ?? candidate?.actorId ?? candidate?.id ?? candidate?._id;
-    return Array.from(actors ?? []).find(actor => actor.type === "character" && (actor.uuid === id || actor.id === id));
+    return Array.from(actors ?? []).find(actor => eligible(actor) && (actor.uuid === id || actor.id === id));
   };
   return [...(group?.system?.playerCharacters ?? []), ...(group?.system?.members ?? [])].map(resolve).filter(Boolean);
 }
 
-export function primaryPartyGroup(actors = game.actors) {
+export function primaryPartyGroup(actors = game.actors, { includeNpcs = false } = {}) {
   const groups = Array.from(actors ?? []).filter(actor => actor.type === "group");
   const ordered = [actors?.party, ...groups].filter((group, index, entries) => group && entries.indexOf(group) === index);
-  return ordered.find(group => characterMembers(group, actors).length) ?? null;
+  return ordered.find(group => characterMembers(group, actors, includeNpcs).length) ?? null;
 }
 
-export function listCharacterActors({ ownedOnly = false, defaultParty = true, actors = game.actors } = {}) {
-  const party = defaultParty ? primaryPartyGroup(actors) : null;
-  const candidates = [...characterMembers(party, actors), ...Array.from(actors ?? []).filter(actor => actor.type === "character" && actor.hasPlayerOwner)];
+export function listCharacterActors({ ownedOnly = false, defaultParty = true, includePartyNpcs = false, actors = game.actors } = {}) {
+  const party = defaultParty ? primaryPartyGroup(actors, { includeNpcs: includePartyNpcs }) : null;
+  const candidates = [...characterMembers(party, actors, includePartyNpcs), ...Array.from(actors ?? []).filter(actor => actor.type === "character" && actor.hasPlayerOwner)];
   return [...new Map(candidates.map(actor => [actor.uuid, actor])).values()]
     .filter(actor => !ownedOnly || actor.isOwner)
     .sort((left, right) => left.name.localeCompare(right.name));

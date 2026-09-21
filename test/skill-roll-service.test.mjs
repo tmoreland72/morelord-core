@@ -21,3 +21,11 @@ test("shared roll helpers expose character modifiers and the active d20", () => 
   assert.equal(actorSkillModifier({ system: { skills: { per: { total: -1 } } } }, "per"), -1);
   assert.equal(extractNaturalD20({ dice: [{ faces: 20, results: [{ result: 4, discarded: true }, { result: 16, active: true }] }] }), 16);
 });
+test("optional situational skill modifiers preserve native automatic rules", async () => {
+  const calls = [];
+  const actor = {rollSkill: async config => { calls.push(config); return [{total:10}]; }};
+  await rollSkill(actor,"ste",{advantage:true});
+  await rollSkill(actor,"ste",{disadvantage:true});
+  await rollSkill(actor,"ste",{advantage:false,disadvantage:false});
+  assert.deepEqual(calls,[{skill:"ste",advantage:true},{skill:"ste",disadvantage:true},{skill:"ste"}]);
+});

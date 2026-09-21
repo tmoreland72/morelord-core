@@ -15,10 +15,12 @@
     "templates"
   ],
   "optionalPaths": [
+    "IN-GAME-TESTING.md",
     "assets",
     "lang",
     "LICENSE",
     "LICENSE.md",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "TELEMETRY.md"
   ]
 }

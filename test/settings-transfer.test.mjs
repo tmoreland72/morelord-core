@@ -4,6 +4,7 @@ import { exportSettings, importSettings } from "../scripts/services/settings-tra
 
 test("settings round trip skips missing modules and protects records, validates before writing, and restores failures", async () => {
   const definitions = [
+    ["morelord-core", "serverUrl", String, "https://morelordgaming.com"],
     ["morelord-core", "shareUsageStatistics", Boolean, true],
     ["morelord-core", "installationToken", String, "secret"],
     ["morelord-core", "locations", Object, {}],
@@ -29,6 +30,7 @@ test("settings round trip skips missing modules and protects records, validates 
     const file = exportSettings();
     assert.equal(file.modules["morelord-core"].installationToken, undefined);
     assert.equal(file.modules["morelord-core"].locations, undefined);
+    assert.equal(file.modules["morelord-core"].shareUsageStatistics, undefined);
     assert.equal(file.modules["morelord-marketplace"].shops, undefined);
     assert.equal(file.modules["morelord-journeys"].activeJourney, undefined);
     file.modules["morelord-core"].shareUsageStatistics = false;
@@ -36,7 +38,8 @@ test("settings round trip skips missing modules and protects records, validates 
     file.modules["morelord-missing"] = null;
     file.modules["morelord-core"].installationToken = "overwrite";
     const result = await importSettings(JSON.parse(JSON.stringify(file)));
-    assert.equal(result.skipped, 2);
+    assert.equal(result.skipped, 3);
+    assert.equal(values.get("morelord-core.shareUsageStatistics"), true);
     assert.equal(values.get("morelord-core.installationToken"), "secret");
     assert.equal(values.get("morelord-marketplace.buyRate"), 2);
     assert.deepEqual(exportSettings().modules["morelord-encounters"].defaultPartyUuids, ["Actor.a"]);
@@ -48,7 +51,7 @@ test("settings round trip skips missing modules and protects records, validates 
     file.modules["morelord-core"].shareUsageStatistics = true;
     fail = true;
     await assert.rejects(importSettings(file), /Previous settings restored/);
-    assert.equal(values.get("morelord-core.shareUsageStatistics"), false);
+    assert.equal(values.get("morelord-core.shareUsageStatistics"), true);
     assert.equal(values.get("morelord-marketplace.buyRate"), 2);
     game.modules.get("morelord-marketplace").active = false;
     await importSettings(file);

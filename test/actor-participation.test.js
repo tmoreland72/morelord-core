@@ -1,6 +1,21 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { listCharacterChoices } from "../scripts/ui/actor-participation.js";
+import { listCharacterActors, listCharacterChoices } from "../scripts/ui/actor-participation.js";
+
+test("NPC party members are opt-in, deduplicated, and obey ownership filters", () => {
+  const hero = { type: "character", uuid: "Actor.hero", name: "Hero", hasPlayerOwner: true, isOwner: true };
+  const pet = { type: "npc", id: "pet", uuid: "Actor.pet", name: "Pet", isOwner: false };
+  const outsider = { type: "npc", uuid: "Actor.other", name: "Other", hasPlayerOwner: true };
+  const party = { type: "group", system: { members: [{ actor: hero }, { actor: pet }, { uuid: pet.uuid }] } };
+  const actors = [party, hero, pet, outsider];
+  actors.party = party;
+  assert.deepEqual(listCharacterActors({ actors }), [hero]);
+  assert.deepEqual(listCharacterActors({ actors, includePartyNpcs: true }), [hero, pet]);
+  assert.deepEqual(listCharacterActors({ actors, includePartyNpcs: true, ownedOnly: true }), [hero]);
+  assert.deepEqual(listCharacterActors({ actors, includePartyNpcs: true, defaultParty: false }), [hero]);
+  party.system.members = [{ actor: pet }];
+  assert.deepEqual(listCharacterActors({ actors, includePartyNpcs: true }), [hero, pet]);
+});
 
 const character = (id, { player = true } = {}) => ({ id, uuid: `Actor.${id}`, name: id, type: "character", hasPlayerOwner: player, isOwner: player, img: `${id}.webp` });
 

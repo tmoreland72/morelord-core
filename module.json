@@ -18,7 +18,7 @@
   "socket": true,
   "compatibility": {
     "minimum": "13",
-    "verified": "14.367"
+    "verified": "14.368"
   },
   "relationships": {
     "requires": [

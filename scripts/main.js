@@ -1,4 +1,6 @@
+import { collectModuleDiagnostics } from "./services/module-diagnostics.js";
 import { SettingsTransferApp } from "./ui/settings-transfer-app.js";
+import { TelemetryService } from "./services/telemetry-service.js";
 import { ContextualSocketService } from "./services/contextual-socket-service.js";
 import { IGNORED_USERS_SETTING, isIgnored, listUsers, activePlayerForActor } from "./services/user-service.js";
 import { IgnoredUsersApp } from "./ui/ignored-users-app.js";
@@ -21,6 +23,7 @@ import { actorSkillModifier, extractNaturalD20, rollSkill } from "./services/ski
 import { SUBSCRIPTION_TIERS, normalizeSubscriptionTier, capSubscriptionTier, applySubscriptionTesting } from "./services/subscription-testing.js";
 
 const MODULE_ID = "morelord-core";
+const telemetry = new TelemetryService();
 Hooks.on("renderApplicationV2", applyPageLayout);
 Hooks.on("renderApplication", applyPageLayout);
 Hooks.on("renderApplicationV2", activateCardSelection);
@@ -202,7 +205,7 @@ function getDiagnostics() {
 
   return {
     report: {
-      schemaVersion: 1,
+      schemaVersion: 2,
       generatedAt: new Date().toISOString(),
       privacy: "Excludes account tokens, installation IDs, server/world names and IDs, network addresses, users, and game document content."
     },
@@ -217,12 +220,15 @@ function getDiagnostics() {
       version: core?.version ?? null,
       connected: Boolean(game.settings.get(MODULE_ID, SETTINGS.TOKEN)),
       entitlementCachePresent: Object.keys(getCache()).length > 0,
-      anonymousUsageStatistics: game.settings.get(MODULE_ID, SETTINGS.SHARE_USAGE)
+      anonymousUsageStatistics: game.settings.get(MODULE_ID, SETTINGS.SHARE_USAGE),
+      featureUsageReporting: telemetry.enabled("usage"),
+      errorReporting: telemetry.enabled("error")
     },
     modules: {
       activeCount: modules.length,
       active: modules
     },
+    moduleDiagnostics: collectModuleDiagnostics(game.modules.values()),
     client: {
       userAgent: navigator.userAgent,
       platform: navigator.userAgentData?.platform ?? navigator.platform ?? null,
@@ -356,7 +362,8 @@ class MorelordConnectionApp extends HandlebarsApplicationMixin(ApplicationV2) {
       expiresAt: core?.expiresAt ? new Date(core.expiresAt).toLocaleString() : null,
       activation: this.activation,
       serverUrl: game.settings.get(MODULE_ID, SETTINGS.SERVER_URL),
-      shareUsageStatistics: game.settings.get(MODULE_ID, SETTINGS.SHARE_USAGE),
+      shareUsageStatistics: game.settings.get(MODULE_ID, "telemetryConsentVersion") === 1 && game.settings.get(MODULE_ID, SETTINGS.SHARE_USAGE),
+      shareErrorReports: game.settings.get(MODULE_ID, "shareErrorReports"),
       accountUrl: this.activation?.verificationUrl || `${normalizeServerUrl(game.settings.get(MODULE_ID, SETTINGS.SERVER_URL))}/account`
     };
   }
@@ -411,6 +418,8 @@ class MorelordConnectionApp extends HandlebarsApplicationMixin(ApplicationV2) {
     try {
       await game.settings.set(MODULE_ID, SETTINGS.SERVER_URL, serverUrl);
       await game.settings.set(MODULE_ID, SETTINGS.SHARE_USAGE, data.has(SETTINGS.SHARE_USAGE));
+      await game.settings.set(MODULE_ID, "shareErrorReports", data.has("shareErrorReports"));
+      await game.settings.set(MODULE_ID, "telemetryConsentVersion", 1);
       await game.settings.set(MODULE_ID, SETTINGS.DEVELOPER_TIER,
         capSubscriptionTier(data.get(SETTINGS.DEVELOPER_TIER), getActualEntitlements()?.tier));
       await game.settings.set(MODULE_ID, SETTINGS.DEVELOPER_MODE, data.has(SETTINGS.DEVELOPER_MODE));
@@ -455,7 +464,15 @@ class MorelordDiagnosticsDownloadApp extends ApplicationV2 {
   }
 }
 
+class MorelordDiscordApp extends ApplicationV2 {
+  render() {
+    window.open("https://discord.gg/B5YKQf579E", "_blank", "noopener,noreferrer");
+    return this;
+  }
+}
+
 Hooks.once("init", () => {
+  telemetry.registerSettings();
   for (const [key, type, defaultValue] of [
     [SETTINGS.DEVELOPER_MODE, Boolean, false],
     [SETTINGS.DEVELOPER_TIER, String, "standard"]
@@ -490,13 +507,14 @@ Hooks.once("init", () => {
     restricted: true
   });
   game.settings.register(MODULE_ID, SETTINGS.SHARE_USAGE, {
-    name: "Share Anonymous Usage Statistics",
-    hint: "Share only the Morelord Core and Foundry version during access checks. No campaign, player, actor, item, or chat data is collected.",
+    name: "Share Usage Statistics",
+    hint: "After choosing in Core Settings, share feature events and versions using a random world reporting ID. No account connection required.",
     scope: "world",
     config: false,
     type: Boolean,
     default: true,
-    restricted: true
+    restricted: true,
+    onChange: () => telemetry.reset()
   });
   for (const [key, type, defaultValue] of [
     [SETTINGS.TOKEN, String, ""],
@@ -540,10 +558,19 @@ Hooks.once("init", () => {
     type: MorelordDiagnosticsDownloadApp,
     restricted: true
   });
+  game.settings.registerMenu(MODULE_ID, "discord", {
+    name: "Discord Community",
+    label: "Join Discord",
+    hint: "Join the Morelord Gaming Discord server for support, feature requests, and general discussions.",
+    icon: "fa-brands fa-discord",
+    type: MorelordDiscordApp,
+    restricted: false
+  });
 });
 
 Hooks.once("ready", async () => {
   const api = {
+    telemetry,
     users: Object.freeze({ isIgnored, list: listUsers, activePlayerForActor }),
     designSystemVersion: "1.1.0",
     open: () => new MorelordConnectionApp().render({ force: true }),
@@ -602,6 +629,7 @@ Hooks.once("ready", async () => {
   };
   game.modules.get(MODULE_ID).api = api;
   globalThis.MorelordCore = api;
+  telemetry.start();
 
   if (game.user.isGM && api.isConnected()) {
     await refreshEntitlements(PRODUCT_SLUG, { quiet: true });

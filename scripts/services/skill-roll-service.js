@@ -1,8 +1,8 @@
-export async function rollSkill(actor, skillId, { dc = null, flavor = null, configure = true, create = true } = {}) {
+export async function rollSkill(actor, skillId, { dc = null, flavor = null, configure = true, create = true, advantage = false, disadvantage = false } = {}) {
   if (!actor) throw new Error("No actor available for the skill check.");
   if (typeof actor.rollSkill !== "function") throw new Error(`${actor.name} cannot make a skill check.`);
   const result = await actor.rollSkill(
-    { skill: skillId, ...(dc == null ? {} : { target: dc }) },
+    { skill: skillId, ...(dc == null ? {} : { target: dc }), ...(advantage ? { advantage: true } : {}), ...(disadvantage ? { disadvantage: true } : {}) },
     { configure: Boolean(configure), ...(flavor ? { title: flavor } : {}) },
     { create: Boolean(create), data: { ...(flavor ? { flavor } : {}) } }
   );
