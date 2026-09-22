@@ -194,3 +194,9 @@ The shared release validator supports required runtime files (including root mai
 `MorelordCore.sources.filter` exposes the shared `Dnd5eSourceFilterService` used by Craftworks and Marketplace. It honors D&D5e Configure Sources and canonical SRD provenance on copied documents. `ItemPickerApp` in `scripts/ui/item-picker-app.js` searches enabled physical Item compendiums and calls `onSelect(item)` with the selected document. Downtime commissions consume this Core UI.
 
 Locations stay open after Save. Shared field labels align their controls at the top, checkbox labels remain on one line, resource rows have room for multi-line descriptions, and dialog buttons grow to fit their text.
+
+## Shared roll requests and compendiums
+
+Core 0.3.11 provides shared chat roll controls, immediate Completed feedback, GM fallback, grouped request cards, and dice-animation outcome scheduling for Game Master, Craftworks, and Journeys. Module-owned private outcomes remain in GM-only messages. The contextual socket service exposes runSerialized for local commits coordinated with remote requests.
+
+The compendiums API exposes organize(entries, folderPath, {migration}) and labels(entries). Entries use collection and optional label. Organization preserves pack identifiers and configuration and migrates each pack once, respecting later manual moves. Display labels apply on connected clients; existing world-pack disk labels are not rewritten. Core components include the hotbar-sized macro image button used by Game Master.

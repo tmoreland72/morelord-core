@@ -1,3 +1,5 @@
+import { ChatRollRequests } from './services/chat-roll-requests.js';
+import { organizeCompendiums, labelCompendiums } from './services/compendium-organization.js';
 import { collectModuleDiagnostics } from "./services/module-diagnostics.js";
 import { SettingsTransferApp } from "./ui/settings-transfer-app.js";
 import { TelemetryService } from "./services/telemetry-service.js";
@@ -31,6 +33,7 @@ Hooks.on("renderApplication", activateCardSelection);
 Hooks.on("renderApplicationV2", activateCollapsibleSections);
 Hooks.on("renderApplication", activateCollapsibleSections);
 const contextualSocket = new ContextualSocketService();
+const chatRequests = new ChatRollRequests(contextualSocket);
 contextualSocket.start();
 const windowGeometry = new WindowGeometryService({ moduleId: MODULE_ID, settingKey: "windowGeometry" });
 const capabilityRegistry = new CapabilityRegistry();
@@ -472,6 +475,7 @@ class MorelordDiscordApp extends ApplicationV2 {
 }
 
 Hooks.once("init", () => {
+  game.settings.register(MODULE_ID, "compendiumOrganization", {scope:"world", config:false, type:Object, default:{}});
   telemetry.registerSettings();
   for (const [key, type, defaultValue] of [
     [SETTINGS.DEVELOPER_MODE, Boolean, false],
@@ -570,6 +574,8 @@ Hooks.once("init", () => {
 
 Hooks.once("ready", async () => {
   const api = {
+    chatRequests,
+    compendiums: Object.freeze({organize: organizeCompendiums, labels: labelCompendiums}),
     telemetry,
     users: Object.freeze({ isIgnored, list: listUsers, activePlayerForActor }),
     designSystemVersion: "1.1.0",
@@ -630,6 +636,7 @@ Hooks.once("ready", async () => {
   game.modules.get(MODULE_ID).api = api;
   globalThis.MorelordCore = api;
   telemetry.start();
+  chatRequests.start();
 
   if (game.user.isGM && api.isConnected()) {
     await refreshEntitlements(PRODUCT_SLUG, { quiet: true });

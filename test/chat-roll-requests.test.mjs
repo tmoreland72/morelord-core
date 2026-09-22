@@ -1,0 +1,86 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { ChatRollRequests, canRollForActor, rollAuthority } from "../scripts/services/chat-roll-requests.js";
+import { ContextualSocketService } from "../scripts/services/contextual-socket-service.js";
+
+test("chat requests authorize owners and fallback GMs, serialize resolution, and keep private outcomes out of acknowledgments", async t => {
+  const keys = ["game", "foundry", "socketlib", "fromUuid"];
+  const saved = keys.map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]);
+  t.after(() => { for (const [key, descriptor] of saved) if (descriptor) Object.defineProperty(globalThis, key, descriptor); else delete globalThis[key]; });
+  const gm = { id: "gm", active: true, isGM: true }, fallback = { id: "fallback", active: true, isGM: true };
+  const player = { id: "player", active: true }, stranger = { id: "stranger", active: true };
+  const actor = { uuid: "Actor.hero", testUserPermission: user => user === player };
+  const users = [gm, fallback, player, stranger];
+  users.get = id => users.find(user => user.id === id);
+  let ignored = [], request = { type: "test", actorUuid: actor.uuid, modes: true, choices: [], data: {} }, resolutions = 0;
+  const message = { author: gm, getFlag: () => request, async setFlag(_id, _key, value) { request = value; } };
+  globalThis.game = { user: gm, users, messages: new Map([["request", message]]), settings: { settings: new Map([["morelord-core.ignoredUserIds", {}]]), get: () => ignored } };
+  globalThis.foundry = { utils: { deepClone: structuredClone, randomID: () => crypto.randomUUID() } };
+  globalThis.fromUuid = async () => actor;
+  let dispatch;
+  globalThis.socketlib = { registerModule: () => ({ register: (_name, handler) => { dispatch = handler; } }) };
+  const socket = new ContextualSocketService();
+  socket.start();
+  const service = new ChatRollRequests(socket);
+  service.register("test", async () => { resolutions++; await new Promise(resolve => setTimeout(resolve, 5)); return { secretTotal: 19 }; });
+  const send = (user, data = {}) => dispatch({ namespace: "morelord-core.roll-requests", type: "test", senderUserId: user.id, targetUserId: game.user.id, data: { messageId: "request", ...data } });
+  assert.equal((await send(stranger)).accepted, false);
+  assert.equal((await send(player, { mode: "forged" })).accepted, false);
+  assert.equal((await send(player, { choice: "forged" })).accepted, false);
+  const results = await Promise.all([send(player), send(gm)]);
+  assert.equal(resolutions, 1);
+  assert.deepEqual(results, [{ accepted: true }, { accepted: true, alreadyResolved: true }]);
+  request = { ...request, completed: false };
+  player.active = false;
+  assert.equal(canRollForActor(actor, player), false);
+  assert.equal(canRollForActor(actor, gm), true);
+  assert.equal((await send(player)).accepted, false);
+  gm.active = false;
+  game.user = fallback;
+  assert.equal(rollAuthority(message), fallback);
+  assert.equal((await send(fallback)).accepted, true);
+  assert.equal(resolutions, 2);
+  ignored = [fallback.id];
+  assert.equal(canRollForActor(actor, fallback), false);
+  assert.equal(rollAuthority(message), undefined);
+});
+
+test("group creation keeps one message, independent rows, resend completion, and separate batches", async t => {
+  const keys = ["game", "foundry", "ChatMessage", "ui", "fromUuid"];
+  const saved = keys.map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]);
+  t.after(() => { for (const [key, descriptor] of saved) if (descriptor) Object.defineProperty(globalThis, key, descriptor); else delete globalThis[key]; });
+  const gm={id:"gm",isGM:true,active:true}, player={id:"player",active:true};
+  const users=[gm,player];users.get=id=>users.find(user=>user.id===id);
+  const actors=[{uuid:"Actor.a",testUserPermission:user=>user===player},{uuid:"Actor.b",testUserPermission:()=>false}];
+  const messages=[];messages.get=id=>messages.find(message=>message.id===id);
+  globalThis.game={user:gm,users,messages,settings:{settings:new Map()}};
+  globalThis.foundry={utils:{escapeHTML:String}};
+  globalThis.ui={chat:{updateMessage(){}}};
+  globalThis.fromUuid=async uuid=>actors.find(actor=>actor.uuid===uuid);
+  globalThis.ChatMessage={async create(data){
+    const message={...data,id:String(messages.length),author:gm,getFlag:(id,key)=>message.flags[id][key],async update(changes){
+      for(const [path,value] of Object.entries(changes)){const parts=path.split('.');let target=message;for(const part of parts.slice(0,-1))target=target[part]??={};target[parts.at(-1)]=value;}
+    }};messages.push(message);return message;
+  }};
+  let resolve;const calls=[];
+  const service=new ChatRollRequests({createChannel:()=>({on:(_type,handler)=>{resolve=handler;}})});
+  service.register("group",async(data,context)=>{calls.push(context.actor.uuid);return {privateTotal:20};});
+  const options={type:"group",title:"Party Check",groupKey:"batch",choices:[{id:"sur",label:"Survival"},{id:"decline",label:"Decline search"}]};
+  const [first,second]=await Promise.all(actors.map((actor,index)=>service.create({...options,key:`request.${index}`,actorUuid:actor.uuid})));
+  assert.equal(first,second);assert.equal(messages.length,1);
+  const entries=first.getFlag("morelord-core","rollRequest").entries, [a,b]=Object.keys(entries);
+  assert.equal(Object.keys(entries).length,2);
+  assert.equal((first.content.match(/data-ml-roll-entry=/g)??[]).length,2);
+  assert.equal((first.content.match(/data-ml-roll-decline/g)??[]).length,2);
+  assert.equal((await resolve({messageId:first.id,entryKey:b},{senderUserId:player.id})).accepted,false);
+  assert.equal((await resolve({messageId:first.id,entryKey:"__proto__"},{senderUserId:gm.id})).accepted,false);
+  assert.deepEqual(await resolve({messageId:first.id,entryKey:a,choice:"sur"},{senderUserId:player.id}),{accepted:true});
+  assert.equal(entries[a].completed,true);assert.equal(entries[b].completed,false);
+  await service.create({...options,key:"request.0",actorUuid:actors[0].uuid});
+  assert.equal(entries[a].completed,true);assert.equal(messages.length,1);
+  assert.equal((await resolve({messageId:first.id,entryKey:a},{senderUserId:gm.id})).alreadyResolved,true);
+  await resolve({messageId:first.id,entryKey:b,choice:"decline"},{senderUserId:gm.id});
+  assert.deepEqual(calls,["Actor.a","Actor.b"]);
+  await service.create({...options,groupKey:"next-batch",key:"new",actorUuid:actors[0].uuid});
+  assert.equal(messages.length,2);
+});

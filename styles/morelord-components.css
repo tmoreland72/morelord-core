@@ -139,6 +139,7 @@
 .ml-card[data-size="large"] > .ml-check strong,
 .ml-card__summary { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; }
 .ml-card__footer { margin-top: auto; }
+.ml-roll-completed { margin: 0; text-align: center; }
 .ml-card { min-width: 0; overflow-wrap: anywhere; }
 .ml-window .window-content button:is(.ml-card, .ml-list-button) { height: auto; max-height: none; flex-shrink: 0; white-space: normal; text-align: left; line-height: var(--ml-line-height-body); }
 .ml-card__body { min-width: 0; overflow-wrap: anywhere; }
@@ -324,3 +325,7 @@
 .ml-action-pad-group { position:relative; width:96px; height:96px; }
 .ml-window .window-content .ml-action-pad-group > .ml-action-pad { padding-bottom:var(--ml-control-height); }
 .ml-window .window-content .ml-action-pad-group > .ml-icon-button { position:absolute; bottom:0; right:0; border-radius:var(--ml-radius-lg) 0 var(--ml-radius-lg) 0; }
+
+/* Macro buttons matching Foundry's action-bar slot geometry. */
+.ml-window .window-content .ml-action-pad[data-size="hotbar"] { width:var(--hotbar-size,60px); min-width:var(--hotbar-size,60px); height:var(--hotbar-size,60px); min-height:var(--hotbar-size,60px); padding:0; overflow:hidden; border-radius:10px; }
+.ml-action-pad[data-size="hotbar"] > img { width:100%; height:100%; object-fit:cover; border:0; border-radius:inherit; }

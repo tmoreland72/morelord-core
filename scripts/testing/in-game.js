@@ -1,3 +1,7 @@
+export function inGameTestSkipReason(world = globalThis.game?.world) {
+  return world?.id?.toLowerCase() === "dev1" ? null : `In-Foundry testing skipped: Dev1 must be loaded (current world: ${world?.id ?? "unknown"}).`;
+}
+
 // Opt-in only: import from a logged-in Foundry browser console or Script macro.
 // Keep this out of main.js so ordinary sessions never execute test code.
 export function assert(condition, message) {
@@ -26,6 +30,8 @@ let running = false;
 
 /** Run on GM and player clients separately. Extra checks must clean up their own fixtures. */
 export async function runInGameTests({ checks = [] } = {}) {
+  const reason=inGameTestSkipReason();
+  if(reason) return {suite:"morelord-core-smoke",schemaVersion:1,skipped:true,ok:true,results:[{id:"core.dev1-only",status:"skip",reason}],summary:{pass:0,fail:0,skip:1}};
   assert(!running, "An in-game suite is already running in this client.");
   assert(globalThis.game?.ready, "Join a world and wait for Foundry to finish loading.");
   running = true;

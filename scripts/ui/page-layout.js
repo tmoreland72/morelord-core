@@ -1,10 +1,11 @@
+import { preserveWindowScroll } from "./scroll-preservation.js";
 /** One scrolling page body and a separate action footer for Morelord applications. */
 export function applyPageLayout(application, renderedElement) {
   const root = renderedElement instanceof HTMLElement ? renderedElement : application?.element;
   if (!root?.matches?.(".ml-window")) return;
   const content = root.querySelector(".window-content");
   const body = content?.querySelector(":scope > .ml-app-shell");
-  if (!body) return; // DialogV2 has its own shared body/footer layout.
+  if (!body) { preserveWindowScroll(application, root); return; } // DialogV2 has its own shared body/footer layout.
 
   content.classList.add("ml-page-layout");
   body.classList.add("ml-page-body");
@@ -35,4 +36,5 @@ export function applyPageLayout(application, renderedElement) {
       parent.classList.add("ml-page-flow");
     }
   }
+  preserveWindowScroll(application, root);
 }

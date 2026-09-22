@@ -55,6 +55,9 @@ export class ContextualSocketService {
 
   get ready() { return this.#ready; }
 
+  /** Serialize local commits with socket handlers, without holding a queue during animations. */
+  runSerialized(key, callback) { return this.#serial.run(key, callback); }
+
   #on(namespace, type, handler, { serialize = null } = {}) {
     const key = `${namespace}:${type}`;
     this.#handlers.set(key, { handler, serialize });
