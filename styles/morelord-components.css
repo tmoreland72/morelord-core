@@ -329,3 +329,6 @@
 /* Macro buttons matching Foundry's action-bar slot geometry. */
 .ml-window .window-content .ml-action-pad[data-size="hotbar"] { width:var(--hotbar-size,60px); min-width:var(--hotbar-size,60px); height:var(--hotbar-size,60px); min-height:var(--hotbar-size,60px); padding:0; overflow:hidden; border-radius:10px; }
 .ml-action-pad[data-size="hotbar"] > img { width:100%; height:100%; object-fit:cover; border:0; border-radius:inherit; }
+
+/* A tray toggle shares the window surface, including its transparency. */
+.ml-window .ml-tray-handle { display:inline-flex; align-items:center; justify-content:center; gap:var(--ml-space-2); width:auto; height:auto; padding:var(--ml-space-1) var(--ml-space-3); border:1px solid var(--ml-color-border); border-radius:var(--ml-radius-md) var(--ml-radius-md) 0 0; box-shadow:none; cursor:pointer; }

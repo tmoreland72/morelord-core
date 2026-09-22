@@ -946,3 +946,5 @@ Use `.ml-tabs` with keyboard-accessible `[role="tab"]` links and `aria-selected`
 Use `.ml-roll-controls` for three skill-roll buttons in DIS / Roll / ADV order; the center control is wider. Core `rolls.skill` accepts optional `advantage` and `disadvantage` booleans. Omitted or false values leave automatic system rules untouched; true adds that modifier and the native system handles cancellation.
 
 Soundboard actions may opt into .ml-action-pad (96px rounded square). Use data-size=image for a 40px image-only macro button with an accessible name. A .ml-action-pad-group pairs the pad with a trailing .ml-icon-button delete control. Existing controls retain their dimensions.
+
+Tray handles use a native button with class ml-tray-handle inside ml-window, aria-expanded and aria-controls. Core supplies the same surface and transparency as window-content. Feature modules position the handle and update its direction icon when the tray opens or closes.
