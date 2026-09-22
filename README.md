@@ -200,3 +200,5 @@ Locations stay open after Save. Shared field labels align their controls at the 
 Core 0.3.11 provides shared chat roll controls, immediate Completed feedback, GM fallback, grouped request cards, and dice-animation outcome scheduling for Game Master, Craftworks, and Journeys. Module-owned private outcomes remain in GM-only messages. The contextual socket service exposes runSerialized for local commits coordinated with remote requests.
 
 The compendiums API exposes organize(entries, folderPath, {migration}) and labels(entries). Entries use collection and optional label. Organization preserves pack identifiers and configuration and migrates each pack once, respecting later manual moves. Display labels apply on connected clients; existing world-pack disk labels are not rewritten. Core components include the hotbar-sized macro image button used by Game Master.
+
+Core 0.3.12 fixes the 0.3.11 public socket export: socket.runSerialized(key, callback) is available to the shared afterDiceAnimation helper. This restores result display for saved rolls in Game Master, Craftworks and Journeys.

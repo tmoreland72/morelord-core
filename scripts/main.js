@@ -612,7 +612,8 @@ Hooks.once("ready", async () => {
     rolls: Object.freeze({ skill: rollSkill, skillModifier: actorSkillModifier, naturalD20: extractNaturalD20 }),
     socket: Object.freeze({
       get ready() { return contextualSocket.ready; },
-      createChannel: namespace => contextualSocket.createChannel(namespace)
+      createChannel: namespace => contextualSocket.createChannel(namespace),
+      runSerialized: (key, callback) => contextualSocket.runSerialized(key, callback)
     }),
     locations: Object.freeze({
       settlementTypes: SETTLEMENT_TYPES,
