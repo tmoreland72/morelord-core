@@ -13,6 +13,7 @@
     var(--ml-color-window);
   font-family: var(--ml-font-family-body);
   font-size: var(--ml-font-size-body);
+  font-weight: var(--ml-font-weight-normal);
   line-height: var(--ml-line-height-body);
 }
 
@@ -22,6 +23,7 @@
   color: var(--ml-color-text);
   font-family: var(--ml-font-family-body);
   font-size: var(--ml-font-size-body);
+  font-weight: var(--ml-font-weight-normal);
   line-height: var(--ml-line-height-body);
 }
 
@@ -78,7 +80,7 @@
   pointer-events: none;
 }
 
-:where(.ml-app, .ml-chat-card) :where(h1, h2, h3, h4) {
+:where(.ml-app, .ml-chat-card) :where(h1, h2, h3, h4, h5, h6) {
   color: inherit;
   font-family: var(--ml-font-family-heading);
   line-height: var(--ml-line-height-heading);
@@ -88,6 +90,7 @@
 :where(.ml-app, .ml-window .window-content) h3 { font-size: 1.1rem; }
 
 :where(.ml-app, .ml-chat-card) :where(p, li, dd, label, input, select, textarea, button) { font-family: inherit; }
+:is(.ml-window .window-content, .ml-app, .ml-chat-card) :where(p, li, dd) { font-weight: var(--ml-font-weight-normal); }
 :where(.ml-app, .ml-chat-card) :where(.notes, small, [data-text="muted"]) { color: var(--ml-color-muted); }
 
 .ml-stack { display: flex; flex-direction: column; gap: var(--ml-space-3); }
@@ -118,7 +121,7 @@
   color: var(--ml-color-text);
 }
 .ml-window .window-content select option {
-  background: var(--color-cool-5, #18161d);
+  background: var(--ml-color-window);
   color: var(--ml-color-text);
 }
 .ml-window .window-content select { color-scheme: dark; }

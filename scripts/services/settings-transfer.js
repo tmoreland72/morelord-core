@@ -15,7 +15,7 @@ function requireGM() {
 export function transferableSettings() {
   return Array.from(game.settings.settings.values()).filter(setting => {
     const { namespace, key } = setting;
-    if (namespace === "morelord-core" && ["shareUsageStatistics", "shareErrorReports", "telemetryConsentVersion", "telemetryWorldId", "telemetryCredentials"].includes(key)) return false;
+    if (namespace === "morelord-core" && ["shareUsageStatistics", "shareErrorReports", "telemetryConsentVersion", "telemetryNoticeVersion", "telemetryWorldId", "telemetryCredentials"].includes(key)) return false;
     if (!namespace.startsWith("morelord-") || !game.modules.get(namespace)?.active) return false;
     return CONFIGURATION_KEYS[namespace]?.split(" ").includes(key)
       || (namespace === "morelord-craftworks" && key.startsWith("recipePackEnabled_"))

@@ -10,6 +10,42 @@ function fixture() {
   return { settings, requests, service };
 }
 
+test("notice defaults, saved opt-out, once per world, and close without saving", async () => {
+  const previous = globalThis.foundry;
+  try {
+    for (const usage of [true, false]) {
+      const { service, settings } = fixture();
+      settings.shareUsageStatistics = usage;
+      let shown = 0;
+      globalThis.foundry = { applications: { api: { DialogV2: { wait: async options => {
+        shown++;
+        assert.equal(/name="shareUsageStatistics"[^>]* checked/.test(options.content), usage);
+        assert.equal(/name="shareErrorReports"[^>]* checked/.test(options.content), false);
+        await options.buttons[0].callback(null, { form: { elements: {
+          shareUsageStatistics: { checked: false }, shareErrorReports: { checked: false }
+        } } });
+      } } } } };
+      await service.showNotice();
+      service.noticeAttempted = false;
+      await service.showNotice();
+      assert.equal(shown, 1);
+      assert.equal(settings.telemetryNoticeVersion, 1);
+      assert.equal(settings.telemetryConsentVersion, 1);
+      assert.equal(settings.shareUsageStatistics, false);
+    }
+    const { service, settings } = fixture();
+    let shown = 0;
+    globalThis.foundry.applications.api.DialogV2.wait = async () => { shown++; };
+    await service.showNotice(); await service.showNotice();
+    assert.equal(shown, 1);
+    assert.equal(settings.telemetryConsentVersion, 0);
+    assert.equal(settings.telemetryNoticeVersion, undefined);
+    service.noticeAttempted = false;
+    await service.showNotice();
+    assert.equal(shown, 2);
+  } finally { globalThis.foundry = previous; }
+});
+
 test("old consent sends nothing; explicit consent uses only a reporting credential", async () => {
   const { service, settings, requests } = fixture();
   service.track("morelord-core", "dashboard.opened");

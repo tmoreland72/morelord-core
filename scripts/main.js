@@ -365,7 +365,7 @@ class MorelordConnectionApp extends HandlebarsApplicationMixin(ApplicationV2) {
       expiresAt: core?.expiresAt ? new Date(core.expiresAt).toLocaleString() : null,
       activation: this.activation,
       serverUrl: game.settings.get(MODULE_ID, SETTINGS.SERVER_URL),
-      shareUsageStatistics: game.settings.get(MODULE_ID, "telemetryConsentVersion") === 1 && game.settings.get(MODULE_ID, SETTINGS.SHARE_USAGE),
+      shareUsageStatistics: game.settings.get(MODULE_ID, SETTINGS.SHARE_USAGE),
       shareErrorReports: game.settings.get(MODULE_ID, "shareErrorReports"),
       accountUrl: this.activation?.verificationUrl || `${normalizeServerUrl(game.settings.get(MODULE_ID, SETTINGS.SERVER_URL))}/account`
     };
@@ -423,6 +423,7 @@ class MorelordConnectionApp extends HandlebarsApplicationMixin(ApplicationV2) {
       await game.settings.set(MODULE_ID, SETTINGS.SHARE_USAGE, data.has(SETTINGS.SHARE_USAGE));
       await game.settings.set(MODULE_ID, "shareErrorReports", data.has("shareErrorReports"));
       await game.settings.set(MODULE_ID, "telemetryConsentVersion", 1);
+      await game.settings.set(MODULE_ID, "telemetryNoticeVersion", 1);
       await game.settings.set(MODULE_ID, SETTINGS.DEVELOPER_TIER,
         capSubscriptionTier(data.get(SETTINGS.DEVELOPER_TIER), getActualEntitlements()?.tier));
       await game.settings.set(MODULE_ID, SETTINGS.DEVELOPER_MODE, data.has(SETTINGS.DEVELOPER_MODE));
@@ -512,7 +513,7 @@ Hooks.once("init", () => {
   });
   game.settings.register(MODULE_ID, SETTINGS.SHARE_USAGE, {
     name: "Share Usage Statistics",
-    hint: "After choosing in Core Settings, share feature events and versions using a random world reporting ID. No account connection required.",
+    hint: "Selected by default in the one-time GM notice. Save your choice to share feature events and versions using a random world reporting ID; turn off anytime in Core Settings.",
     scope: "world",
     config: false,
     type: Boolean,
@@ -574,9 +575,9 @@ Hooks.once("init", () => {
 
 Hooks.once("ready", async () => {
   const api = {
-    chatRequests,
     compendiums: Object.freeze({organize: organizeCompendiums, labels: labelCompendiums}),
     telemetry,
+    chatRequests,
     users: Object.freeze({ isIgnored, list: listUsers, activePlayerForActor }),
     designSystemVersion: "1.1.0",
     open: () => new MorelordConnectionApp().render({ force: true }),

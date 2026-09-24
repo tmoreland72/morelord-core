@@ -204,6 +204,8 @@ Add the shared class alongside a readable module class. The shared class owns co
 
 ## Forms and controls
 
+Standard paragraphs, list prose, and descriptions use Core's normal body weight across windows, dialogs, and chat cards. Reserve bold for headings, labels, and deliberate inline emphasis. Core owns this default in `morelord-primitives.css`; do not override ordinary prose weight in feature modules.
+
 - Inputs, selects, and textareas use the shared height, background, border, radius, and focus treatment.
 - Select menus must remain readable in their expanded native popup; Morelord’s dark windows use a dark `color-scheme` and opaque option background.
 - Field labels use the shared uppercase eyebrow treatment.
@@ -947,4 +949,15 @@ Use `.ml-roll-controls` for three skill-roll buttons in DIS / Roll / ADV order; 
 
 Soundboard actions may opt into .ml-action-pad (96px rounded square). Use data-size=image for a 40px image-only macro button with an accessible name. A .ml-action-pad-group pairs the pad with a trailing .ml-icon-button delete control. Existing controls retain their dimensions.
 
+Use .ml-action-pad[data-size="hotbar"] for image macro buttons matching Foundry action-bar slots (60px fallback, 10px rounded corners). Supply the native --hotbar-size variable when available.
+
+Core page layout automatically preserves scrolling across redraws, including nested overflow panels and plain DOM trays that call applyPageLayout. No module-specific scroll handler is required. Give repeated/reordered panels a stable data-ml-scroll-key; otherwise Core uses IDs or structural signatures. Existing renderPreservingScroll callers remain supported, including explicit reset:true for deliberate phase resets.
+
+Grouped request cards use `MorelordCore.chatRequests.create({ type, key, groupKey, title, actorUuid, dc, modes, choices, data })`. Give each character request a stable `key` and the party batch one shared `groupKey`; a resend must retain both. The shared service owns the Game Master-style stacked character cards, actor portraits, skill choices, DIS/Roll/ADV controls, separate decline action, completion states, and active-player/GM routing. Keep result visibility and domain validation in the registered resolver; public request flags must not contain private outcomes. Omit `groupKey` for a standalone request.
+
+
+Completed request rows use Core’s `markRollCompleted(row)` helper and `.ml-roll-completed` status text. Remove all response controls instead of leaving disabled buttons. Show centered Completed text immediately on click while retaining the actor identity; other rows remain clickable. Use `submitChatRoll`/`isRollSubmitted` to preserve this state through rerenders and restore controls after rejected submissions. Use Core’s `waitForDiceAnimation(message)` or `afterDiceAnimation(messages, callback, serializeKey)` before revealing derived outcomes, without holding the roll-request queue while animations run.
+
 Tray handles use a native button with class ml-tray-handle inside ml-window, aria-expanded and aria-controls. Core supplies the same surface and transparency as window-content. Feature modules position the handle and update its direction icon when the tray opens or closes.
+
+Shared window/footer surfaces follow Foundry’s light/dark color scheme with `light-dark()` and its palette. Select options consume the same surface token; feature modules must not override these colors.

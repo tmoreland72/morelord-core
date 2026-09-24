@@ -15,8 +15,8 @@
   --ml-color-text: var(--color-text-primary, currentColor);
   --ml-color-muted: var(--color-text-subtle, var(--color-text-dark-secondary, rgb(255 255 255 / 72%)));
   --ml-color-border: var(--color-border-light-2, var(--color-border-light-primary, rgb(255 255 255 / 18%)));
-  --ml-color-window: color-mix(in srgb, var(--color-cool-5, #18161d) 94%, transparent);
-  --ml-color-footer: #0d0c12;
+  --ml-color-window: light-dark(var(--color-light-1, #f7f3e8), color-mix(in srgb, var(--color-cool-5, #18161d) 94%, transparent));
+  --ml-color-footer: light-dark(var(--color-light-1, #f7f3e8), #0d0c12);
   --ml-color-surface: rgb(255 255 255 / 4%);
   --ml-color-surface-raised: rgb(255 255 255 / 7%);
   --ml-color-surface-sunken: rgb(0 0 0 / 18%);

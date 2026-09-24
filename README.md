@@ -1,5 +1,7 @@
 # Morelord Core
 
+Core's `compendiums.organize(entries, path, {migration})` API places existing packs in a shared native folder hierarchy without changing pack/document IDs or permissions. `entries` contains `{collection, label}` objects. Placement is recorded once per pack/world; later manual moves remain respected. `compendiums.labels(entries)` applies display labels on each client, including generated world packs whose old manifest labels remain on disk. Craftworks and Game Master consume this service for the Morelord Gaming parent folder. Personal Graypes Compendium is organized separately by its own module and is not part of that hierarchy.
+
 User-facing history and result logs must use readable text. `scripts/ui/log-formatting.js` provides `logLabel` and `logValue` for plain-text fallback formatting of structured values; prefer domain-specific sentences and resolved names when available. Escape these strings when inserting HTML. JSON remains appropriate for storage, exports, and developer diagnostics.
 
 User-facing history and result logs must use readable text. `scripts/ui/log-formatting.js` provides `logLabel` and `logValue` for plain-text fallback formatting of structured values; prefer domain-specific sentences and resolved names when available. Escape these strings when inserting HTML. JSON remains appropriate for storage, exports, and developer diagnostics.
@@ -7,6 +9,8 @@ User-facing history and result logs must use readable text. `scripts/ui/log-form
 Shared account activation and entitlement services for Morelord Tools Foundry VTT modules.
 
 ## GM setup
+
+See the [Core GM Product Guide](CORE-GM-PRODUCT-GUIDE.md) for account controls, reporting preferences, Ignored Users, shared Locations, configuration transfer, and troubleshooting.
 
 1. Install and enable Morelord Core.
 2. Open **Game Settings → Configure Settings → Module Settings → Morelord Core**.
@@ -94,7 +98,7 @@ https://raw.githubusercontent.com/tmoreland72/morelord-core/main/module.json
 
 ## Usage and error reporting
 
-Core Settings provides independent **Share feature usage** and **Share error reports** choices, available without an account connection. The broader reports require a fresh explicit choice; existing version-only consent does not enable them. Reports use a random world reporting ID and exclude campaign content and credentials. Developer Mode suppresses reporting. The legacy version-only entitlement headers remain governed by the existing stored sharing preference until changed. See [TELEMETRY.md](TELEMETRY.md) for event coverage, privacy, counting limitations and deployment requirements. The reporting website and database migrations were deployed on September 20, 2026.
+New and existing worlds receive a one-time GM reporting notice in the next Core update. **Share feature usage** and **Share error reports** are both preselected by default, preserving saved opt-outs. Uncheck either before saving to opt out, or change it anytime in **Morelord Core → Core Settings**. No account connection is required. Legacy worlds send no broader reports until the GM saves; existing explicit choices remain intact. Reports use a pseudonymous random world reporting ID and exclude campaign content and credentials. Developer Mode suppresses reporting. See [TELEMETRY.md](TELEMETRY.md) for notice behavior, collected fields, 90-day raw-event retention and counting limitations.
 ## Standard release workflow
 
 Production Morelord Foundry modules use the same `release.ps1`. Character Export and Downtime follow these release steps. Project-specific values are stored in `release.config.json`, so improvements to the workflow can be copied between repositories without editing module logic.
@@ -202,3 +206,14 @@ Core 0.3.11 provides shared chat roll controls, immediate Completed feedback, GM
 The compendiums API exposes organize(entries, folderPath, {migration}) and labels(entries). Entries use collection and optional label. Organization preserves pack identifiers and configuration and migrates each pack once, respecting later manual moves. Display labels apply on connected clients; existing world-pack disk labels are not rewritten. Core components include the hotbar-sized macro image button used by Game Master.
 
 Core 0.3.12 fixes the 0.3.11 public socket export: socket.runSerialized(key, callback) is available to the shared afterDiceAnimation helper. This restores result display for saved rolls in Game Master, Craftworks and Journeys.
+
+## Grouped chat roll requests
+
+Shared chat roll requests accept a `groupKey` to keep one persistent public party card, with independent character DCs, choices, DIS/Roll/ADV controls, completion, and GM fallback. Use a fresh group key for a new batch; retain it for resends. Existing single-character cards remain supported. Keep private outcomes in domain-owned GM-only messages, not request flags or socket acknowledgments.
+
+
+Clicking a character's roll immediately removes that row's controls and shows centered **Completed** text; other rows remain usable. Shared `submitChatRoll(message, key, row, submit)` and `isRollSubmitted(message, key)` preserve this local state during rerenders and restore controls when the GM rejects or cancels the roll. `completeChatRoll(message, entryKey)` persists completion once the GM records it. Permissions, offline-player GM fallback, and duplicate protection are unchanged.
+
+`waitForDiceAnimation(message)` delays derived outcomes, not request-card completion. Consumers can schedule `afterDiceAnimation(messages, callback, serializeKey)` without awaiting it inside a socket handler; only its final callback joins `MorelordCore.socket.runSerialized(key, callback)`, sharing the existing mutation queue. Handle its rejected promise, reread current domain state before committing, and retain saved dice for recovery. Animation waits must never hold the roll queue. Craftworks, Journeys, and Game Master use this path; rolls without animations show outcomes immediately after the commit.
+
+Core window, footer, and select-option surfaces follow Foundry’s color scheme and palette so light-theme text remains readable.

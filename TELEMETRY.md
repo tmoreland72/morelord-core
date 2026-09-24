@@ -1,10 +1,12 @@
 # Usage, errors and download reporting
 
-The reporting website and migrations were deployed on September 20, 2026. Core 0.3.10 introduces the opt-in reporting client.
+The reporting website and migrations were deployed on September 20, 2026. Core 0.3.10 introduced the reporting client. The next Core update adds the one-time GM notice described below.
 
 ## GM controls
 
-Open Morelord Core's account/settings window, even without a connected account. Share feature usage and Share error reports are independent choices. Both appear unchecked until the GM explicitly chooses and saves. The existing shareUsageStatistics key is preserved; telemetryConsentVersion=1 gates the broader reporting. Prior version-only sharing does not grant consent for feature events or errors. Legacy version headers remain on entitlement requests until that setting is changed. No account token, subscription, or activation is needed by the new endpoint.
+New and existing worlds receive a one-time **Morelord Reporting Preferences** notice for the elected active GM. **Share feature usage** and **Share error reports** are both preselected by default and preserve any previous saved choices. Uncheck either control before **Save Reporting Preferences** to opt out. Saving records the notice once per world, including when both choices are off. Closing without saving leaves preferences unchanged and offers the notice at the next GM session, not repeatedly during the same session.
+
+Change either choice anytime in **Morelord Core → Core Settings**, without connecting an account. The existing `shareUsageStatistics` key is preserved; `telemetryConsentVersion=1` still gates broader reporting, so a legacy world sends no feature/error reports before saving its choice. Previously enabled reporting stays governed by its saved choices. `telemetryNoticeVersion=1` records the completed notice and is excluded from settings transfers. Legacy version headers remain on entitlement requests until that setting is changed. No account token, subscription, or activation is needed by the reporting endpoint.
 
 Reporting is disabled in Developer Mode and for Core's Ignored Users. Revoking consent clears pending reports and aborts the client's current request; already received reports remain subject to retention. Privacy choices, the random reporting ID and its reporting credential are excluded from configuration exports. Do not opt demo worlds in: real reports would count them as usage unless Developer Mode is enabled.
 

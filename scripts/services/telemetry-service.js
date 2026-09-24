@@ -32,6 +32,7 @@ export class TelemetryService {
   seenErrors = new WeakSet();
   registering = false;
   rejectedToken = null;
+  noticeAttempted = false;
 
   constructor({ game = () => globalThis.game, fetch = (...args) => globalThis.fetch(...args) } = {}) {
     this.game = game;
@@ -40,10 +41,41 @@ export class TelemetryService {
 
   registerSettings() {
     const settings = this.game().settings;
-    for (const [key, type, value] of [["telemetryConsentVersion", Number, 0], ["shareErrorReports", Boolean, false], ["telemetryCredentials", Object, {}]]) {
+    for (const [key, type, value] of [["telemetryNoticeVersion", Number, 0], ["telemetryConsentVersion", Number, 0], ["shareErrorReports", Boolean, true], ["telemetryCredentials", Object, {}]]) {
       settings.register(CORE, key, { scope: "world", config: false, restricted: true, type, default: value,
         onChange: () => { if (key !== "telemetryCredentials") this.reset(); } });
     }
+  }
+
+  async showNotice() {
+    const game = this.game();
+    if (!game.user?.isGM || this.noticeAttempted || game.settings.get(CORE, "telemetryNoticeVersion") >= 1) return;
+    this.noticeAttempted = true;
+    const usage = game.settings.get(CORE, "shareUsageStatistics");
+    const errors = game.settings.get(CORE, "shareErrorReports");
+    await foundry.applications.api.DialogV2.wait({
+      id: "morelord-core-reporting-notice",
+      classes: ["ml-window"],
+      window: { title: "Morelord Reporting Preferences", resizable: true },
+      position: { width: 520 },
+      content: `<div><section class="ml-app ml-app-shell ml-dialog-shell ml-stack">
+        <header class="ml-section-heading"><div><h2>Help us improve</h2><p>Choose what this world shares with Morelord Gaming.</p></div></header>
+        <div class="ml-surface ml-stack">
+          <label class="ml-check"><input type="checkbox" name="shareUsageStatistics" aria-describedby="ml-reporting-usage" ${usage ? "checked" : ""}><span>Share feature usage</span></label>
+          <small id="ml-reporting-usage">Sends feature actions, module/Foundry/system versions, and GM/player role using a random world reporting ID. Reports are pseudonymous, not anonymous. No campaign content or account credentials are sent.</small>
+          <label class="ml-check"><input type="checkbox" name="shareErrorReports" aria-describedby="ml-reporting-errors" ${errors ? "checked" : ""}><span>Share error reports</span></label>
+          <small id="ml-reporting-errors">Optional: sends error types, Morelord code locations and failed operations. Recent feature actions are included only with usage sharing. Custom error messages are excluded.</small>
+        </div>
+      </section></div>`,
+      buttons: [{ action: "save", label: "Save Reporting Preferences", default: true, callback: async (_event, button) => {
+        const form = button.form;
+        await game.settings.set(CORE, "shareUsageStatistics", form.elements.shareUsageStatistics.checked);
+        await game.settings.set(CORE, "shareErrorReports", form.elements.shareErrorReports.checked);
+        await game.settings.set(CORE, "telemetryConsentVersion", 1);
+        await game.settings.set(CORE, "telemetryNoticeVersion", 1);
+      } }],
+      rejectClose: false
+    });
   }
 
   enabled(kind) {
@@ -135,6 +167,7 @@ export class TelemetryService {
     try {
       const game = this.game();
       const primary = Array.from(globalThis.MorelordCore?.users?.list?.(game.users) ?? game.users ?? []).filter(user => user.active && user.isGM).sort((a, b) => a.id.localeCompare(b.id))[0];
+      if (primary?.id === game.user?.id) await this.showNotice();
       if (primary?.id === game.user?.id && (this.enabled("usage") || this.enabled("error"))) {
         await this.register();
         const day = new Date().toISOString().slice(0, 10);
