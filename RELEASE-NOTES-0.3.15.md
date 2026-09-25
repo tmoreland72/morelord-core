@@ -1,6 +1,8 @@
 # Morelord Core 0.3.15
 
-## Improvements
+## What Changed
+
+### Improvements
 
 - Shared section subtitles use the main text color while explanatory paragraphs and hints use the muted notes color.
 - Shared section headings support inline actions and reusable item links for shop and generator interfaces.
