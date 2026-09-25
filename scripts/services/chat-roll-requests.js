@@ -22,9 +22,10 @@ export const rollAuthority = message => listUsers().find(user => user.active && 
 export function canRollForActor(actor, user = game.user) {
   return Boolean(user?.active && !isIgnored(user) && (user.isGM || (actor && activePlayerForActor(actor)?.id === user.id)));
 }
-export function rollControls(attributes, { modes = true } = {}) {
-  return `<div class="ml-roll-controls">${(modes ? [["dis", "DIS"], ["normal", "Roll"], ["adv", "ADV"]] : [["normal", "Roll"]]).map(([mode, label]) =>
-    `<button type="button" ${attributes(mode)} aria-label="${mode === "dis" ? "Roll with disadvantage" : mode === "adv" ? "Roll with advantage" : "Roll"}">${label}</button>`).join("")}</div>`;
+export function rollControls(attributes, { modes = true, actionLabel = "Roll" } = {}) {
+  const safeLabel = actionLabel === "Roll" ? "Roll" : escape(actionLabel);
+  return `<div class="ml-roll-controls">${(modes ? [["dis", "DIS"], ["normal", "Roll"], ["adv", "ADV"]] : [["normal", safeLabel]]).map(([mode, label]) =>
+    `<button type="button" ${attributes(mode)} aria-label="${mode === "dis" ? "Roll with disadvantage" : mode === "adv" ? "Roll with advantage" : safeLabel}">${label}</button>`).join("")}</div>`;
 }
 export function markRollCompleted(row) {
   if (!row || row.querySelector(".ml-roll-completed")) return;
@@ -70,11 +71,11 @@ export class ChatRollRequests {
     this.creation = operation.catch(() => {});
     return operation;
   }
-  async createCard({ type, key, groupKey = null, groupTitle = null, title, actorUuid = null, dc = null, modes = true, choices = [], data = {} }) {
+  async createCard({ type, key, groupKey = null, groupTitle = null, title, actorUuid = null, dc = null, modes = true, actionLabel = "Roll", choices = [], data = {} }) {
     if (!game.user.isGM || isIgnored(game.user)) throw new Error("An eligible GM must create roll requests.");
     if (!this.handlers.has(type)) throw new Error(`Roll request handler ${type} is unavailable.`);
     const existing = game.messages.find(message => message.author?.isGM && message.getFlag(ID, "rollRequest")?.key === (groupKey ?? key) && message.getFlag(ID, "rollRequest")?.type === type);
-    const request = { type, key, title, actorUuid, dc, modes, choices, data, completed: false };
+    const request = { type, key, title, actorUuid, dc, modes, actionLabel, choices, data, completed: false };
     // Entry keys become document update paths, so keep caller identifiers out of them.
     const entryKey = groupKey ? Array.from(new TextEncoder().encode(key), byte => byte.toString(16).padStart(2, "0")).join("") : null;
     if (existing) {
@@ -93,7 +94,7 @@ export class ChatRollRequests {
     const commonDC = entries.every(([, entry]) => entry.dc === entries[0][1].dc) ? entries[0][1].dc : null;
     return `<section class="ml-chat-card ml-stack ml-core-roll-request"><h3>${escape(request.title)}</h3>${commonDC == null ? "" : `<p>DC ${escape(commonDC)}</p>`}${entries.map(([key, entry]) => {
       const choices = entry.choices.filter(option => option.id !== "decline");
-      return `<div class="ml-card ml-stack" data-ml-roll-entry="${escape(key)}">${entry.actorUuid ? actorIdentity(entry) : "<span>Game master</span>"}${entry.title !== request.title ? `<p>${escape(entry.title)}</p>` : ""}${entry.dc == null || commonDC != null ? "" : `<p>DC ${escape(entry.dc)}</p>`}${choices.length ? `<select data-ml-roll-choice aria-label="Roll choice">${choices.map(option => `<option value="${escape(option.id)}">${escape(option.label)}</option>`).join("")}</select>` : ""}${rollControls(mode => `data-ml-core-roll="${mode}"`, { modes: entry.modes })}${entry.choices.some(option => option.id === "decline") ? '<button type="button" data-ml-core-roll="normal" data-ml-roll-decline>Decline search</button>' : ""}</div>`;
+      return `<div class="ml-card ml-stack" data-ml-roll-entry="${escape(key)}">${entry.actorUuid ? actorIdentity(entry) : "<span>Game master</span>"}${entry.title !== request.title ? `<p>${escape(entry.title)}</p>` : ""}${entry.dc == null || commonDC != null ? "" : `<p>DC ${escape(entry.dc)}</p>`}${choices.length ? `<select data-ml-roll-choice aria-label="Roll choice">${choices.map(option => `<option value="${escape(option.id)}">${escape(option.label)}</option>`).join("")}</select>` : ""}${rollControls(mode => `data-ml-core-roll="${mode}"`, { modes: entry.modes, actionLabel: entry.actionLabel })}${entry.choices.some(option => option.id === "decline") ? '<button type="button" data-ml-core-roll="normal" data-ml-roll-decline>Decline search</button>' : ""}</div>`;
     }).join("")}</section>`;
   }
   start() {

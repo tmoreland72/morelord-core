@@ -155,7 +155,7 @@ remain visible. Give the body `tabindex="0"` and an accessible description label
 - Headings use `--ml-font-family-heading`.
 - Display/page titles use `--ml-font-size-display`.
 - Section titles use the shared `h2`/`h3` hierarchy or `.ml-section-heading`.
-- Supporting copy uses `--ml-color-muted`, `.notes`, `small`, or `data-text="muted"`.
+- Supporting copy uses `--ml-color-muted`, `.notes`, `small`, or `data-text="muted"`. Core also supports `.hint` as an alias for `.notes`: both use the shared theme-aware muted color and normal weight. Prefer `.notes` for new helper paragraphs; existing `.hint` markup needs no migration or module-specific override.
 - Feature CSS may use `font-family: inherit` or a Core `--ml-font-*` token only.
 - Do not hard-code font stacks in feature modules.
 
@@ -947,6 +947,8 @@ Use `.ml-tabs` with keyboard-accessible `[role="tab"]` links and `aria-selected`
 
 Use `.ml-roll-controls` for three skill-roll buttons in DIS / Roll / ADV order; the center control is wider. Core `rolls.skill` accepts optional `advantage` and `disadvantage` booleans. Omitted or false values leave automatic system rules untouched; true adds that modifier and the native system handles cancellation.
 
+A single button in `.ml-roll-controls` spans the full row, including Long Rest requests.
+
 Soundboard actions may opt into .ml-action-pad (96px rounded square). Use data-size=image for a 40px image-only macro button with an accessible name. A .ml-action-pad-group pairs the pad with a trailing .ml-icon-button delete control. Existing controls retain their dimensions.
 
 Use .ml-action-pad[data-size="hotbar"] for image macro buttons matching Foundry action-bar slots (60px fallback, 10px rounded corners). Supply the native --hotbar-size variable when available.
@@ -961,3 +963,9 @@ Completed request rows use Core’s `markRollCompleted(row)` helper and `.ml-rol
 Tray handles use a native button with class ml-tray-handle inside ml-window, aria-expanded and aria-controls. Core supplies the same surface and transparency as window-content. Feature modules position the handle and update its direction icon when the tray opens or closes.
 
 Shared window/footer surfaces follow Foundry’s light/dark color scheme with `light-dark()` and its palette. Select options consume the same surface token; feature modules must not override these colors.
+
+Section headings with trailing actions use `.ml-section-heading[data-actions]`, a first `div` containing the title, and a sibling `.ml-actions` containing buttons. Core places actions on the right and wraps them on narrow windows. Item rows use `.ml-card.ml-item-row`, an image, a `.ml-stack[data-gap="1"]` text child, and trailing controls. Use `.content-link.ml-item-link` for a plain, bold item link rather than the native bordered content-link treatment. Marketplace purchase and inventory lists consume these same components.
+
+Section subtitles (`.ml-section-heading p`) use the main text color: white in the dark theme. Plain body paragraphs inside `.ml-surface` sections use the muted color: brown in the dark theme. Both use normal weight. `.notes` and `.hint` remain muted helpers outside section headers; a section subtitle takes precedence even if it has either class. Preserve semantic warning and callout colors.
+
+Single-action chat requests may supply `modes: false, actionLabel: "Long Rest"` to Core `chatRequests.create`. The label is escaped and used for the button and its accessible name; existing callers default to Roll.

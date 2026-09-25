@@ -83,4 +83,7 @@ test("group creation keeps one message, independent rows, resend completion, and
   assert.deepEqual(calls,["Actor.a","Actor.b"]);
   await service.create({...options,groupKey:"next-batch",key:"new",actorUuid:actors[0].uuid});
   assert.equal(messages.length,2);
+  const rest = await service.create({ type: "group", key: "rest", title: "Long Rest", modes: false, actionLabel: "Long Rest" });
+  assert.ok(rest.content.includes('aria-label="Long Rest">Long Rest</button>'));
+  assert.ok(!rest.content.includes('data-ml-core-roll="adv"'));
 });

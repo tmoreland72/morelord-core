@@ -91,7 +91,8 @@
 
 :where(.ml-app, .ml-chat-card) :where(p, li, dd, label, input, select, textarea, button) { font-family: inherit; }
 :is(.ml-window .window-content, .ml-app, .ml-chat-card) :where(p, li, dd) { font-weight: var(--ml-font-weight-normal); }
-:where(.ml-app, .ml-chat-card) :where(.notes, small, [data-text="muted"]) { color: var(--ml-color-muted); }
+:where(.ml-app, .ml-chat-card) :where(.notes, .hint, small, [data-text="muted"]) { color: var(--ml-color-muted); }
+:is(.ml-window .window-content, .ml-app, .ml-chat-card) :where(.notes, .hint) { font-weight: var(--ml-font-weight-normal); }
 
 .ml-stack { display: flex; flex-direction: column; gap: var(--ml-space-3); }
 .ml-stack > :where(p, h2, h3, h4) { margin-block: 0; }
