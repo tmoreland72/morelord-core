@@ -2,7 +2,7 @@
 
 ## What Changed
 
-### New Features
+### Added
 
 - Shared keyboard-accessible tabs, quantity controls, inline actor portrait selectors, responsive layouts, and collapsible sidebars support Marketplace's new Transfer workflow.
 
