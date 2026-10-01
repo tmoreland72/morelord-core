@@ -1,6 +1,6 @@
 # Morelord Core: GM Product Guide
 
-Morelord Core provides shared account access, Locations, user participation controls, settings transfer, and support tools for Morelord modules. Supported Morelord Tools modules use its account connection to check which premium features are available in the world.
+Morelord Core provides shared account access, Locations, user participation controls, settings transfer, and support tools for Morelord Gaming modules. Supported Morelord Tools modules use its account connection to check which premium features are available in the world.
 
 Reviewed against local Core 0.3.13 on September 23, 2026. This implementation review is not a new compatibility test or public-release announcement.
 
@@ -35,7 +35,7 @@ Morelord Core does not remove existing world data if premium access expires.
 
    `https://raw.githubusercontent.com/tmoreland72/morelord-core/main/module.json`
 
-3. Install the other Morelord modules you intend to use from the same Setup page, checking each package's compatibility and dependencies. Installation makes packages available to Foundry; activation is separate for each world.
+3. Install the other Morelord Gaming modules you intend to use from the same Setup page, checking each package's compatibility and dependencies. Installation makes packages available to Foundry; activation is separate for each world.
 4. Launch the compatible world you want to connect and log in as a GM.
 5. Open the **Settings sidebar → Module Management** (Foundry 14).
 6. Enable the desired modules and accept Foundry's required-dependency activation when offered. Verify **Morelord Core** and **socketlib** are enabled for modules that require them. For example, Downtime requires Core, and Core requires socketlib. Recommended integrations are optional and are not the same as required dependencies.
@@ -43,16 +43,16 @@ Morelord Core does not remove existing world data if premium access expires.
 
 The video documentation series installs the suite together in this opening walkthrough so later module guides can refer back to it. A complete suite installation is not required to use Core. Character Export does not declare Core as a required dependency in its reviewed local manifest.
 
-The account connection applies to the current world. Repeat the connection process in each world that should use your Morelord access.
+The account connection applies to the current world. Repeat the connection process in each world that should use your Morelord Gaming access.
 
-## Connect a Morelord Account
+## Connect a Morelord Gaming Account
 
 1. Open **Game Settings → Configure Settings → Module Settings → Morelord Core**.
 2. Select **Connect or Manage Account**.
 3. In the **Morelord Account** window, select **Connect Morelord Account**.
 4. Foundry opens the Morelord Gaming approval page in your browser and displays a temporary code.
 5. Confirm that the code in Foundry matches the prefilled code on the website.
-   If you signed in using a different browser, open your Morelord account page there and enter the code from Foundry in **Activation code**.
+   If you signed in using a different browser, open your Morelord Gaming account page there and enter the code from Foundry in **Activation code**.
 6. On the website, select **Approve Foundry Connection**.
 7. Return to Foundry. Foundry checks for approval automatically and reports when the account is connected.
 
@@ -64,9 +64,9 @@ If the browser page does not open, select **Reopen Approval Page** in the Foundr
 
 ### Connect Discord from the website
 
-On your Morelord account page, select **Connect Discord** and authorize the Discord account you intend to use. Linking an identity does not automatically join the community server. If the page reports that you are not in the server, follow **Join the Morelord Gaming Discord**, accept the invite, and complete Discord's required server onboarding.
+On your Morelord Gaming account page, select **Connect Discord** and authorize the Discord account you intend to use. Linking an identity does not automatically join the community server. If the page reports that you are not in the server, follow **Join the Morelord Gaming Discord**, accept the invite, and complete Discord's required server onboarding.
 
-Return to the Morelord account page and select **Synchronize roles**. Review its status, then check your channel access in Discord. A successful synchronization message does not by itself prove that every channel permission is configured correctly. If a channel reports that you cannot send messages, include that channel and the synchronization status when reporting the access problem.
+Return to the Morelord Gaming account page and select **Synchronize roles**. Review its status, then check your channel access in Discord. A successful synchronization message does not by itself prove that every channel permission is configured correctly. If a channel reports that you cannot send messages, include that channel and the synchronization status when reporting the access problem.
 
 ### Membership changes and Discord channels
 
@@ -89,13 +89,13 @@ The window also provides three actions:
 
 - **Refresh Access:** Checks Morelord Gaming for current membership and feature access.
 - **Open Account:** Opens your Morelord Gaming account page in a browser.
-- **Disconnect:** Removes the Morelord account connection and locally cached access information from this world.
+- **Disconnect:** Removes the Morelord Gaming account connection and locally cached access information from this world.
 
 ## Refresh Access
 
 Morelord Core checks access automatically when a connected GM loads the world. Use **Refresh Access** when:
 
-- You changed your Morelord membership.
+- You changed your Morelord Gaming membership.
 - You connected or updated a supported Morelord Tools product.
 - A premium feature does not reflect a recent account change.
 - You want to confirm the most recent validation time.
@@ -125,7 +125,7 @@ Open **Connect or Manage Account**, then scroll to **Core Settings**. These cont
 | Morelord Gaming Website | Address for activation and access checks. Default: `https://morelordgaming.com`. Keep it unless intentionally using another supported endpoint. |
 | Share feature usage | Shares feature actions, active module versions, Foundry/system versions, and GM/player role under a random world reporting ID. Reports are pseudonymous and exclude campaign content. |
 | Share error reports | Independently shares error types, Morelord code locations, failed operations, and versions. Recent feature actions accompany errors only when feature sharing is enabled. Custom error text and account credentials are excluded. |
-| Enable Developer Mode | Off by default. Limits access for testing across Morelord modules and pauses both reporting streams. It does not grant paid access. |
+| Enable Developer Mode | Off by default. Limits access for testing across Morelord Gaming modules and pauses both reporting streams. It does not grant paid access. |
 | Test Subscription Level | Standard, Premium, or Champion, capped by the connected account and each module's actual access. Default: Standard. Applies while Developer Mode is enabled; Standard disables paid access. Unavailable higher choices are disabled. Reopen module windows after saving to refresh displays. |
 
 The elected active GM receives a one-time **Morelord Reporting Preferences** notice. Both reporting choices are preselected unless a previous choice was saved. Uncheck either to opt out, then choose **Save Reporting Preferences**. Closing without saving leaves preferences unchanged and offers the notice at the next GM session. Existing version-only consent does not automatically authorize broader reporting. Change either choice later in Core Settings without affecting account linking or premium access.
@@ -134,7 +134,7 @@ Account activation separately supplies world and installation information needed
 
 ## Ignored Users
 
-Open **Morelord Core → Select Ignored Users**. Check recording or observer accounts to exclude them, then select **Save**. Uncheck and save to include them again. Ignored accounts cannot send or receive routed Morelord module messages; do not ignore participating GMs or players. This does not delete users or change their Foundry role.
+Open **Morelord Core → Select Ignored Users**. Check recording or observer accounts to exclude them, then select **Save**. Uncheck and save to include them again. Ignored accounts cannot send or receive routed Morelord Gaming module messages; do not ignore participating GMs or players. This does not delete users or change their Foundry role.
 
 ## Shared Locations
 
