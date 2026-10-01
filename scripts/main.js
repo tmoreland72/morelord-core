@@ -15,6 +15,7 @@ import { CAPABILITY_TIERS, SETTLEMENT_TYPES, evaluateRequirements, meetsTier } f
 import { LocationManagerApp } from "./location/location-manager-app.js";
 import { renderPreservingScroll } from "./ui/scroll-preservation.js";
 import { applyPageLayout } from "./ui/page-layout.js";
+import { activateTabs } from "./ui/tabs.js";
 import { activateCardSelection } from "./ui/card-selection.js";
 import { activateCollapsibleSections, createCollapsibleSection } from "./ui/collapsible-section.js";
 import { actorIdentity, decorateActorSelect } from "./ui/actor-identity.js";
@@ -27,7 +28,9 @@ import { SUBSCRIPTION_TIERS, normalizeSubscriptionTier, capSubscriptionTier, app
 const MODULE_ID = "morelord-core";
 const telemetry = new TelemetryService();
 Hooks.on("renderApplicationV2", applyPageLayout);
+Hooks.on("renderApplicationV2", activateTabs);
 Hooks.on("renderApplication", applyPageLayout);
+Hooks.on("renderApplication", activateTabs);
 Hooks.on("renderApplicationV2", activateCardSelection);
 Hooks.on("renderApplication", activateCardSelection);
 Hooks.on("renderApplicationV2", activateCollapsibleSections);
@@ -597,6 +600,7 @@ Hooks.once("ready", async () => {
       actorIdentity,
       decorateActorSelect,
       applyPageLayout,
+      activateTabs,
       activateCardSelection,
       activateCollapsibleSections,
       createCollapsibleSection,

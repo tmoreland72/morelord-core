@@ -31,6 +31,10 @@ export function applyPageLayout(application, renderedElement) {
   // Remove legacy pane scrollports, including constrained ancestors that would clip them.
   for (const element of body.querySelectorAll("div, section, main, aside, form, ul, ol")) {
     if (element.closest('.ml-card[data-size="large"] > .ml-card__body[data-scroll]')) continue;
+    if (element.matches('.ml-horizontal-scroll')) {
+      for (let parent = element.parentElement; parent && parent !== body; parent = parent.parentElement) parent.classList.add("ml-page-flow");
+      continue;
+    }
     if (!/^(auto|scroll)$/.test(getComputedStyle(element).overflowY)) continue;
     for (let parent = element; parent && parent !== body; parent = parent.parentElement) {
       parent.classList.add("ml-page-flow");

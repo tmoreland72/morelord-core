@@ -67,6 +67,10 @@
 .ml-actor-select-field > span:first-child { grid-column: 1 / -1; }
 .ml-actor-select-field > select { grid-column: 2; grid-row: 2; min-width: 0; }
 .ml-actor-select-field > [data-ml-actor-select-preview] { grid-column: 1; grid-row: 2; }
+.ml-actor-select-field[data-ml-actor-select-layout="inline"] { grid-template-columns: max-content minmax(0, 1fr); }
+.ml-actor-select-field[data-ml-actor-select-layout="inline"] > span:first-child { grid-column: 1; grid-row: 1; }
+.ml-actor-select-field[data-ml-actor-select-layout="inline"] > select { grid-column: 2; grid-row: 1; padding-inline-start: calc(var(--ml-avatar-sm) + 2 * var(--ml-space-2)); }
+.ml-actor-select-field[data-ml-actor-select-layout="inline"] > [data-ml-actor-select-preview] { grid-column: 2; grid-row: 1; justify-self: start; margin-inline-start: var(--ml-space-2); pointer-events: none; }
 .ml-check,
 .ml-window .window-content label:has(> input[type="checkbox"]):not(.ml-actor-choice, .ml-choice-card) { display: grid; grid-template-columns: max-content minmax(0, 1fr); align-items: start; gap: var(--ml-space-2); min-width: min-content; margin: 0; white-space: nowrap; }
 /* Trailing checkboxes keep their text in the flexible column. Choice cards already own their portrait columns. */
@@ -119,7 +123,7 @@
 .ml-section-heading[data-actions] > div:first-child { flex: 1 1 240px; min-width: 0; }
 .ml-section-heading[data-actions] > .ml-actions { flex: 0 0 auto; margin-left: auto; }
 .ml-section-heading[data-actions] > .ml-actions > button { width: auto; }
-.ml-item-link { display: block; width: fit-content; max-width: 100%; padding: 0; border: 0; background: transparent; box-shadow: none; font-weight: var(--ml-font-weight-bold); }
+.ml-item-link { display: block; width: fit-content; max-width: 100%; padding: 0; border: 0; background: transparent; box-shadow: none; font-weight: var(--ml-font-weight-bold); white-space: normal; overflow-wrap: anywhere; }
 .ml-collapsible-section > summary { display: flex; align-items: start; gap: var(--ml-space-3); cursor: pointer; list-style: none; }
 .ml-collapsible-section > summary::-webkit-details-marker { display: none; }
 .ml-collapsible-section > summary > .ml-section-heading { flex: 1; min-width: 0; margin: 0; }
@@ -127,6 +131,12 @@
 .ml-collapsible-section[open] > summary > i { transform: rotate(90deg); }
 .ml-collapsible-section > summary:focus-visible { outline: 2px solid var(--ml-color-accent); outline-offset: var(--ml-space-1); }
 .ml-collapsible-section > .ml-collapsible-section__body { margin-top: var(--ml-space-3); }
+.ml-collapsible-section[data-layout="sidebar"] { min-width: 0; }
+.ml-collapsible-section[data-layout="sidebar"]:not([open]) { padding: var(--ml-space-2); }
+.ml-collapsible-section[data-layout="sidebar"]:not([open]) > summary > .ml-section-heading { display: none; }
+.ml-collapsible-section[data-layout="sidebar"]:not([open]) > summary { justify-content: center; }
+.ml-truncate { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ml-horizontal-scroll { min-width: 0; max-width: 100%; overflow-x: auto !important; overflow-y: hidden !important; }
 .ml-card,
 .ml-window .window-content .ml-card {
   padding: var(--ml-space-3);
@@ -341,3 +351,6 @@
 
 /* A tray toggle shares the window surface, including its transparency. */
 .ml-window .ml-tray-handle { display:inline-flex; align-items:center; justify-content:center; gap:var(--ml-space-2); width:auto; height:auto; padding:var(--ml-space-1) var(--ml-space-3); border:1px solid var(--ml-color-border); border-radius:var(--ml-radius-md) var(--ml-radius-md) 0 0; box-shadow:none; cursor:pointer; }
+
+/* Domain layouts can adapt to their actual application width. */
+.ml-app-shell[data-ml-responsive] { container-type: inline-size; }

@@ -945,6 +945,15 @@ Checkbox option groups with variable-length names should use `ml-cluster` contai
 
 Use `.ml-tabs` with keyboard-accessible `[role="tab"]` links and `aria-selected` for a compact tab strip. Use `.ml-compact` on a panel to reduce body and control text while keeping a separate hero unchanged. Columns within a single surface can use `.ml-stack` and a plain label; they do not require nested surfaces or section headings.
 
+Core initializes `.ml-tabs[role="tablist"]` in Foundry applications with Arrow Left/Right, Home/End, Enter, and Space activation. Give each tab a stable ID, `aria-controls`, `aria-selected`, and selected-only `tabindex="0"`; use `aria-disabled="true"` while loading. Module action handlers own panel changes and must ignore disabled activation. Custom renderers can call `ui.activateTabs(application)`. Marketplace consumes this shared behavior for Sell, Transfer, Buy, and Wishlist.
+
+Application shells may opt into inline-size container queries with `data-ml-responsive`. Domain layouts use `@container` to respond to the actual window width, while Core owns the container setup, surfaces, and controls. Marketplace's Transfer inventory/cart is the first consumer.
+
+Actor dropdown labels may opt into `data-ml-actor-select-layout="inline"` with a text `span` followed by the native `select`. Core's `decorateActorSelect` places the selected portrait inside the control, keeping the label and selector on one row. Existing actor selectors keep their default layout.
+
+For minus/quantity/plus controls, preload `modules/morelord-core/templates/components/quantity-controls.hbs` and pass `action`, `name`, `quantity`, `increaseEnabled`, and optional `disabled`, `itemId`, or `stockKey`. Module action handlers validate the delta and bounds. Marketplace Shop Manager stock and Transfer cart share this component.
+
+
 Use `.ml-roll-controls` for three skill-roll buttons in DIS / Roll / ADV order; the center control is wider. Core `rolls.skill` accepts optional `advantage` and `disadvantage` booleans. Omitted or false values leave automatic system rules untouched; true adds that modifier and the native system handles cancellation.
 
 A single button in `.ml-roll-controls` spans the full row, including Long Rest requests.
@@ -969,3 +978,7 @@ Section headings with trailing actions use `.ml-section-heading[data-actions]`, 
 Section subtitles (`.ml-section-heading p`) use the main text color: white in the dark theme. Plain body paragraphs inside `.ml-surface` sections use the muted color: brown in the dark theme. Both use normal weight. `.notes` and `.hint` remain muted helpers outside section headers; a section subtitle takes precedence even if it has either class. Preserve semantic warning and callout colors.
 
 Single-action chat requests may supply `modes: false, actionLabel: "Long Rest"` to Core `chatRequests.create`. The label is escaped and used for the button and its accessible name; existing callers default to Roll.
+
+Collapsible sidebars may use details.ml-collapsible-section with data-layout="sidebar", the usual section key, and a labeled summary. Core collapses the heading to its chevron; the module grid determines the freed column width. Use .ml-truncate on fixed-width text with a full-value title for ellipsis. Marketplace Buy filters and Source labels consume these components.
+
+Wide tables use .ml-horizontal-scroll on their wrapper. Core preserves horizontal scrolling while removing constrained ancestor panes, retaining one vertical page scrollbar. Marketplace inventory tables use this component.

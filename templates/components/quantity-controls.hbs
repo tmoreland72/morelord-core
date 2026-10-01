@@ -1,0 +1,5 @@
+<div class="ml-actions" aria-label="Quantity for {{name}}">
+  <button type="button" class="ml-icon-button" data-action="{{action}}" data-delta="-1" {{#if stockKey}}data-stock-key="{{stockKey}}"{{/if}} {{#if itemId}}data-item-id="{{itemId}}"{{/if}} aria-label="Decrease {{name}} quantity" title="Decrease {{name}} quantity" {{#if disabled}}disabled{{/if}}><i class="fa-solid fa-minus"></i></button>
+  <span class="ml-badge" aria-label="Current quantity">{{quantity}}</span>
+  <button type="button" class="ml-icon-button" data-action="{{action}}" data-delta="1" {{#if stockKey}}data-stock-key="{{stockKey}}"{{/if}} {{#if itemId}}data-item-id="{{itemId}}"{{/if}} aria-label="Increase {{name}} quantity" title="Increase {{name}} quantity" {{#if disabled}}disabled{{else}}{{#unless increaseEnabled}}disabled{{/unless}}{{/if}}><i class="fa-solid fa-plus"></i></button>
+</div>
