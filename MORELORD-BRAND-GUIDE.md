@@ -116,6 +116,8 @@ Every ApplicationV2 window must include `ml-window` in `DEFAULT_OPTIONS.classes`
 </section>
 ```
 
+Set `--ml-window-opacity: 100%` on a window root when an opaque background is required; Core applies it to the window body and tray handle. Other windows retain the 94% dark-theme default.
+
 Use the shared 24px desktop content padding and 16px compact padding. Do not introduce module-specific shell padding.
 
 ## Dialog contract
