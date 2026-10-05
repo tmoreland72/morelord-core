@@ -3,5 +3,5 @@
 .release-*
 .env
 
-# Local document render previews
+# Local working files
 /tmp/

@@ -19,9 +19,10 @@ import { activateTabs } from "./ui/tabs.js";
 import { activateCardSelection } from "./ui/card-selection.js";
 import { activateCollapsibleSections, createCollapsibleSection } from "./ui/collapsible-section.js";
 import { actorIdentity, decorateActorSelect } from "./ui/actor-identity.js";
+import { openItemPreview } from "./ui/item-preview.js";
 import { DocumentationService } from "./documentation/documentation-service.js";
 import { DocumentationApp } from "./documentation/documentation-app.js";
-import { listCharacterActors, listCharacterChoices, participantRecords, primaryPartyGroup, selectedCharacterUuids } from "./ui/actor-participation.js";
+import { canUseActorInventory, listCharacterActors, listCharacterChoices, participantRecords, primaryPartyGroup, selectedCharacterUuids } from "./ui/actor-participation.js";
 import { actorSkillModifier, extractNaturalD20, rollSkill } from "./services/skill-roll-service.js";
 import { SUBSCRIPTION_TIERS, normalizeSubscriptionTier, capSubscriptionTier, applySubscriptionTesting } from "./services/subscription-testing.js";
 
@@ -454,10 +455,7 @@ class MorelordConnectionApp extends HandlebarsApplicationMixin(ApplicationV2) {
     documentationService.register({
       id: "morelord-core", title: "Morelord Core", icon: "fa-solid fa-link",
       subtitle: "Shared premium access for Morelord Tools modules.",
-      sections: [
-        { id: "account", title: "Morelord Account", icon: "fa-solid fa-user", introduction: "Use this page to connect your Morelord account and review the membership and access information shared by Morelord Tools modules." },
-        { id: "diagnostics", title: "Troubleshooting", icon: "fa-solid fa-stethoscope", introduction: "Use Download Troubleshooting File in Core’s settings list to create a report for Morelord support. It includes Foundry, game system, module, browser, and graphics details. It excludes account credentials, installation and world identifiers, network addresses, users, and campaign content." }
-      ]
+      source: "modules/morelord-core/CORE-GM-PRODUCT-GUIDE.md"
     });
     return new DocumentationApp({ productId: "morelord-core" }).render({ force: true });
   }
@@ -599,18 +597,19 @@ Hooks.once("ready", async () => {
     ui: Object.freeze({
       actorIdentity,
       decorateActorSelect,
+      openItemPreview,
       applyPageLayout,
       activateTabs,
       activateCardSelection,
       activateCollapsibleSections,
       createCollapsibleSection,
       renderPreservingScroll,
-      participation: Object.freeze({ listCharacterActors, listCharacterChoices, participantRecords, primaryPartyGroup, selectedCharacterUuids }),
+      participation: Object.freeze({ canUseActorInventory, listCharacterActors, listCharacterChoices, participantRecords, primaryPartyGroup, selectedCharacterUuids }),
       documentation: Object.freeze({
         register: definition => documentationService.register(definition),
         get: id => documentationService.get(id),
         list: () => documentationService.list(),
-        open: id => new DocumentationApp({ productId: id }).render({ force: true })
+        open: id => documentationService.open(id)
       })
     }),
     sources: Object.freeze({ resolveBookLabel, resolvePackLabel, filter: new Dnd5eSourceFilterService() }),

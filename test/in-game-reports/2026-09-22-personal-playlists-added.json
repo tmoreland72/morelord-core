@@ -1,0 +1,45 @@
+{
+  "world": "dev1",
+  "pack": "morelord-compendium.playlists-1",
+  "label": "Playlists",
+  "folder": "Graypes Compendium",
+  "added": [
+    {
+      "id": "uqo3QFl6xuYalpaB",
+      "name": "All",
+      "sounds": 74
+    },
+    {
+      "id": "jZiWCESwglLcvbBA",
+      "name": "Black Iron Inn",
+      "sounds": 1
+    },
+    {
+      "id": "Iw36pyExksnGEk3y",
+      "name": "Camp",
+      "sounds": 1
+    },
+    {
+      "id": "qY7fwe6pBoFlCmZ1",
+      "name": "Chapels",
+      "sounds": 5
+    },
+    {
+      "id": "RcbncFjvYnOAy19M",
+      "name": "Combat",
+      "sounds": 6
+    },
+    {
+      "id": "swPHuNm0tQbrPPsl",
+      "name": "Mystery",
+      "sounds": 1
+    },
+    {
+      "id": "KJ5IVeLB3bMOVKUw",
+      "name": "Travel",
+      "sounds": 10
+    }
+  ],
+  "existingPreserved": 6,
+  "soundEntries": 98
+}

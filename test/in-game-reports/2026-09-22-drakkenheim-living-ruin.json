@@ -1,0 +1,13 @@
+{
+  "world": "dev1",
+  "foundry": "14.368",
+  "system": "6.0.3",
+  "results": [
+    {
+      "id": "morelord-encounters.living-ruin-roster",
+      "status": "pass",
+      "durationMs": 158317
+    }
+  ],
+  "ok": true
+}

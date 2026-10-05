@@ -7,7 +7,7 @@ export class DocumentationService {
     const product = structuredClone(definition);
     product.id = id;
     product.sections = Array.from(product.sections ?? []);
-    if (!product.sections.length) throw new Error(`Documentation '${id}' requires at least one section.`);
+    if (!product.sections.length && !product.source) throw new Error(`Documentation '${id}' requires a guide source or at least one section.`);
     this.#products.set(id, product);
     return structuredClone(product);
   }
@@ -18,4 +18,10 @@ export class DocumentationService {
   }
 
   list() { return Array.from(this.#products.values(), product => structuredClone(product)); }
+
+  open(id) {
+    const products = ['morelord-character-export', 'morelord-core', 'morelord-craftworks', 'morelord-downtime', 'morelord-encounters', 'morelord-journeys', 'morelord-marketplace'];
+    const path = products.includes(id) ? `/docs/${id}` : '/docs';
+    return window.open(`https://morelordgaming.com${path}`, '_blank', 'noopener,noreferrer');
+  }
 }

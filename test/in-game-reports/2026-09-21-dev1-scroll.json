@@ -1,0 +1,14 @@
+[
+  {
+    "theme": "vtt game system-dnd5e theme-dark",
+    "before": 200,
+    "after": 200,
+    "pass": true
+  },
+  {
+    "theme": "vtt game system-dnd5e theme-light",
+    "before": 200,
+    "after": 200,
+    "pass": true
+  }
+]

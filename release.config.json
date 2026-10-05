@@ -10,17 +10,16 @@
   "requiredPaths": [
     "module.json",
     "README.md",
+    "CORE-GM-PRODUCT-GUIDE.md",
     "scripts",
     "styles",
     "templates"
   ],
   "optionalPaths": [
     "IN-GAME-TESTING.md",
-    "assets",
     "lang",
     "LICENSE",
     "LICENSE.md",
-    "CHANGELOG.md",
     "TELEMETRY.md"
   ]
 }

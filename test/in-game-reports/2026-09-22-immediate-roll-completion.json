@@ -1,0 +1,24 @@
+{
+  "world": "dev1",
+  "foundry": "14.368",
+  "system": "6.0.3",
+  "animationBoundary": "Controlled completion gate on disposable native roll messages; actual shared sockets, documents and UI",
+  "results": [
+    {
+      "id": "game-master.completed-roll-presentation",
+      "status": "pass",
+      "durationMs": 5127
+    },
+    {
+      "id": "craftworks.delerium-roll-completion",
+      "status": "pass",
+      "durationMs": 22440
+    },
+    {
+      "id": "journeys.immediate-group-rolls",
+      "status": "pass",
+      "durationMs": 18939
+    }
+  ],
+  "ok": true
+}

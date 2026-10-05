@@ -1,0 +1,82 @@
+{
+  "state": {
+    "world": {
+      "id": "lost-mine-of-phandelver-tuesdays",
+      "title": "Lost Mine of Phandelver (Tuesdays)"
+    },
+    "user": "Chuck",
+    "core": "0.3.13",
+    "gameMaster": "0.1.4",
+    "apiReady": true,
+    "root": true,
+    "activeGM": "Gamemaster",
+    "eligibleGMs": [],
+    "board": [],
+    "global": {
+      "status": 200,
+      "data": {
+        "version": 1,
+        "macroMigration": 2,
+        "triggers": [
+          {
+            "id": "volatile-magic",
+            "kind": "volatile",
+            "name": "Volatile Magic",
+            "enabled": false,
+            "macroUuid": "Compendium.morelord-game-master.macros.Macro.VolatileMagic001",
+            "tableUuid": "Compendium.morelord-game-master.roll-tables.RollTable.JtRByu566t45mzkG",
+            "tableName": "Volatile Magic Table"
+          },
+          {
+            "id": "wild-magic-surge",
+            "kind": "sorcerer",
+            "name": "Wild Magic Surge",
+            "enabled": false,
+            "macroUuid": "Compendium.morelord-game-master.macros.Macro.WildMagicSurge01",
+            "tableUuid": "Compendium.morelord-game-master.roll-tables.RollTable.aDMFCKJcdKaJjTc6",
+            "tableName": "Wild Magic Surge"
+          },
+          {
+            "id": "sneak-attack",
+            "kind": "sneak",
+            "name": "Sneak Attack",
+            "enabled": false,
+            "macroUuid": "Compendium.morelord-game-master.macros.Macro.SneakAttack00001"
+          },
+          {
+            "id": "lucky-find",
+            "kind": "lucky-find",
+            "name": "Lucky Finds",
+            "enabled": false,
+            "macroUuid": "Compendium.morelord-game-master.macros.Macro.LuckyFinds000001"
+          },
+          {
+            "id": "world-clock",
+            "kind": "world-clock",
+            "name": "World Clock",
+            "enabled": false,
+            "macroUuid": "Compendium.morelord-game-master.macros.Macro.WorldClock000001",
+            "gameMinutes": 10,
+            "realMinutes": 1
+          }
+        ]
+      }
+    },
+    "packs": [
+      {
+        "id": "morelord-game-master.macros",
+        "indexSize": 7
+      },
+      {
+        "id": "morelord-game-master.roll-tables",
+        "indexSize": 2
+      }
+    ],
+    "panelText": "Game Master"
+  },
+  "errors": [
+    "obs-utils: globalThis.gsap is not defined. Foundry should expose GSAP — animations will not work.",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Error: Invalid Asset modules/monks-combat-marker/markers/marker05.webp\n    at loadTexture (http://127.0.0.1:31400/scripts/foundry.mjs:106107:42)\n    at async TokenTurnMarker.draw (http://127.0.0.1:31400/scripts/foundry.mjs:161820:21)"
+  ]
+}

@@ -159,7 +159,7 @@
 .ml-card__footer { margin-top: auto; }
 .ml-roll-completed { margin: 0; text-align: center; }
 .ml-card { min-width: 0; overflow-wrap: anywhere; }
-.ml-window .window-content button:is(.ml-card, .ml-list-button) { height: auto; max-height: none; flex-shrink: 0; white-space: normal; text-align: left; line-height: var(--ml-line-height-body); }
+.ml-window .window-content button:is(.ml-card, .ml-list-button) { height: auto; max-height: none; flex-shrink: 0; white-space: normal; text-align: left; line-height: var(--ml-line-height-body); color: var(--ml-color-text); }
 .ml-card__body { min-width: 0; overflow-wrap: anywhere; }
 
 .ml-details { overflow: clip; border: 1px solid var(--ml-color-border); border-radius: var(--ml-radius-md); }
@@ -285,16 +285,16 @@
 .ml-actor-choice span { min-width: 0; font-weight: var(--ml-font-weight-bold); overflow-wrap: anywhere; }
 
 /* Shared product documentation viewer. */
-.ml-documentation__layout { display: grid; grid-template-columns: minmax(190px, 240px) minmax(0, 1fr); gap: var(--ml-space-4); align-items: start; }
-.ml-documentation__navigation { position: sticky; top: 0; display: grid; gap: var(--ml-space-2); padding: var(--ml-space-3); }
-.ml-documentation__navigation .ml-list-button { grid-template-columns: auto minmax(0, 1fr); align-items: center; text-align: left; }
 .ml-documentation__content, .ml-documentation__section { min-width: 0; }
-.ml-documentation__section { scroll-margin-top: var(--ml-space-4); }
+.ml-documentation__section { scroll-margin-top: var(--ml-space-4); overflow-wrap: anywhere; }
+.ml-documentation__section img { max-width: 100%; height: auto; }
+.ml-documentation__section pre { max-width: 100%; overflow-x: auto; }
 .ml-documentation__section > p { margin-block: 0; line-height: 1.55; }
-.ml-documentation__steps, .ml-documentation__bullets { display: grid; gap: var(--ml-space-3); margin: 0; padding-inline-start: var(--ml-space-5); }
+.ml-documentation__steps, .ml-documentation__bullets { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--ml-space-3); margin: 0; padding-inline-start: var(--ml-space-5); }
+.ml-documentation__section :not(pre) > code { white-space: normal; }
+.ml-documentation__section table { color: var(--ml-color-text); }
 .ml-documentation__steps li, .ml-documentation__bullets li { padding-inline-start: var(--ml-space-1); }
 .ml-documentation__steps p { margin: var(--ml-space-1) 0 0; color: var(--ml-color-muted); line-height: 1.5; }
-@media (max-width: 720px) { .ml-documentation__layout { grid-template-columns: 1fr; } .ml-documentation__navigation { position: static; } }
 @media (max-width: 760px) {
   .ml-resource-header { display: none; }
   .ml-resource-row { grid-template-columns: 1fr; }

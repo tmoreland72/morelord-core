@@ -37,7 +37,7 @@ export function activateCollapsibleSections(application, renderedElement) {
     const key = JSON.stringify(["morelord-core.sections", globalThis.game?.world?.id, globalThis.game?.user?.id, section.dataset.mlSectionKey]);
     let saved;
     try { saved = globalThis.localStorage?.getItem(key); } catch { /* Browser storage may be unavailable. */ }
-    section.open = saved !== "false";
+    section.open = (saved ?? (section.dataset.mlSectionDefault === 'closed' ? 'false' : 'true')) !== "false";
     let previous = section.open;
     section.addEventListener("toggle", () => {
       if (section.open === previous) return;

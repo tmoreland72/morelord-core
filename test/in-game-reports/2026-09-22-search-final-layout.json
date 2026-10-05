@@ -1,0 +1,16 @@
+{
+  "world": "dev1",
+  "foundry": "14.368",
+  "results": [
+    {
+      "id": "craftworks.delerium-roll-completion",
+      "status": "pass",
+      "durationMs": 36451
+    }
+  ],
+  "ok": true,
+  "summary": {
+    "pass": 1,
+    "fail": 0
+  }
+}

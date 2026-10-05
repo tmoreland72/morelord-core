@@ -1,13 +1,14 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
-import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 
 test("design checks scan modules without styles and distinguish chat cards from applications", t => {
-  const root = mkdtempSync(join(tmpdir(), "morelord-design-test-"));
+  const working = fileURLToPath(new URL("../tmp/", import.meta.url));
+  mkdirSync(working, { recursive: true });
+  const root = mkdtempSync(join(working, "morelord-design-test-"));
   t.after(() => rmSync(root, { recursive: true, force: true }));
   const chat = join(root, "templates", "chat");
   mkdirSync(chat, { recursive: true });

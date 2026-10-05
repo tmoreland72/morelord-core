@@ -1,3 +1,11 @@
+import { isIgnored } from "../services/user-service.js";
+
+function hasEligibleParticipant(actor) {
+  const users = Array.from(globalThis.game?.users ?? []).filter(user =>
+    user.character?.uuid === actor.uuid || (!user.isGM && actor.testUserPermission?.(user, "OWNER")));
+  return !users.length || users.some(user => !isIgnored(user));
+}
+
 function characterMembers(group, actors, includeNpcs = false) {
   const eligible = actor => actor?.type === "character" || (includeNpcs && actor?.type === "npc");
   const resolve = member => {
@@ -15,10 +23,19 @@ export function primaryPartyGroup(actors = game.actors, { includeNpcs = false } 
   return ordered.find(group => characterMembers(group, actors, includeNpcs).length) ?? null;
 }
 
+/** Inventory access includes a Group's character members, without changing document ownership. */
+export function canUseActorInventory(actor, user = game.user, { actors = game.actors } = {}) {
+  if (!actor || !user) return false;
+  if (user.isGM || actor.testUserPermission?.(user, "OWNER")) return true;
+  return actor.type === "group" && characterMembers(actor, actors).some(member =>
+    member.uuid === user.character?.uuid || member.testUserPermission?.(user, "OWNER"));
+}
+
 export function listCharacterActors({ ownedOnly = false, defaultParty = true, includePartyNpcs = false, actors = game.actors } = {}) {
   const party = defaultParty ? primaryPartyGroup(actors, { includeNpcs: includePartyNpcs }) : null;
   const candidates = [...characterMembers(party, actors, includePartyNpcs), ...Array.from(actors ?? []).filter(actor => actor.type === "character" && actor.hasPlayerOwner)];
   return [...new Map(candidates.map(actor => [actor.uuid, actor])).values()]
+    .filter(hasEligibleParticipant)
     .filter(actor => !ownedOnly || actor.isOwner)
     .sort((left, right) => left.name.localeCompare(right.name));
 }

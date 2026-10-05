@@ -2,11 +2,12 @@
 import { createRequire } from 'node:module';
 import { cp, mkdtemp, readFile, mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import os from 'node:os';
 import { startBrowser } from '../../morelord-game-master/tests/browser-driver.mjs';
 const { ClassicLevel } = createRequire('E:/Foundry14/App/resources/app/package.json')('classic-level');
 const modules = path.resolve(import.meta.dirname, '../..');
-const staging = await mkdtemp(path.join(os.tmpdir(), 'morelord-source-audit-'));
+const working = path.resolve(import.meta.dirname, '../tmp');
+await mkdir(working, {recursive: true});
+const staging = await mkdtemp(path.join(working, 'morelord-source-audit-'));
 const packs = [];
 for (const id of ['drakkenheim-core', 'drakkenheim-monsters', 'drakkenheim-scgd', 'dnd-monster-manual', 'dnd-players-handbook', 'dnd-dungeon-masters-guide', 'dnd5e']) {
   const root = id === 'dnd5e' ? path.resolve(modules, '../systems/dnd5e') : path.join(modules, id);

@@ -1,0 +1,23 @@
+{
+  "world": "dev1",
+  "foundry": "14.368",
+  "system": "6.0.3",
+  "results": [
+    {
+      "id": "morelord-encounters.published-notes-and-typography",
+      "status": "pass",
+      "durationMs": 3
+    },
+    {
+      "id": "morelord-encounters.all-drakkenheim-results",
+      "status": "pass",
+      "durationMs": 203547
+    },
+    {
+      "id": "morelord-encounters.living-ruin-roster",
+      "status": "pass",
+      "durationMs": 49346
+    }
+  ],
+  "ok": true
+}

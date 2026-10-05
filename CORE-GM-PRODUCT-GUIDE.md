@@ -1,5 +1,11 @@
 # Morelord Core: GM Product Guide
 
+## Documentation
+
+**Documentation** opens the corresponding module's documentation on the Morelord Gaming website in a new browser tab. Use the website's module tree and nested section links to navigate the complete guides. Modules without a dedicated website page open the documentation index.
+
+Every player and GM page, including module Game Settings, must document each field and action using its displayed label, accepted values, defaults, dependencies, and effects. Examples belong in the guide.
+
 Morelord Core provides shared account access, Locations, user participation controls, settings transfer, and support tools for Morelord Gaming modules. Supported Morelord Tools modules use its account connection to check which premium features are available in the world.
 
 Reviewed against local Core 0.3.13 on September 23, 2026. This implementation review is not a new compatibility test or public-release announcement.
@@ -41,7 +47,7 @@ Morelord Core does not remove existing world data if premium access expires.
 6. Enable the desired modules and accept Foundry's required-dependency activation when offered. Verify **Morelord Core** and **socketlib** are enabled for modules that require them. For example, Downtime requires Core, and Core requires socketlib. Recommended integrations are optional and are not the same as required dependencies.
 7. Save the module configuration and complete any requested reload. Handle the reporting-preferences notice if it appears, then open **Game Settings → Configure Settings → Module Settings → Morelord Core**.
 
-The video documentation series installs the suite together in this opening walkthrough so later module guides can refer back to it. A complete suite installation is not required to use Core. Character Export does not declare Core as a required dependency in its reviewed local manifest.
+The Core video is a concise options reference for GMs already familiar with Foundry. It focuses on Morelord-specific choices and their effects; these installation steps remain available as a written reference. A complete suite installation is not required to use Core. Character Export does not declare Core as a required dependency in its reviewed local manifest.
 
 The account connection applies to the current world. Repeat the connection process in each world that should use your Morelord Gaming access.
 
@@ -136,7 +142,11 @@ Account activation separately supplies world and installation information needed
 
 Open **Morelord Core → Select Ignored Users**. Check recording or observer accounts to exclude them, then select **Save**. Uncheck and save to include them again. Ignored accounts cannot send or receive routed Morelord Gaming module messages; do not ignore participating GMs or players. This does not delete users or change their Foundry role.
 
+Characters assigned to or owned only by ignored users are also excluded from shared character selections, including party-group members. Characters shared with a non-ignored player remain available, even if that player is offline. GM-managed party members without a player owner or assigned user remain available. Reopen a selection window after changing Ignored Users to refresh its options; existing stored participation records are preserved.
+
 ## Shared Locations
+
+Shared Locations give Morelord Gaming modules a common description of a place. Downtime uses location information to expose available activities, while Craftworks can check crafting location requirements such as access to a forge. Marketplace and Journeys also use shared locations for their own workflows. Configure capabilities to describe the facilities those workflows need; creating a location record alone does not create the services or activities themselves. The individual module guides explain their uses in detail.
 
 Open **Morelord Core → Manage Shared Locations**. Choose **Create First Location** when empty, or the plus button to add another. Select a saved location in the left list to edit it.
 
@@ -221,3 +231,4 @@ If needed, disconnect and reconnect the world to create a fresh account connecti
 | Get a support report | Morelord Core module settings | **Download Troubleshooting File** |
 | Open the community | Morelord Core module settings | **Join Discord** |
 | Remove the connection | Morelord Account window | **Disconnect** |
+

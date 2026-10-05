@@ -103,7 +103,7 @@ New and existing worlds receive a one-time GM reporting notice in the next Core 
 
 Production Morelord Foundry modules use the same `release.ps1`. Character Export and Downtime follow these release steps. Project-specific values are stored in `release.config.json`, so improvements to the workflow can be copied between repositories without editing module logic.
 
-Before a normal release, create `RELEASE-NOTES-x.y.z.md`. The same Markdown file is used for the GitHub Release and parsed into the public Morelord Gaming `/releases` feed. Recognized headings are `Added`, `Features`, `Improvements`, `Changed`, `Fixed`, `Breaking Changes`, and `Security`. Prefix a bullet with `[Premium]` or `[Champion]` when the change is tier-specific; otherwise it is treated as Standard.
+Before a normal release, create `release-notes/RELEASE-NOTES-x.y.z.md`. The same Markdown file is used for the GitHub Release and parsed into the public Morelord Gaming `/releases` feed. Recognized headings are `Added`, `Features`, `Improvements`, `Changed`, `Fixed`, `Breaking Changes`, and `Security`. Prefix a bullet with `[Premium]` or `[Champion]` when the change is tier-specific; otherwise it is treated as Standard.
 
 Set the website publishing token once in your PowerShell environment:
 
@@ -217,3 +217,9 @@ Clicking a character's roll immediately removes that row's controls and shows ce
 `waitForDiceAnimation(message)` delays derived outcomes, not request-card completion. Consumers can schedule `afterDiceAnimation(messages, callback, serializeKey)` without awaiting it inside a socket handler; only its final callback joins `MorelordCore.socket.runSerialized(key, callback)`, sharing the existing mutation queue. Handle its rejected promise, reread current domain state before committing, and retain saved dice for recovery. Animation waits must never hold the roll queue. Craftworks, Journeys, and Game Master use this path; rolls without animations show outcomes immediately after the commit.
 
 Core window, footer, and select-option surfaces follow Foundry’s color scheme and palette so light-theme text remains readable.
+
+Release history lives in `release-notes/`; Foundry links to the GitHub Releases page through the manifest `changelog` URL. Use the module-local `/tmp/` directory for working files; it is ignored by Git and excluded from release packages.
+
+Core 0.4.2 exposes `ui.participation.canUseActorInventory(actor, user = game.user, { actors = game.actors } = {})`: GMs and owners qualify directly; a Group also qualifies when the user owns or is assigned one of its character members. Callers must still validate operation-specific permissions and route restricted writes through a connected GM. `ui.openItemPreview(item)` opens a read-only sheet; restricted sources are copied into an unsaved Observer document without changing the source or its ownership.
+
+The shared quantity-controls partial accepts optional `cartType`, `clearAction`, `classes`, and `quantityClass` values. `clearAction` adds an accessible remove button with `data-delta="0"`; existing plus/minus consumers keep their behavior. Documentation uses `ui.documentation.open(moduleId)` to open the supported module page on Morelord Gaming in a new browser tab, falling back to the documentation index for modules without a dedicated page. Ignored-only characters are excluded from shared character choices, including explicit saved selections; eligible offline owners remain supported.

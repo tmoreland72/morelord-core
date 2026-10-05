@@ -19,6 +19,33 @@ test("NPC party members are opt-in, deduplicated, and obey ownership filters", (
 
 const character = (id, { player = true } = {}) => ({ id, uuid: `Actor.${id}`, name: id, type: "character", hasPlayerOwner: player, isOwner: player, img: `${id}.webp` });
 
+test("ignored-only characters are excluded from party, fallback, and saved selections", () => {
+  const previous = globalThis.game;
+  const ignored = { id: "observer", isGM: false, active: true };
+  const offline = { id: "player", isGM: false, active: false };
+  const gm = { id: "gm", isGM: true };
+  const hidden = character("Hidden");
+  const shared = character("Shared");
+  const assigned = character("Assigned", { player: false });
+  const managed = character("Managed", { player: false });
+  ignored.character = assigned;
+  hidden.testUserPermission = user => user === ignored || user === gm;
+  shared.testUserPermission = user => [ignored, offline, gm].includes(user);
+  const party = { type: "group", system: { members: [hidden, shared, assigned, managed] } };
+  const actors = [party, hidden, shared, assigned, managed]; actors.party = party;
+  let ignoredIds = [ignored.id];
+  globalThis.game = { users: [ignored, offline, gm], settings: {
+    settings: new Map([["morelord-core.ignoredUserIds", {}]]), get: () => ignoredIds
+  } };
+  try {
+    assert.deepEqual(listCharacterActors({ actors }), [managed, shared]);
+    assert.deepEqual(listCharacterActors({ actors, defaultParty: false }), [shared]);
+    assert.deepEqual(listCharacterChoices({ actors, selectedUuids: [hidden.uuid, assigned.uuid] }).filter(c => c.checked), []);
+    ignoredIds = [];
+    assert.equal(listCharacterActors({ actors }).length, 4);
+  } finally { globalThis.game = previous; }
+});
+
 test("participant defaults prefer members of the primary group Actor", () => {
   const aric = character("Aric");
   const brom = character("Brom");

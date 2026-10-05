@@ -1,0 +1,39 @@
+{
+  "kind": "offline-css",
+  "modules": [
+    "morelord-core",
+    "morelord-marketplace",
+    "morelord-craftworks",
+    "morelord-downtime",
+    "morelord-journeys",
+    "morelord-encounters",
+    "morelord-character-export",
+    "morelord-game-master"
+  ],
+  "results": [
+    {
+      "theme": "dark",
+      "status": "pass",
+      "consumers": [
+        "craftworks-settings",
+        "custom-recipe-editor",
+        "hoard-gm",
+        "harvest-prototype",
+        "journey-settings",
+        "journey-app"
+      ]
+    },
+    {
+      "theme": "light",
+      "status": "pass",
+      "consumers": [
+        "craftworks-settings",
+        "custom-recipe-editor",
+        "hoard-gm",
+        "harvest-prototype",
+        "journey-settings",
+        "journey-app"
+      ]
+    }
+  ]
+}

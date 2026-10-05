@@ -1,0 +1,65 @@
+{
+  "report": {
+    "ok": true,
+    "results": [
+      {
+        "id": "game-master.compiled-macro-lifecycle-and-independent-surges",
+        "status": "pass",
+        "durationMs": 75057
+      },
+      {
+        "id": "game-master.selected-token-fate",
+        "status": "pass",
+        "durationMs": 4402
+      }
+    ],
+    "summary": {
+      "pass": 2,
+      "fail": 0
+    },
+    "environment": {
+      "world": "dev1",
+      "foundry": "14.368",
+      "system": "6.0.3"
+    }
+  },
+  "state": {
+    "world": "dev1",
+    "activeGM": "Gamemaster",
+    "user": "Chuck",
+    "packs": [
+      {
+        "id": "world.morelord-craftworks-standard-materials",
+        "label": "Craftworks Materials",
+        "folder": "Craftworks",
+        "parent": "Morelord Gaming"
+      },
+      {
+        "id": "world.morelord-craftworks-materials-monsters-of-drakkenheim",
+        "label": "Craftworks Drakkenheim Materials",
+        "folder": "Craftworks",
+        "parent": "Morelord Gaming"
+      },
+      {
+        "id": "world.morelord-craftworks-spell-scrolls",
+        "label": "Craftworks Spell Scrolls",
+        "folder": "Craftworks",
+        "parent": "Morelord Gaming"
+      },
+      {
+        "id": "world.morelord-craftworks-custom-recipes",
+        "label": "Craftworks Custom Recipes",
+        "folder": "Craftworks",
+        "parent": "Morelord Gaming"
+      }
+    ],
+    "newPacksLoaded": false,
+    "personal": [
+      {
+        "id": "f5KIoGvaXmPVT5AA",
+        "parent": null
+      }
+    ]
+  },
+  "errors": []
+}

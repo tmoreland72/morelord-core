@@ -2,6 +2,8 @@
 
 ## Scope and instruction handling
 
+- Demo briefs, scripts, and `VIDEO-*.md` files are working files, not permanent Core documentation. Keep them in the owning module's ignored `/tmp/` directory while needed, or with the user's designated video production files; remove obsolete copies from the module repository. Keep this reusable guide.
+
 - Read this guide before planning, scripting, recording, editing, or exporting a Morelord demo video.
 - Follow the user's current instructions. When the user gives a reusable demo rule or correction, update this guide during that task so it persists across future tasks. Keep requirements specific to one video in that video's brief.
 - Preserve explicit requirements about content, sequence, wording, pacing, framing, audio, editing, and delivery. Do not silently replace them with inferred preferences.
@@ -9,6 +11,8 @@
 - If instructions conflict or a required result cannot be achieved, explain the specific issue and ask only for the missing decision. Continue independent work where possible.
 
 ## Production service access
+
+- Direct YouTube transfer was validated September 25, 2026: initiate a resumable upload through Composio's authenticated YouTube proxy, retain Google's response Location header, and PUT the local video directly to that Google upload URL. The same route worked for a local custom thumbnail. The current proxy helper returns only the response body on success, so preserve the response headers when obtaining the session URL. This avoids unrelated media-host staging. Distinguish project-level API quota errors from channel upload limits; an empty successful initiation body is normal and is not a completed upload. Record the returned video ID immediately and verify public status, processing, thumbnail, metadata and playlist membership before reporting publication.
 
 - Use the user's designated video destination when provided; otherwise store and reference demo production files using the physical `E:/.codex/visualizations/` path. The legacy `C:/Users/troy/.codex` path is a junction to `E:/.codex`; do not present it as the production location. Record project-specific moves and the new paths in the assembly brief.
 
@@ -37,6 +41,8 @@
 
 ## Before delivery
 
+- For user-recorded shorts, preserve substantive feature explanations rather than cutting to a duration target without review. GM creature eligibility and harvesting choices are essential workflow content; do not remove them while retaining lower-priority participant-selection detail. Perform and review the editorial pass before reframing/cropping. Distinguish service-provided audio cleanup from editorial cuts made locally.
+
 - Keep Chuck's narration intact across edits. Never cut a spoken phrase and delay its remaining words into a later shot. Prefer continuous narration for short scenes; extend or hold the visuals to fit the complete speech. Make necessary audio edits only at verified natural pauses, with room for the final consonant and a short trailing pause. Transcription timestamps alone do not establish safe cut points. Check every audio join for clipped words, repeats, and delayed sentence tails before delivery.
 - Review the assembled video against the brief and every applicable rule in this guide.
 - Do not deliver footage with visible error notifications. Inspect notification areas across the final timeline and closely review GM/player transitions; coarse chapter samples can miss short banners. Use clean recorded footage or re-record the affected action, preserving narration and pointer continuity. A recording edit does not establish that an underlying software issue was fixed.
@@ -45,6 +51,10 @@
 - Report any unmet requirement or verification that could not be performed. Do not claim the video was reviewed unless it was actually inspected.
 
 ## User-defined standing recording preferences
+
+- For demo titles, descriptions, covers and discovery keywords, use DnD and D&D rather than D&D 5e unless edition specificity is actually needed. User correction, October 2: DnD/D&D are sufficient for these Morelord videos. Foundry VTT may appear in description/keywords without being included in the display title.
+
+- Generated walkthrough narration must sound conversational and leave a natural pause after each complete sentence. User correction, October 2: the harvesting clone ran sentence endings together and sounded artificial. Check every sentence boundary in the assembled audio; punctuation alone does not establish adequate pauses. Keep deliberate sentence pauses when trimming or synchronizing narration, and obtain approval of the current authoritative script before paid regeneration.
 
 - Demo thumbnails/banners must match the existing Morelord demo series. Use `E:/Morelord Gaming Videos/Road to Phandalin Demo/YouTube/thumbnail.png` as the campaign-demo layout reference and the `Morelord [module] Youtube Image.png` files in `E:/Morelord Gaming Videos` as style references: prominent gold Morelord Gaming masthead, framed parchment title, illustrated Chuck/scenery and a restrained feature ribbon. Inspect the actual references before generation; retain the series design while adapting the setting and title.
 - Do not add captions, lower thirds, explanatory overlays, or subtitles unless requested.
@@ -98,7 +108,7 @@
 User direction, September 23, 2026. These rules apply to the module video documentation series and override conflicting campaign-demo defaults above.
 
 - Start with Morelord Core, followed by Morelord Downtime. Prioritize other modules with missing or dated videos after reviewing their existing coverage; do not assume that review has already happened. Campaign Manager remains inactive.
-- Core video documentation includes member onboarding and Discord: how members gain access and what they can do at each membership level. Use real test accounts for workflows that require actual account state. Use the newly created Gmail and Discord accounts designated by the user going forward; their identifiers and onboarding state are recorded in VIDEO-DOCS-CORE.md. They replace the previous test-account choice. Verify actual membership-to-role mappings and effective Discord permissions before scripting benefit claims. Foundry Developer Mode is not evidence of website membership or Discord access. Keep account identifiers and non-secret preparation state in the production brief; never store passwords, tokens, or recovery codes in documentation.
+- Core video documentation includes member onboarding and Discord: how members gain access and what they can do at each membership level. Use real test accounts for workflows that require actual account state. Use the newly created Gmail and Discord accounts designated by the user going forward; record their identifiers and onboarding state in the current production brief. They replace the previous test-account choice. Verify actual membership-to-role mappings and effective Discord permissions before scripting benefit claims. Foundry Developer Mode is not evidence of website membership or Discord access. Keep account identifiers and non-secret preparation state in the production brief; never store passwords, tokens, or recovery codes in documentation.
 - Produce instructional video documentation: build the spoken scripts, align product documentation with the implemented behavior, then record.
 - Begin Core's video on Foundry's Setup/home page: visibly install the modules for the series, launch the prepared world, show enabling modules and Foundry's required-dependency activation, then continue to Game Settings. Use this as the shared installation reference for later videos. Verify actual prompts and distinguish required dependencies from optional integrations; do not stage automatic activation by manually enabling dependencies beforehand.
 - Use the user's clean Foundry server for the series' installation and initial settings setup, then return to Demo1 for the remainder of the videos. All installations use `http://localhost:31400`; verify the running installation and world rather than identifying them by URL alone. Preserve first-run states until capture. Record server/world identities in the brief and make the handoff clear; setup on one server/world does not automatically configure another.
@@ -119,3 +129,13 @@ Exact speaking rate, chapter duration, export settings, and series artwork remai
 - Prepare unrelated/non-Morelord modules off-camera before recording Morelord activation. Pause capture for this preparation, close their startup notices, then resume with the Morelord modules disabled so their actual activation and dependencies can be demonstrated.
 
 - For Google/Discord account authentication, let the user enter credentials directly with capture stopped. Google rejected the automation-controlled Chrome session during Core production; use normal supported-browser sign-in and verify a suitable recording method afterward. Do not assume an automated/incognito login will work or try to conceal automation from the identity provider.
+
+## Current editorial direction — experienced GMs (September 24 correction)
+
+These instructions supersede earlier conflicting beginner-walkthrough and slow-delivery requirements for the video documentation series.
+
+- Address game masters already comfortable with Foundry. Quickly explain Morelord-specific options, their purpose, and their consequences. Do not teach routine Foundry installation, navigation, record creation, or standard form entry.
+- Explain why a GM would configure a feature before demonstrating its configuration. Examples must establish a useful Morelord workflow; adding a record alone is not a useful demonstration. Capabilities are Morelord-specific and require an explanation of what consumes them and why a GM would choose them, rather than merely showing the add button or enumerating values.
+- Never talk about something the screen is not showing. Pair each spoken point with the relevant visible control, capability, or result. Do not discuss a hidden field, an off-screen workflow, or a membership change over unrelated footage. Describing the purpose of a visible control is appropriate; claiming or demonstrating downstream behavior requires the corresponding view. Cut or recapture mismatched footage instead of padding it with holds. Check alignment sentence by sentence, not merely by chapter.
+- Use brisk, clear delivery and purposeful screen time. Passing an automated silence check does not establish good pacing or useful instruction.
+- Assume regular Foundry use. Skip information obvious to experienced Foundry GMs: routine navigation, typing into fields, creating/selecting records, standard save/delete confirmations, and generic explanations of buttons or dropdowns. Show necessary actions without narrating their mechanics. Explain Morelord-specific behavior, cross-module effects, meaningful choices, and non-obvious restrictions or consequences.

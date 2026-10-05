@@ -1,0 +1,110 @@
+{
+  "world": "dev1",
+  "packs": [
+    {
+      "id": "morelord-game-master.macros",
+      "label": "Game Master Macros",
+      "folder": "Game Master",
+      "parent": "Morelord Gaming",
+      "documents": [
+        {
+          "id": "ItemUseTable0001",
+          "name": "Item Use — Roll Table",
+          "type": "script",
+          "canExecute": true
+        },
+        {
+          "id": "LuckyFinds000001",
+          "name": "Lucky Finds",
+          "type": "script",
+          "canExecute": true
+        },
+        {
+          "id": "RollOfFate000001",
+          "name": "Roll of Fate",
+          "type": "script",
+          "canExecute": true
+        },
+        {
+          "id": "SneakAttack00001",
+          "name": "Sneak Attack",
+          "type": "script",
+          "canExecute": true
+        },
+        {
+          "id": "VolatileMagic001",
+          "name": "Volatile Magic",
+          "type": "script",
+          "canExecute": true
+        },
+        {
+          "id": "WildMagicSurge01",
+          "name": "Wild Magic Surge",
+          "type": "script",
+          "canExecute": true
+        },
+        {
+          "id": "WorldClock000001",
+          "name": "World Clock",
+          "type": "script",
+          "canExecute": true
+        }
+      ]
+    },
+    {
+      "id": "morelord-game-master.roll-tables",
+      "label": "Game Master Roll Tables",
+      "folder": "Game Master",
+      "parent": "Morelord Gaming",
+      "documents": [
+        {
+          "id": "JtRByu566t45mzkG",
+          "name": "Volatile Magic Table",
+          "results": 12,
+          "formula": "1d12"
+        },
+        {
+          "id": "aDMFCKJcdKaJjTc6",
+          "name": "Wild Magic Surge",
+          "results": 25,
+          "formula": "1d100"
+        }
+      ]
+    }
+  ],
+  "triggers": [
+    {
+      "name": "Lucky Finds",
+      "enabled": true,
+      "macroUuid": "Compendium.morelord-game-master.macros.Macro.LuckyFinds000001",
+      "tableUuid": "RollTable.3abmrOvePnpcPirB",
+      "status": "Running"
+    },
+    {
+      "name": "Sneak Attack",
+      "enabled": true,
+      "macroUuid": "Compendium.morelord-game-master.macros.Macro.SneakAttack00001",
+      "status": "Running"
+    },
+    {
+      "name": "Wild Magic Surge",
+      "enabled": true,
+      "macroUuid": "Compendium.morelord-game-master.macros.Macro.WildMagicSurge01",
+      "tableUuid": "Compendium.morelord-game-master.roll-tables.RollTable.aDMFCKJcdKaJjTc6",
+      "status": "Running"
+    },
+    {
+      "name": "Volatile Magic",
+      "enabled": false,
+      "macroUuid": "Compendium.morelord-game-master.macros.Macro.VolatileMagic001",
+      "tableUuid": "Compendium.morelord-game-master.roll-tables.RollTable.JtRByu566t45mzkG",
+      "status": "Stopped"
+    }
+  ],
+  "personal": [
+    {
+      "name": "Graypes Compendium",
+      "parent": null
+    }
+  ]
+}
