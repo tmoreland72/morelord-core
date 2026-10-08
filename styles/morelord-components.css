@@ -20,6 +20,14 @@
 .ml-eyebrow { margin: 0; color: var(--ml-color-accent); font-size: var(--ml-font-size-sm); font-weight: var(--ml-font-weight-bold); letter-spacing: .04em; text-transform: uppercase; }
 
 .ml-actions, .ml-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ml-space-2); }
+/* Native sidebar extension: shared toolbar and checkbox controls. */
+.ml-core-directory-selection { flex: none; }
+.ml-core-directory-selection .window-content.ml-app { padding: var(--ml-space-2); --ml-color-text: light-dark(var(--color-cool-5), var(--color-light-2)); --ml-color-border: light-dark(var(--color-cool-3), var(--color-light-5)); }
+.ml-core-directory-selection .ml-toolbar > button { flex: 1 1 auto; height: auto; max-height: none; white-space: normal; color: var(--ml-color-text); --button-text-color: var(--ml-color-text); --button-background-color: var(--ml-color-surface-raised); --button-border-color: var(--ml-color-border); }
+.ml-core-directory-check { flex: 0 0 auto; padding-inline: var(--ml-space-2); align-self: center; }
+.ml-core-directory-check input { accent-color: var(--ml-color-accent); }
+.ml-core-directory-check input:focus-visible { outline: 2px solid var(--ml-color-focus); outline-offset: 2px; }
+.ml-core-directory-delete-list { max-height: 40vh; overflow-y: auto; }
 .ml-actions { justify-content: flex-end; }
 .ml-icon-button { display: inline-grid; place-items: center; flex: 0 0 var(--ml-control-height); width: var(--ml-control-height); min-width: var(--ml-control-height); height: var(--ml-control-height); min-height: var(--ml-control-height); padding: 0; }
 .ml-window .window-content .ml-icon-button[data-size="compact"] { flex-basis: 20px; width: 20px; min-width: 20px; height: 20px; min-height: 20px; padding: 0; font-size: 14px; line-height: 1; }

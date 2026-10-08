@@ -3,6 +3,10 @@
 @import url("./morelord-primitives.css");
 @import url("./morelord-components.css");
 
+/* Canvas distance badge: shared window surface and badge styling, fixed pointer positioning. */
+.ml-core-token-distance { position: fixed; z-index: 100; pointer-events: none; --ml-window-opacity: 100%; }
+.ml-core-token-distance .window-content { border-radius: var(--ml-radius-pill); }
+
 /* Core account-screen layout. Generic styling belongs in the imported layers. */
 .ml-core-account__header { border-bottom-color: var(--ml-color-accent); border-bottom-width: 2px; }
 .ml-core-account__details { display: grid; grid-template-columns: 145px 1fr; gap: var(--ml-space-2) var(--ml-space-4); }

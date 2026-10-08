@@ -12,9 +12,21 @@ Reviewed against local Core 0.3.13 on September 23, 2026. This implementation re
 
 Recording check: the public Core 0.3.13 package installed from Foundry's catalog does not include the one-time reporting notice described below from the development worktree. In that package, open **Connect or Manage Account → Core Settings** to choose reporting preferences directly. The video documentation must follow the installed package's actual controls.
 
-This guide is for Game Masters. Players do not need to configure Morelord Core.
+This guide is for Game Masters. Players can change their own **Token Distance Indicator** preference in Module Settings; they do not need to configure account access.
 
 ## What Morelord Core Does
+
+### Delete multiple sidebar documents
+
+GMs can use **Select multiple** in Scenes, Actors, Items, Journal, Rollable Tables, Cards, Macros, and Playlists, including their pop-out directories. Core must be enabled; account linking and premium access are not required. Selection starts empty and is kept separately for each directory window.
+
+- **Select multiple** shows a labeled checkbox beside each world document. Check or uncheck individual documents; existing entry opening and dragging remain available.
+- **Select visible** adds all currently displayed entries, respecting the current search and collapsed folders. Previously selected entries stay selected even when hidden by a later search or folder collapse.
+- **Clear selection** unchecks every selected document, including hidden entries.
+- **Delete selected (N)** opens a confirmation listing the selected document names. It is disabled with no selection and while confirmation/deletion is pending. **Cancel**, the default confirmation action, keeps the documents and selection. **Delete selected** in the confirmation permanently deletes the listed documents through Foundry's native document API. There is no undo; native deletion effects apply, including a document's embedded content. Folders are kept.
+- **Done selecting** exits selection mode and clears selection.
+
+For example, search the Actors directory for a batch's common name, choose **Select multiple → Select visible**, review **Delete selected (N)**, then confirm. Selection survives directory rerenders but resets when the client reloads. Only world documents are included: compendium packs, chat messages, combat entries, journal pages, and individual playlist sounds are outside this directory action.
 
 Morelord Core provides one shared account connection for supported Morelord Tools modules. From Foundry, a GM can:
 
@@ -123,6 +135,10 @@ After cached access is no longer usable, premium features may be unavailable unt
 Disconnecting clears the account token, installation reference, connection label, and cached access information stored by Morelord Core in the current world. It does not delete existing world content. You can reconnect later by completing the approval process again.
 
 ## Core Settings and Reporting Preferences
+
+**Token Distance Indicator** accepts checked (enabled) or unchecked (disabled), defaults to checked, and applies only to the current user's client. Choose **Save Core Settings** to apply it here, or change the same checkbox directly in **Game Settings → Configure Settings → Morelord Core**. Players use that settings checkbox. No account connection or premium access is required. Disable it when using another distance indicator such as TheRipper's Hover Distance to avoid duplicate displays.
+
+Select exactly one token, then hover over another visible token to see distance between their nearest occupied spaces using native grid/diagonal rules. Adjacent tokens show 5 ft on feet-based scenes, and distances round up to 5-unit intervals in the scene's units. Token size does not add extra center-to-center distance. Gridless scenes measure nearest footprint edges with a half-space allowance for adjacency. Players can instead hover without selecting: Core uses their assigned character's token if exactly one owned, visible token exists. Multiple selections, ambiguous character tokens, and hovering the source itself show nothing. The indicator measures flat map distance without elevation, walls, reach, or movement costs; it never exposes hidden or unseen tokens to players.
 
 Open **Connect or Manage Account**, then scroll to **Core Settings**. These controls are available without connecting an account. Use **Save Core Settings** to apply changes.
 

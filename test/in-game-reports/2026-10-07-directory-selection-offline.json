@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "scope": "offline",
+  "checks": [
+    "eight directories",
+    "hidden entry filtering",
+    "rerender persistence",
+    "cancel",
+    "escaped names",
+    "default cancel",
+    "single deletion",
+    "unselected preservation",
+    "GM restriction"
+  ]
+}

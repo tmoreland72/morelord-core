@@ -17,6 +17,12 @@ See the [Core GM Product Guide](CORE-GM-PRODUCT-GUIDE.md) for account controls, 
 3. Select **Connect or Manage Account**.
 4. Approve the temporary code at MorelordGaming.com.
 
+## Token Distance Indicator
+
+Hover over another visible token to see the distance. Players measure from one selected owned token, or from their assigned character's unique visible token when nothing is selected. GMs must select exactly one token first. Multiple selected tokens or multiple unselected tokens for the assigned character produce no readout. Distances use the nearest occupied token spaces and Foundry's grid/diagonal rules. Adjacent tokens show 5 ft on a feet-based scene, regardless of token size. Values round up to 5-unit intervals in the scene's units; gridless scenes use the nearest token footprint edges with a half-space allowance for adjacency. This is a flat map distance; elevation, walls, reach, and movement costs are not included. Hidden or unseen targets are never revealed to players.
+
+**Token Distance Indicator** is a per-user checkbox under **Game Settings → Configure Settings → Morelord Core**, enabled by default. GMs can also change it in **Connect or Manage Account → Core Settings → Save Core Settings** for their own client. Changes take effect immediately without an account or premium access. If using TheRipper's Hover Distance, disable one of the indicators to avoid duplicate readouts; Core does not change the other module's settings.
+
 ## Locations Manager
 
 Saved Associated Scenes remain highlighted when the editor reopens, including when the Scene list is unfocused. Click a Scene to toggle its association, then save the location.
@@ -223,3 +229,6 @@ Release history lives in `release-notes/`; Foundry links to the GitHub Releases 
 Core 0.4.2 exposes `ui.participation.canUseActorInventory(actor, user = game.user, { actors = game.actors } = {})`: GMs and owners qualify directly; a Group also qualifies when the user owns or is assigned one of its character members. Callers must still validate operation-specific permissions and route restricted writes through a connected GM. `ui.openItemPreview(item)` opens a read-only sheet; restricted sources are copied into an unsaved Observer document without changing the source or its ownership.
 
 The shared quantity-controls partial accepts optional `cartType`, `clearAction`, `classes`, and `quantityClass` values. `clearAction` adds an accessible remove button with `data-delta="0"`; existing plus/minus consumers keep their behavior. Documentation uses `ui.documentation.open(moduleId)` to open the supported module page on Morelord Gaming in a new browser tab, falling back to the documentation index for modules without a dedicated page. Ignored-only characters are excluded from shared character choices, including explicit saved selections; eligible offline owners remain supported.
+## Sidebar multiselect
+
+GM-only **Select multiple** controls support Scenes, Actors, Items, Journals, Rollable Tables, Cards, Macros, and Playlists, including pop-out directories. Select individual documents or **Select visible**, then review the named list before confirming **Delete selected (N)**. **Clear selection** and **Done selecting** clear hidden selections too. Folders remain; document deletion is permanent and uses Foundry's native API. No linked account or premium access is required. See `CORE-GM-PRODUCT-GUIDE.md` for every control and scope.

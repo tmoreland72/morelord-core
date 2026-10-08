@@ -47,9 +47,13 @@
     <div class="ml-section-heading">
       <div>
         <h2><i class="fa-solid fa-gear"></i> Core Settings</h2>
-        <p>Connection and privacy settings shared by Morelord modules.</p>
+        <p>Connection, privacy, and quality-of-life settings.</p>
       </div>
     </div>
+    <label class="ml-setting-row">
+      <span>Token Distance Indicator <small>Hover to measure from your character or selected token; GMs select one first. Uses nearest spaces in 5-unit steps. Disable when using Hover Distance.</small></span>
+      <input type="checkbox" name="tokenDistanceIndicator" {{checked tokenDistanceIndicator}}>
+    </label>
     <label class="ml-stack" data-gap="1">
       <span>Morelord Gaming Website</span>
       <input type="url" name="serverUrl" value="{{serverUrl}}" required>
