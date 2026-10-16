@@ -33,4 +33,3 @@ export function edgePositions({rect, size, footprints, occupied=[], inset=1, ran
   }
   return result;
 }
-
