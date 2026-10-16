@@ -68,6 +68,11 @@
 
 .ml-choice-card { display: grid; grid-template-columns: auto var(--ml-avatar-md) minmax(0, 1fr); align-items: center; gap: var(--ml-space-2); padding: var(--ml-space-2); border: 1px solid var(--ml-color-border); border-radius: var(--ml-radius-md); background: var(--ml-color-surface-sunken); cursor: pointer; }
 .ml-choice-card:has(input:checked), .ml-choice-card[aria-checked="true"] { border-color: var(--ml-color-accent); background: var(--ml-color-surface-raised); }
+.ml-field-group:has(> .ml-choice-grid) { container-type:inline-size; }
+.ml-choice-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:var(--ml-space-2); }
+@container (max-width:600px) { .ml-choice-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+.ml-choice-card[data-size="compact"] { grid-template-columns:auto 1rem minmax(0,1fr); min-height:var(--ml-control-height); }
+.ml-choice-card[data-size="compact"] > span { font-size:var(--ml-font-size-sm); font-weight:var(--ml-font-weight-medium); line-height:var(--ml-line-height-body); }
 .ml-actor-identity { display: inline-flex; align-items: center; gap: var(--ml-space-2); min-width: 0; max-width: 100%; vertical-align: middle; text-align: left; }
 .ml-actor-identity > span { min-width: 0; overflow-wrap: anywhere; }
 .ml-actor-identity > .ml-avatar { flex: 0 0 var(--ml-avatar-sm); width: var(--ml-avatar-sm); height: var(--ml-avatar-sm); object-fit: cover; border: 0; border-radius: 50%; }

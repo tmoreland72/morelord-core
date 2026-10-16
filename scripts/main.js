@@ -21,6 +21,7 @@ import { activateTabs } from "./ui/tabs.js";
 import { activateCardSelection } from "./ui/card-selection.js";
 import { activateCollapsibleSections, createCollapsibleSection } from "./ui/collapsible-section.js";
 import { actorIdentity, decorateActorSelect } from "./ui/actor-identity.js";
+import { createChoiceGroup } from './ui/choice-group.js';
 import { openItemPreview } from "./ui/item-preview.js";
 import { DocumentationService } from "./documentation/documentation-service.js";
 import { DocumentationApp } from "./documentation/documentation-app.js";
@@ -609,6 +610,7 @@ Hooks.once("ready", async () => {
       activateCardSelection,
       activateCollapsibleSections,
       createCollapsibleSection,
+      createChoiceGroup,
       renderPreservingScroll,
       participation: Object.freeze({ canUseActorInventory, listCharacterActors, listCharacterChoices, participantRecords, primaryPartyGroup, selectedCharacterUuids }),
       documentation: Object.freeze({
