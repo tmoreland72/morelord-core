@@ -1,5 +1,7 @@
 # Morelord Core
 
+Core 0.5.1 provides the shared monster cards, action pills, image links, and artwork fallback required by the accompanying Craftworks and Encounters updates. Release Core 0.5.1 before those module updates.
+
 Core's `compendiums.organize(entries, path, {migration})` API places existing packs in a shared native folder hierarchy without changing pack/document IDs or permissions. `entries` contains `{collection, label}` objects. Placement is recorded once per pack/world; later manual moves remain respected. `compendiums.labels(entries)` applies display labels on each client, including generated world packs whose old manifest labels remain on disk. Craftworks and Game Master consume this service for the Morelord Gaming parent folder. Personal Graypes Compendium is organized separately by its own module and is not part of that hierarchy.
 
 User-facing history and result logs must use readable text. `scripts/ui/log-formatting.js` provides `logLabel` and `logValue` for plain-text fallback formatting of structured values; prefer domain-specific sentences and resolved names when available. Escape these strings when inserting HTML. JSON remains appropriate for storage, exports, and developer diagnostics.

@@ -942,6 +942,14 @@ Section header subtitles are short descriptions, not instructions. Put actionabl
 
 For compact labels with quantities, use `<span class="ml-badge" data-truncate title="Full name"><span class="ml-badge__label">Name</span><span class="ml-badge__value">2/4</span></span>`. Core limits the pill width and truncates only the label; the trailing value stays visible. Existing badges are unchanged unless they opt in with `data-truncate`.
 
+Clickable tags use a native `button.ml-badge` alongside passive `span.ml-badge` tags. Core preserves the same pill dimensions and appearance, adds a pointer cursor, and retains keyboard focus styling. Craftworks material sources consume this shared component.
+
+Action pills may use `data-tone="action"` for Core's orange background and white text (`--ml-color-action-pill` / `--ml-color-on-action-pill`). Passive tags retain their normal appearance.
+
+Clickable reference artwork uses `button.ml-image-link` containing an image, with an accessible action label and optional `data-size="large"` for a 72px recipe image. Default images use the shared small-avatar size. Core owns dimensions, border, radius, and keyboard focus; feature modules own the navigation action. Craftworks Craft consumes this control for recipe and material navigation.
+
+Monster result cards use `createMonsterCard(monster, { quantity, showDetails, actions })` from `scripts/ui/monster-card.js`. Supply the actor UUID/name/image snapshot, CR, source label, and native action buttons. Core owns the portrait, identity, layout, and optional requirements/category text. Encounters supplies Regenerate and Open; Craftworks supplies Open only. Optional artwork fallback uses `data-ml-image-fallback="icons/svg/item-bag.svg"` on reference images. Core initializes it through page layout; dynamic cards call `activateImageFallbacks(root)` from `scripts/ui/image-fallbacks.js`.
+
 Checkbox option groups with variable-length names should use `ml-cluster` containing `label.ml-check` with an input and sibling span. Whole options wrap between rows. Keep checkbox labels concise and put longer explanations in a wrapping helper below, associated with `aria-describedby`.
 ## Compact tool panels and roll controls
 
