@@ -17,7 +17,7 @@ See the [Core GM Product Guide](CORE-GM-PRODUCT-GUIDE.md) for account controls, 
 1. Install and enable Morelord Core.
 2. Open **Game Settings → Configure Settings → Module Settings → Morelord Core**.
 3. Select **Connect or Manage Account**.
-4. Approve the temporary code at MorelordGaming.com.
+4. Approve the temporary code at MorelordGaming.com. Foundry shows the code in large type. **Copy** copies it, and **Open approval page** opens the approval address if the browser blocked the automatic page.
 
 ## Token Distance Indicator
 
