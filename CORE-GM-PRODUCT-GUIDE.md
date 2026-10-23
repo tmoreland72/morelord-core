@@ -16,6 +16,16 @@ This guide is for Game Masters. Players can change their own **Token Distance In
 
 ## What Morelord Core Does
 
+Morelord Core provides one shared account connection for supported Morelord Tools modules. From Foundry, a GM can:
+
+- Connect the current world to a Morelord Gaming account.
+- Review the membership level recognized for the world.
+- Refresh premium access after an account or membership change.
+- Open the Morelord Gaming account page.
+- Disconnect the world from the account.
+
+Morelord Core does not remove existing world data if premium access expires.
+
 ### Delete multiple sidebar documents
 
 GMs can use **Select multiple** in Scenes, Actors, Items, Journal, Rollable Tables, Cards, Macros, and Playlists, including their pop-out directories. Core must be enabled; account linking and premium access are not required. Selection starts empty and is kept separately for each directory window.
@@ -28,15 +38,17 @@ GMs can use **Select multiple** in Scenes, Actors, Items, Journal, Rollable Tabl
 
 For example, search the Actors directory for a batch's common name, choose **Select multiple → Select visible**, review **Delete selected (N)**, then confirm. Selection survives directory rerenders but resets when the client reloads. Only world documents are included: compendium packs, chat messages, combat entries, journal pages, and individual playlist sounds are outside this directory action.
 
-Morelord Core provides one shared account connection for supported Morelord Tools modules. From Foundry, a GM can:
+### Token Distance Indicator
 
-- Connect the current world to a Morelord Gaming account.
-- Review the membership level recognized for the world.
-- Refresh premium access after an account or membership change.
-- Open the Morelord Gaming account page.
-- Disconnect the world from the account.
+**Token Distance Indicator** accepts checked (enabled) or unchecked (disabled), defaults to checked, and applies only to the current user's client. Choose **Save Core Settings** to apply it in **Connect or Manage Account → Core Settings**, or change the same checkbox directly in **Game Settings → Configure Settings → Morelord Core**. Players use that settings checkbox. No account connection or premium access is required. Disable it when using another distance indicator such as TheRipper's Hover Distance to avoid duplicate displays.
 
-Morelord Core does not remove existing world data if premium access expires.
+Select exactly one token, then hover over another visible token to see distance between their nearest occupied spaces using native grid/diagonal rules. Adjacent tokens show 5 ft on feet-based scenes, and distances round up to 5-unit intervals in the scene's units. Token size does not add extra center-to-center distance. Gridless scenes measure nearest footprint edges with a half-space allowance for adjacency. Players can instead hover without selecting: Core uses their assigned character's token if exactly one owned, visible token exists. Multiple selections, ambiguous character tokens, and hovering the source itself show nothing. The indicator measures flat map distance without elevation, walls, reach, or movement costs; it never exposes hidden or unseen tokens to players.
+
+### Reaction Used
+
+**Reaction Used** accepts checked (enabled) or unchecked (disabled), defaults to checked, and applies to the whole world. Only a GM can change it. Choose **Save Core Settings** to apply it in **Connect or Manage Account → Core Settings**, or change the same checkbox in **Game Settings → Configure Settings → Morelord Core**. No account connection or premium access is required. Automatic marking listens for a D&D 5e activity whose activation type is reaction.
+
+While **Reaction Used** is checked, a creature in a started combat that uses such an activity is marked on its token. In the right-click token HUD status effects the status is labeled **Reaction**, so the name fits the grid. Anyone allowed to update that token can toggle **Reaction** there, including for an opportunity attack, a readied action, or a mark that should not stay on. The active GM removes the mark when that creature's turn starts. When the turn is a shared mob turn from Morelord Encounters, the active GM removes it from every token in that mob on the scene. When combat is deleted, ends, or the round returns to 0, the active GM removes it from tokens on that combat's scene. A player client, and a GM who is not the active GM, does not clear marks. Unchecking **Reaction Used** stops automatic marking and clearing. The status remains on the token HUD for manual use.
 
 ## Requirements
 
@@ -142,13 +154,7 @@ Disconnecting clears the account token, installation reference, connection label
 
 ## Core Settings and Reporting Preferences
 
-**Token Distance Indicator** accepts checked (enabled) or unchecked (disabled), defaults to checked, and applies only to the current user's client. Choose **Save Core Settings** to apply it here, or change the same checkbox directly in **Game Settings → Configure Settings → Morelord Core**. Players use that settings checkbox. No account connection or premium access is required. Disable it when using another distance indicator such as TheRipper's Hover Distance to avoid duplicate displays.
-
-Select exactly one token, then hover over another visible token to see distance between their nearest occupied spaces using native grid/diagonal rules. Adjacent tokens show 5 ft on feet-based scenes, and distances round up to 5-unit intervals in the scene's units. Token size does not add extra center-to-center distance. Gridless scenes measure nearest footprint edges with a half-space allowance for adjacency. Players can instead hover without selecting: Core uses their assigned character's token if exactly one owned, visible token exists. Multiple selections, ambiguous character tokens, and hovering the source itself show nothing. The indicator measures flat map distance without elevation, walls, reach, or movement costs; it never exposes hidden or unseen tokens to players.
-
-**Reaction Used** accepts checked (enabled) or unchecked (disabled), defaults to checked, and applies to the whole world. Only a GM can change it. Choose **Save Core Settings** to apply it here, or change the same checkbox in **Game Settings → Configure Settings → Morelord Core**. No account connection or premium access is required. Automatic marking listens for a D&D 5e activity whose activation type is reaction.
-
-While **Reaction Used** is checked, a creature in a started combat that uses such an activity is marked on its token. In the right-click token HUD status effects the status is labeled **Reaction**, so the name fits the grid. Anyone allowed to update that token can toggle **Reaction** there, including for an opportunity attack, a readied action, or a mark that should not stay on. The active GM removes the mark when that creature's turn starts. When the turn is a shared mob turn from Morelord Encounters, the active GM removes it from every token in that mob on the scene. When combat is deleted, ends, or the round returns to 0, the active GM removes it from tokens on that combat's scene. A player client, and a GM who is not the active GM, does not clear marks. Unchecking **Reaction Used** stops automatic marking and clearing. The status remains on the token HUD for manual use.
+**Token Distance Indicator** and **Reaction Used** are documented above under What Morelord Core Does. Change either checkbox here with **Save Core Settings**, or in **Game Settings → Configure Settings → Morelord Core**. **Token Distance Indicator** applies only to the current user, including players. **Reaction Used** is a world setting changed by a GM.
 
 Open **Connect or Manage Account**, then scroll to **Core Settings**. These controls are available without connecting an account. Use **Save Core Settings** to apply changes.
 
