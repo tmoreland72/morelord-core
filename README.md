@@ -102,7 +102,7 @@ Create the release:
 .\release.ps1 -Version 0.1.2
 ```
 
-The script updates `module.json`, packages only Foundry runtime files, verifies the ZIP structure and encoding, commits the manifest, creates and pushes an annotated tag, and publishes the GitHub Release.
+The script updates `module.json`, rebuilds root `CHANGELOG.md` from `release-notes/RELEASE-NOTES-*.md`, packages runtime files plus that changelog at the ZIP root, verifies the ZIP structure and encoding, commits `module.json` and `CHANGELOG.md`, creates and pushes an annotated tag, and publishes the GitHub Release. `-DryRun` and `-ValidateOnly` leave an already current `CHANGELOG.md` untouched.
 
 Foundry manifest URL:
 
@@ -117,7 +117,7 @@ New and existing worlds receive a one-time GM reporting notice in the next Core 
 
 Production Morelord Foundry modules use the same `release.ps1`. Character Export and Downtime follow these release steps. Project-specific values are stored in `release.config.json`, so improvements to the workflow can be copied between repositories without editing module logic.
 
-Before a normal release, create `release-notes/RELEASE-NOTES-x.y.z.md`. The same Markdown file is used for the GitHub Release and parsed into the public Morelord Gaming `/releases` feed. Recognized headings are `Added`, `Features`, `Improvements`, `Changed`, `Fixed`, `Breaking Changes`, and `Security`. Prefix a bullet with `[Premium]` or `[Champion]` when the change is tier-specific; otherwise it is treated as Standard.
+Before a normal release, create `release-notes/RELEASE-NOTES-x.y.z.md`. The same Markdown file is used for the GitHub Release and parsed into the public Morelord Gaming `/releases` feed. Recognized headings are `Added`, `Features`, `Improvements`, `Changed`, `Fixed`, `Breaking Changes`, and `Security`. Prefix a bullet with `[Premium]` or `[Champion]` when the change is tier-specific; otherwise it is treated as Standard. `release.ps1` rebuilds the root `CHANGELOG.md` from every `release-notes/RELEASE-NOTES-*.md` file, newest version first, and packages that file at the root of the release ZIP. Per-version notes stay out of the archive. Use `#`/`##`/`###` headings with a space after `#`, `- ` bullets, and no `---` horizontal rules so in-Foundry changelog viewers can read `CHANGELOG.md`.
 
 Set the website publishing token once in your PowerShell environment:
 
@@ -137,7 +137,7 @@ Publish the normal release:
 .\release.ps1 -Version x.y.z
 ```
 
-The normal workflow validates the repository, updates `module.json`, builds and verifies the Foundry ZIP, commits and tags the release, pushes it, creates the GitHub Release from the same release-notes file, and publishes the release to `https://morelordgaming.com/releases`. Draft and prerelease builds intentionally skip the public website feed.
+The normal workflow validates the repository, updates `module.json`, rebuilds `CHANGELOG.md`, builds and verifies the Foundry ZIP, commits `module.json` and `CHANGELOG.md`, tags the release, pushes it, creates the GitHub Release from the same release-notes file, and publishes the release to `https://morelordgaming.com/releases`. Draft and prerelease builds intentionally skip the public website feed. `-DryRun` and `-ValidateOnly` do not rewrite `CHANGELOG.md` when it is already current.
 
 If GitHub release creation succeeds but website publication fails, retry only the idempotent website step:
 
@@ -232,7 +232,7 @@ Clicking a character's roll immediately removes that row's controls and shows ce
 
 Core window, footer, and select-option surfaces follow Foundry’s color scheme and palette so light-theme text remains readable.
 
-Release history lives in `release-notes/`; Foundry links to the GitHub Releases page through the manifest `changelog` URL. Use the module-local `/tmp/` directory for working files; it is ignored by Git and excluded from release packages.
+Per-version release history lives in `release-notes/RELEASE-NOTES-<version>.md`, which is excluded from release packages. `release.ps1` rebuilds root `CHANGELOG.md` from those files and packages it at the ZIP root for in-Foundry changelog viewers. Foundry's manifest `changelog` URL still points at the GitHub Releases page. Use the module-local `/tmp/` directory for working files; it is ignored by Git and excluded from release packages.
 
 Core 0.4.2 exposes `ui.participation.canUseActorInventory(actor, user = game.user, { actors = game.actors } = {})`: GMs and owners qualify directly; a Group also qualifies when the user owns or is assigned one of its character members. Callers must still validate operation-specific permissions and route restricted writes through a connected GM. `ui.openItemPreview(item)` opens a read-only sheet; restricted sources are copied into an unsaved Observer document without changing the source or its ownership.
 
