@@ -151,7 +151,7 @@ function matchesSimple(element, selector) {
 }
 
 function selectorSteps(selector) {
-  return [...selector.matchAll(/\s*(>)?\s*([^\s>]+)/g)].map(match => ({ direct: match[1] === '>', selector: match[2] }));
+  return [...selector.replace(/^:scope\s*/, '').matchAll(/\s*(>)?\s*([^\s>]+)/g)].map(match => ({ direct: match[1] === '>', selector: match[2] }));
 }
 
 function descendants(element) {

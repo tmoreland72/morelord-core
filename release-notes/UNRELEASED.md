@@ -12,4 +12,4 @@
 
 ## Verification
 
-Node coverage is in `test/directory-selection.test.js`. The in-game check `directorySelectionCheck` moves its own Macro and RollTable fixtures into a temporary folder and back to root, then deletes only those fixtures and temporary folders. Live Dev1 verification of this change is still outstanding.
+Node coverage is in `test/directory-selection.test.js` and `test/directory-selection.test.mjs`. The in-game check `directorySelectionCheck` moves its own Macro and RollTable fixtures into a temporary folder and back to root, then deletes only those fixtures and temporary folders. Live Dev1 verification of this change is still outstanding.
