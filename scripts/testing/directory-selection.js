@@ -17,13 +17,34 @@ async function answerConfirmation(action) {
   dialog.querySelector(`[data-action="${action}"]`).click();
 }
 
+async function answerMove(folderId, label) {
+  await waitFor(() => {
+    const dialog = document.querySelector('dialog[open] .ml-core-directory-move select[name="folder"]')?.closest('dialog');
+    return dialog && foundry.applications.instances.get(dialog.id)?.rendered;
+  }, 'Move dialog did not finish rendering');
+  const dialog = document.querySelector('dialog[open] .ml-core-directory-move select[name="folder"]').closest('dialog');
+  if (folderId == null) dialog.querySelector('[data-action="cancel"]').click();
+  else {
+    const select = dialog.querySelector('select[name="folder"]');
+    assert(select.options[0]?.value === '' && select.options[0].textContent === 'Root (no folder)', 'Root is the first move destination.');
+    const option = [...select.options].find(entry => entry.value === folderId);
+    assert(option, folderId ? 'Temporary folder is listed.' : 'Root is available.');
+    if (label != null) assert(option.textContent === label, 'Destination label matches the temporary folder.');
+    select.value = folderId;
+    dialog.querySelector('[data-action="move"]').click();
+  }
+  await waitFor(() => !document.querySelector('dialog[open] .ml-core-directory-move'), 'Move dialog did not close');
+}
+
 export const directorySelectionCheck = {
   id: 'core.directory-selection',
   async run() {
     assert(game.user.isGM, 'Run as GM in Dev1.');
     const fixtures = [];
+    const createdFolders = [];
     const previousTab = ui.sidebar.tabGroups.primary;
     const previouslyExpanded = ui.sidebar.expanded;
+    const folderIdOf = doc => doc?.folder?.id ?? (typeof doc?.folder === 'string' ? doc.folder : null);
     try {
       for (const tab of ['scenes', 'actors', 'items', 'journal', 'tables', 'cards', 'macros', 'playlists']) {
         const app = ui[tab];
@@ -78,6 +99,19 @@ export const directorySelectionCheck = {
         const app = ui[tab];
         const docs = await cls.createDocuments([0, 1, 2].map(i => ({ ...data, name: `Core multiselect fixture ${i}` })));
         fixtures.push(...docs);
+        const folder = await Folder.create({
+          name: `Core multiselect fixture folder ${foundry.utils.randomID()}`,
+          type: cls.documentName,
+          sorting: 'a'
+        });
+        createdFolders.push(folder);
+        const fixtureIds = new Set(docs.map(doc => doc.id));
+        const worldSnapshot = () => [...(app.collection.contents ?? app.collection)]
+          .filter(doc => doc?.id && !fixtureIds.has(doc.id))
+          .map(doc => [doc.id, folderIdOf(doc)])
+          .sort((a, b) => a[0].localeCompare(b[0]));
+        const preservedDocuments = worldSnapshot();
+        const preservedFolders = [...game.folders].filter(entry => entry.id !== folder.id).map(entry => entry.id).sort();
         await ui.sidebar.changeTab(tab, 'primary');
         ui.sidebar.expand();
         await app.render({ force: true });
@@ -86,6 +120,8 @@ export const directorySelectionCheck = {
           assert(target && !target.disabled, `${text} is available.`); target.click();
         };
         click('Select multiple');
+        const idleMove = app.element.querySelector('[data-action="move-selected"]');
+        assert(idleMove?.disabled && idleMove.textContent === 'Move selected (0)', 'Move selected starts disabled.');
         const search = app.element.querySelector('search input');
         const savedSearch = search.value;
         try {
@@ -110,6 +146,25 @@ export const directorySelectionCheck = {
         }
         await app.render({ force: true });
         assert(app.element.querySelectorAll('.ml-core-directory-check input:checked').length === 2, 'Selection survives rendering.');
+        const sameDocuments = (left, right) => left.length === right.length && left.every((entry, index) => entry[0] === right[index][0] && entry[1] === right[index][1]);
+        const moveButton = () => app.element.querySelector('[data-action="move-selected"]');
+        assert(moveButton() && !moveButton().disabled && moveButton().textContent === 'Move selected (2)', 'Move selected shows the count.');
+        assert(docs.every(doc => !folderIdOf(app.collection.get(doc.id))), 'Fixtures start at root.');
+        click('Move selected');
+        await answerMove(null);
+        await waitFor(() => !app.element.querySelector('.ml-core-directory-selection button').disabled, 'Directory stayed busy after cancelling a move');
+        assert(docs.every(doc => !folderIdOf(app.collection.get(doc.id))), 'Cancel keeps fixture folders.');
+        assert(sameDocuments(worldSnapshot(), preservedDocuments), 'Cancel leaves pre-existing documents in place.');
+        click('Move selected');
+        await answerMove(folder.id, folder.name);
+        await waitFor(() => docs.slice(0, 2).every(doc => folderIdOf(app.collection.get(doc.id)) === folder.id) && !moveButton().disabled, 'Selected documents were not moved');
+        assert(!folderIdOf(app.collection.get(docs[2].id)), 'Unselected document stays at root.');
+        assert(sameDocuments(worldSnapshot(), preservedDocuments), 'Moving fixtures leaves pre-existing documents in place.');
+        click('Move selected');
+        await answerMove('');
+        await waitFor(() => docs.slice(0, 2).every(doc => !folderIdOf(app.collection.get(doc.id))) && !moveButton().disabled, 'Selected documents were not returned to root');
+        assert(sameDocuments(worldSnapshot(), preservedDocuments), 'Returning fixtures to root leaves pre-existing documents in place.');
+        assert(preservedFolders.every(id => game.folders.get(id)), 'Pre-existing folders remain.');
         click('Delete selected');
         await answerConfirmation('no');
         await waitFor(() => !document.querySelector('.ml-core-directory-delete-list'), 'Cancellation did not close confirmation');
@@ -124,9 +179,21 @@ export const directorySelectionCheck = {
         assert(!app.element.querySelector('.ml-core-directory-check'), 'Done removes selection controls.');
       }
     } finally {
-      const dialog = document.querySelector('dialog .ml-core-directory-delete-list')?.closest('dialog');
-      if (dialog) await foundry.applications.instances.get(dialog.id)?.close();
-      for (const doc of fixtures) if (doc.collection.has(doc.id)) await doc.delete();
+      for (const selector of ['.ml-core-directory-delete-list', '.ml-core-directory-move']) {
+        const dialog = document.querySelector(`dialog ${selector}`)?.closest('dialog');
+        if (dialog) await foundry.applications.instances.get(dialog.id)?.close();
+      }
+      for (const doc of fixtures) if (doc.collection?.has(doc.id)) await doc.delete();
+      for (const folder of createdFolders) {
+        const current = game.folders.get(folder.id);
+        if (!current) continue;
+        const foreign = [...(current.contents ?? [])].filter(doc => !fixtures.some(fixture => fixture.id === doc.id));
+        if (foreign.length) {
+          ui.notifications.warn(`Left temporary folder "${current.name}" in place because it contains other documents.`);
+          continue;
+        }
+        await current.delete({ deleteSubfolders: false, deleteContents: false });
+      }
       await ui.sidebar.changeTab(previousTab, 'primary');
       ui.sidebar.toggleExpanded(previouslyExpanded);
     }

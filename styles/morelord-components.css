@@ -109,7 +109,19 @@
   cursor: pointer;
 }
 .ml-core-directory-check input:focus-visible { outline: 2px solid var(--ml-color-focus); outline-offset: 2px; }
-.ml-core-directory-delete-list { max-height: 40vh; overflow-y: auto; }
+.ml-core-directory-delete-list,
+.ml-core-directory-move-list { max-height: 40vh; overflow-y: auto; }
+/* Compact directory styles absolutely position .thumbnail at its static slot.
+   left is ignored while the portrait is static, and moves it beside the checkbox when it is absolute.
+   A name that directly follows the checkbox keeps the flex gap without compact left padding. */
+.directory .directory-item:not(.scene) > .ml-core-directory-check + .thumbnail,
+.directory .directory-item:not(.scene) > .ml-core-directory-check + img {
+  left: calc(6px + var(--font-size-16, 16px) + 8px);
+}
+.directory .directory-item > .ml-core-directory-check + .entry-name,
+.directory .directory-item > .ml-core-directory-check + .document-name {
+  padding-left: 0;
+}
 .ml-actions { justify-content: flex-end; }
 .ml-icon-button { display: inline-grid; place-items: center; flex: 0 0 var(--ml-control-height); width: var(--ml-control-height); min-width: var(--ml-control-height); height: var(--ml-control-height); min-height: var(--ml-control-height); padding: 0; }
 .ml-window .window-content .ml-icon-button[data-size="compact"] { flex-basis: 20px; width: 20px; min-width: 20px; height: 20px; min-height: 20px; padding: 0; font-size: 14px; line-height: 1; }
