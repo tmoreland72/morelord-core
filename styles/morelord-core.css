@@ -14,7 +14,7 @@
 .ml-core-account__details dd { margin: 0; }
 .ml-core-account__tier { text-transform: capitalize; }
 .ml-core-account__code {
-  margin: var(--ml-space-4) 0;
+  margin: 0;
   padding: var(--ml-space-4);
   border: 2px dashed var(--ml-color-accent);
   border-radius: var(--ml-radius-lg);
@@ -22,8 +22,12 @@
   font-weight: var(--ml-font-weight-heavy);
   letter-spacing: .18em;
   text-align: center;
+  overflow-wrap: anywhere;
   user-select: all;
 }
+.ml-core-account__code-actions { justify-content: center; }
+.ml-window .window-content .ml-core-account__code-actions > button { flex: 0 0 auto; width: auto; }
+.ml-window .window-content .ml-core-account__code-actions > a { color: var(--ml-color-accent); font-weight: var(--ml-font-weight-bold); }
 .ml-core-account__steps { border-left: 3px solid var(--ml-color-accent); }
 .ml-core-account__steps strong { color: var(--ml-color-accent); }
 .ml-core-account__steps em { font-weight: var(--ml-font-weight-bold); }

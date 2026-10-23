@@ -26,15 +26,20 @@
   {{else}}
     <section class="ml-surface ml-stack">
       {{#if activation}}
+        <div class="ml-core-account__code">{{activation.userCode}}</div>
+        <div class="ml-actions ml-core-account__code-actions">
+          <button type="button" data-action="copyActivationCode"><i class="fa-solid fa-copy"></i> Copy</button>
+          {{#if approvalPageUrl}}
+            <a href="{{approvalPageUrl}}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open approval page</a>
+          {{/if}}
+        </div>
         <div class="ml-status" data-tone="warning"><i class="fa-solid fa-hourglass-half"></i> Waiting for website approval</div>
         <div class="ml-surface ml-stack ml-core-account__steps" data-gap="1">
           <p><strong>1.</strong> The Morelord account page was opened in your browser.</p>
-          <p><strong>2.</strong> Confirm that the code below matches the prefilled code on that page.</p>
+          <p><strong>2.</strong> It should already be filled in on that page; if not, paste it.</p>
           <p><strong>3.</strong> Select <em>Approve Foundry Connection</em>, then return here.</p>
         </div>
-        <div class="ml-core-account__code">{{activation.userCode}}</div>
         <p class="notes">Foundry is checking for approval automatically. This code expires in 15 minutes.</p>
-        <button type="button" data-action="openAccount"><i class="fa-solid fa-arrow-up-right-from-square"></i> Reopen Approval Page</button>
       {{else}}
         <div class="ml-status"><i class="fa-solid fa-link"></i> Not connected</div>
         <p>Connect once to unlock premium features across supported Morelord Tools modules in this world.</p>

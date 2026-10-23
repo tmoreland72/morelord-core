@@ -280,6 +280,43 @@ async function disconnect() {
   Hooks.callAll("morelordCoreDisconnected");
 }
 
+function approvalPageUrl(value) {
+  return typeof value === "string" && /^https?:\/\//i.test(value) ? value : "";
+}
+
+async function copyPlainText(text, root = globalThis) {
+  const value = String(text ?? "");
+  const clipboard = root.navigator?.clipboard;
+  if (typeof clipboard?.writeText === "function") {
+    try {
+      await clipboard.writeText(value);
+      return true;
+    } catch {
+      // Clipboard can reject outside a secure context or without permission.
+    }
+  }
+  const ownerDocument = root.document;
+  if (!ownerDocument?.body || typeof ownerDocument.execCommand !== "function") return false;
+  const area = ownerDocument.createElement("textarea");
+  area.value = value;
+  area.setAttribute("readonly", "");
+  area.style.position = "fixed";
+  area.style.left = "-9999px";
+  ownerDocument.body.appendChild(area);
+  area.focus();
+  area.select();
+  area.setSelectionRange?.(0, area.value.length);
+  let copied = false;
+  try {
+    copied = ownerDocument.execCommand("copy");
+  } catch {
+    copied = false;
+  } finally {
+    area.remove();
+  }
+  return copied;
+}
+
 async function beginActivation(app) {
   const result = await request("/api/foundry/activation/start", {
     method: "POST",
@@ -340,6 +377,7 @@ class MorelordConnectionApp extends HandlebarsApplicationMixin(ApplicationV2) {
       connect: MorelordConnectionApp.connect,
       refresh: MorelordConnectionApp.refresh,
       disconnect: MorelordConnectionApp.disconnect,
+      copyActivationCode: MorelordConnectionApp.copyActivationCode,
       openAccount: MorelordConnectionApp.openAccount,
       saveSettings: MorelordConnectionApp.saveSettings,
       openDocumentation: MorelordConnectionApp.openDocumentation
@@ -372,6 +410,7 @@ class MorelordConnectionApp extends HandlebarsApplicationMixin(ApplicationV2) {
       validatedAt: core?.validatedAt ? new Date(core.validatedAt).toLocaleString() : null,
       expiresAt: core?.expiresAt ? new Date(core.expiresAt).toLocaleString() : null,
       activation: this.activation,
+      approvalPageUrl: approvalPageUrl(this.activation?.verificationUrl),
       serverUrl: game.settings.get(MODULE_ID, SETTINGS.SERVER_URL),
       shareUsageStatistics: game.settings.get(MODULE_ID, SETTINGS.SHARE_USAGE),
       tokenDistanceIndicator: game.settings.get(MODULE_ID, "tokenDistanceIndicator"),
@@ -408,6 +447,19 @@ class MorelordConnectionApp extends HandlebarsApplicationMixin(ApplicationV2) {
     await disconnect();
     this.activation = null;
     this.render({ force: true });
+  }
+
+  static async copyActivationCode(event) {
+    event.preventDefault();
+    const code = String(this.activation?.userCode ?? "");
+    if (!code) {
+      notify("error", "There is no activation code to copy.");
+      return;
+    }
+    const copied = await copyPlainText(code);
+    notify(copied ? "info" : "error", copied
+      ? "Activation code copied."
+      : "Could not copy the activation code. Select the code and copy it manually.");
   }
 
   static openAccount(event) {

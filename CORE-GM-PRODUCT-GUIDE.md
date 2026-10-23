@@ -68,15 +68,21 @@ The account connection applies to the current world. Repeat the connection proce
 1. Open **Game Settings → Configure Settings → Module Settings → Morelord Core**.
 2. Select **Connect or Manage Account**.
 3. In the **Morelord Account** window, select **Connect Morelord Account**.
-4. Foundry opens the Morelord Gaming approval page in your browser and displays a temporary code.
-5. Confirm that the code in Foundry matches the prefilled code on the website.
-   If you signed in using a different browser, open your Morelord Gaming account page there and enter the code from Foundry in **Activation code**.
+4. Foundry opens the Morelord Gaming approval page in your browser. The **Morelord Account** window shows the temporary code in large type at the top of the pending view.
+5. It should already be filled in on that page; if not, paste it.
+   Select **Copy** to put the code on the clipboard. If copying is unavailable, select the code itself and copy it manually.
+   If you signed in using a different browser, open your Morelord Gaming account page there and paste the code into **Activation code**.
 6. On the website, select **Approve Foundry Connection**.
 7. Return to Foundry. Foundry checks for approval automatically and reports when the account is connected.
 
+While approval is pending, the window provides:
+
+- **Copy:** Copies the temporary code. If the browser cannot access the clipboard, select the code and copy it manually.
+- **Open approval page:** Opens the same approval address Foundry uses when it tries to open the page automatically, including when that page was blocked.
+
 The temporary code expires after 15 minutes. If it expires or activation fails, start the connection process again to create a new code.
 
-If the browser page does not open, select **Reopen Approval Page** in the Foundry window. Check your browser's pop-up settings if the page still does not appear.
+If the browser page does not open, select **Open approval page**. Check your browser's pop-up settings if you want the page to open automatically next time.
 
 ## Review Account and Access Status
 
@@ -202,7 +208,7 @@ For missing Craftworks components, download a troubleshooting file **before** us
 
 ### The approval page did not open
 
-Select **Reopen Approval Page**. If nothing happens, allow pop-ups for Foundry or copy the workflow to a browser that can reach MorelordGaming.com.
+Select **Open approval page**. That link uses the same approval address. If the link does not open, allow pop-ups for Foundry or paste the address into a browser that can reach MorelordGaming.com. Select **Copy** and paste the code if the approval page did not fill it in.
 
 ### The temporary code expired
 
@@ -210,7 +216,7 @@ Close or return from the pending activation and start the connection again. Each
 
 ### Foundry stays on “Waiting for website approval”
 
-Confirm that the code shown in Foundry matches the code on the website and that you selected **Approve Foundry Connection**. If the attempt expires, start again.
+It should already be filled in on the approval page; if not, select **Copy** and paste the code. Confirm that you selected **Approve Foundry Connection**. If the attempt expires, start again.
 
 ### A membership change is not showing
 
