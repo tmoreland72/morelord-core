@@ -37,7 +37,7 @@ export function registerReactionStatus(config = {}) {
   if (dndEffects && typeof dndEffects === 'object') {
     dndEffects[REACTION_STATUS_ID] = {
       ...dndEffects[REACTION_STATUS_ID],
-      name: 'Reaction Used',
+      name: 'Reaction',
       img: REACTION_ICON,
       icon: REACTION_ICON,
       special: dndEffects[REACTION_STATUS_ID]?.special || 'REACTION'
@@ -48,7 +48,7 @@ export function registerReactionStatus(config = {}) {
     : config.statusEffects?.[REACTION_STATUS_ID];
   const effect = {
     id: REACTION_STATUS_ID,
-    name: 'Reaction Used',
+    name: 'Reaction',
     img: REACTION_ICON,
     icon: REACTION_ICON,
     hud: true,

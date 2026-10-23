@@ -57,8 +57,9 @@ function hooksMock() {
 test('reaction status registers a colored icon without replacing core effects', () => {
   const svg = readFileSync(new URL('../assets/icons/reaction-used.svg', import.meta.url), 'utf8');
   assert.match(svg, /#ffc233/i);
-  assert.match(svg, /#ff6a00/i);
   assert.match(svg, /#100c08/i);
+  assert.match(svg, /L112 292/);
+  assert.equal(svg.includes('A 150'), false);
   assert.equal(svg.includes('icons/svg/'), false);
   const objectConfig = {
     statusEffects: {dead: {id: 'dead', name: 'Dead', _id: 'coreDeadStatus01'}},
@@ -67,7 +68,8 @@ test('reaction status registers a colored icon without replacing core effects', 
   };
   const effect = registerReactionStatus(objectConfig);
   assert.equal(effect.id, REACTION_STATUS_ID);
-  assert.equal(effect.name, 'Reaction Used');
+  assert.equal(effect.name, 'Reaction');
+  assert.equal(objectConfig.DND5E.statusEffects.reaction.name, 'Reaction');
   assert.equal(effect.img, REACTION_ICON);
   assert.equal(effect.icon, REACTION_ICON);
   assert.equal(effect.hud, true);
@@ -84,7 +86,7 @@ test('reaction status registers a colored icon without replacing core effects', 
   registerReactionStatus(arrayConfig);
   registerReactionStatus(arrayConfig);
   assert.equal(arrayConfig.statusEffects.filter(entry => entry.id === 'reaction').length, 1);
-  assert.equal(arrayConfig.statusEffects.reaction.name, 'Reaction Used');
+  assert.equal(arrayConfig.statusEffects.reaction.name, 'Reaction');
   assert.equal(arrayConfig.specialStatusEffects.DEFEATED, 'dead');
 });
 
@@ -253,7 +255,7 @@ test('non-GM clients never clear reactions, and only an owner applies one', asyn
   registerReactionTracker({hooks, game, config});
   await hooks.call('i18nInit');
   await hooks.call('setup');
-  assert.equal(config.statusEffects.reaction.name, 'Reaction Used');
+  assert.equal(config.statusEffects.reaction.name, 'Reaction');
   const combat = startedCombat({combatants: [combatant(hero)], tokens: [token(hero)], turn: 1});
   await hooks.call('updateCombat', combat, {turn: 1});
   await hooks.call('deleteCombat', combat);
