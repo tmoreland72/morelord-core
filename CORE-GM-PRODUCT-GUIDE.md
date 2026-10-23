@@ -26,17 +26,18 @@ Morelord Core provides one shared account connection for supported Morelord Tool
 
 Morelord Core does not remove existing world data if premium access expires.
 
-### Delete multiple sidebar documents
+### Select, move, and delete sidebar documents
 
 GMs can use **Select multiple** in Scenes, Actors, Items, Journal, Rollable Tables, Cards, Macros, and Playlists, including their pop-out directories. Core must be enabled; account linking and premium access are not required. Selection starts empty and is kept separately for each directory window.
 
-- **Select multiple** shows a labeled checkbox beside each world document. Check or uncheck individual documents; existing entry opening and dragging remain available.
+- **Select multiple** shows a labeled checkbox beside each world document. Check or uncheck individual documents; existing entry opening and dragging remain available. The portrait stays to the right of the checkbox, including when a compact directory style absolutely positions that portrait. A row without a portrait, such as a journal entry, does not keep extra space before the name.
 - **Select visible** adds all currently displayed entries, respecting the current search and collapsed folders. Previously selected entries stay selected even when hidden by a later search or folder collapse.
 - **Clear selection** unchecks every selected document, including hidden entries.
-- **Delete selected (N)** opens a confirmation listing the selected document names. It is disabled with no selection and while confirmation/deletion is pending. **Cancel**, the default confirmation action, keeps the documents and selection. **Delete selected** in the confirmation permanently deletes the listed documents through Foundry's native document API. There is no undo; native deletion effects apply, including a document's embedded content. Folders are kept.
+- **Move selected (N)** is disabled when its label is **Move selected (0)** and while a move or deletion is pending. With one or more documents selected, the label shows that count. Choosing it opens a dialog titled **Move N selected documents**, or **Move 1 selected document** when one document is selected. The dialog lists those document names and a **Destination folder** selector. **Root (no folder)** is the first choice. The other choices are that directory's folders, sorted as paths such as `Parent / Child`. **Cancel** is the default and changes nothing. **Move selected** sets the folder on every selected document that still exists, through Foundry's native document API. Documents already in the chosen folder are included and remain there. The selection stays checked. Folders themselves are not moved or deleted. Core then shows an info notification: `Moved 2 documents to Parent / Child.`, `Moved 1 document to Root (no folder).`, or `No selected documents remain to move.` A failed update shows an error notification and keeps the selection.
+- **Delete selected (N)** opens a confirmation listing the selected document names. It is disabled with no selection and while confirmation, a move, or deletion is pending. **Cancel**, the default confirmation action, keeps the documents and selection. **Delete selected** in the confirmation permanently deletes the listed documents through Foundry's native document API. There is no undo; native deletion effects apply, including a document's embedded content. Folders are kept.
 - **Done selecting** exits selection mode and clears selection.
 
-For example, search the Actors directory for a batch's common name, choose **Select multiple → Select visible**, review **Delete selected (N)**, then confirm. Selection survives directory rerenders but resets when the client reloads. Only world documents are included: compendium packs, chat messages, combat entries, journal pages, and individual playlist sounds are outside this directory action.
+For example, search the Actors directory for a batch's common name, choose **Select multiple → Select visible**, then **Move selected (N)** and choose `Cities / Neverwinter`. Choose **Move selected (N)** again and **Root (no folder)** to return them. To remove them instead, review **Delete selected (N)**, then confirm. Selection survives directory rerenders but resets when the client reloads. Only world documents are included: compendium packs, chat messages, combat entries, journal pages, and individual playlist sounds are outside this directory action.
 
 ### Token Distance Indicator
 
