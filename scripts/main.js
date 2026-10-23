@@ -1,5 +1,6 @@
 import { ChatRollRequests } from './services/chat-roll-requests.js';
 import { registerTokenDistance } from './ui/token-distance.js';
+import { registerReactionTracker } from './ui/reaction-tracker.js';
 import { registerDirectorySelection } from './ui/directory-selection.js';
 import { organizeCompendiums, labelCompendiums } from './services/compendium-organization.js';
 import { collectModuleDiagnostics } from "./services/module-diagnostics.js";
@@ -414,6 +415,7 @@ class MorelordConnectionApp extends HandlebarsApplicationMixin(ApplicationV2) {
       serverUrl: game.settings.get(MODULE_ID, SETTINGS.SERVER_URL),
       shareUsageStatistics: game.settings.get(MODULE_ID, SETTINGS.SHARE_USAGE),
       tokenDistanceIndicator: game.settings.get(MODULE_ID, "tokenDistanceIndicator"),
+      reactionTracker: game.settings.get(MODULE_ID, "reactionTracker"),
       shareErrorReports: game.settings.get(MODULE_ID, "shareErrorReports"),
       accountUrl: this.activation?.verificationUrl || `${normalizeServerUrl(game.settings.get(MODULE_ID, SETTINGS.SERVER_URL))}/account`
     };
@@ -483,6 +485,7 @@ class MorelordConnectionApp extends HandlebarsApplicationMixin(ApplicationV2) {
       await game.settings.set(MODULE_ID, SETTINGS.SERVER_URL, serverUrl);
       await game.settings.set(MODULE_ID, SETTINGS.SHARE_USAGE, data.has(SETTINGS.SHARE_USAGE));
       await game.settings.set(MODULE_ID, "tokenDistanceIndicator", data.has("tokenDistanceIndicator"));
+      await game.settings.set(MODULE_ID, "reactionTracker", data.has("reactionTracker"));
       await game.settings.set(MODULE_ID, "shareErrorReports", data.has("shareErrorReports"));
       await game.settings.set(MODULE_ID, "telemetryConsentVersion", 1);
       await game.settings.set(MODULE_ID, "telemetryNoticeVersion", 1);
@@ -536,6 +539,7 @@ class MorelordDiscordApp extends ApplicationV2 {
 
 Hooks.once("init", () => {
   registerTokenDistance();
+  registerReactionTracker();
   game.settings.register(MODULE_ID, "compendiumOrganization", {scope:"world", config:false, type:Object, default:{}});
   telemetry.registerSettings();
   for (const [key, type, defaultValue] of [

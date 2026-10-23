@@ -59,6 +59,10 @@
       <span>Token Distance Indicator <small>Hover to measure from your character or selected token; GMs select one first. Uses nearest spaces in 5-unit steps. Disable when using Hover Distance.</small></span>
       <input type="checkbox" name="tokenDistanceIndicator" {{checked tokenDistanceIndicator}}>
     </label>
+    <label class="ml-setting-row">
+      <span>Reaction Used <small>Mark a token when it uses a reaction during a started combat. The active GM clears it on that creature's next turn and when combat ends.</small></span>
+      <input type="checkbox" name="reactionTracker" {{checked reactionTracker}}>
+    </label>
     <label class="ml-stack" data-gap="1">
       <span>Morelord Gaming Website</span>
       <input type="url" name="serverUrl" value="{{serverUrl}}" required>

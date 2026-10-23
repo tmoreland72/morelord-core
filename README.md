@@ -25,6 +25,12 @@ Hover over another visible token to see the distance. Players measure from one s
 
 **Token Distance Indicator** is a per-user checkbox under **Game Settings → Configure Settings → Morelord Core**, enabled by default. GMs can also change it in **Connect or Manage Account → Core Settings → Save Core Settings** for their own client. Changes take effect immediately without an account or premium access. If using TheRipper's Hover Distance, disable one of the indicators to avoid duplicate readouts; Core does not change the other module's settings.
 
+## Reaction Used
+
+**Reaction Used** is a world checkbox under **Game Settings → Configure Settings → Morelord Core** and in **Connect or Manage Account → Core Settings**. It is checked by default. Only a GM can change it; choose **Save Core Settings** in the account window. No account connection or premium access is required.
+
+While it is checked, a creature in a started combat that uses a D&D 5e activity with a reaction activation receives the **Reaction** token status. The label is **Reaction** so it fits the token HUD status grid. The colored lightning-bolt icon appears on the token and in the right-click token status effects, where it can also be toggled by hand for an opportunity attack, a readied action, or a mark that should be removed. The active GM clears the mark when that creature's turn starts. On a shared mob turn from Morelord Encounters, every token in that mob on the scene is cleared. When combat ends, or the round returns to 0, the active GM clears the mark from tokens on that scene. Other GMs and players do not clear marks. Unchecking **Reaction Used** stops automatic marking and clearing; the status stays available on the token HUD.
+
 ## Locations Manager
 
 Saved Associated Scenes remain highlighted when the editor reopens, including when the Scene list is unfocused. Click a Scene to toggle its association, then save the location.
