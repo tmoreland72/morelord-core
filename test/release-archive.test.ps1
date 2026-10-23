@@ -31,4 +31,110 @@ foreach ($folder in @('tmp', 'release-notes')) {
     if (!$rejected) { throw "$folder must remain forbidden." }
     Remove-Item -LiteralPath (Join-Path $fixture $folder) -Recurse
 }
-Write-Output 'PASS: runtime and LevelDB logs accepted; diagnostic logs, tmp, and release-notes rejected.'
+[System.IO.File]::WriteAllText((Join-Path $fixture 'CHANGELOG.md'), "# Sample Changelog`n")
+Build-Archive -SourceDirectory $fixture -DestinationArchive $zip
+$withChangelog = @{
+    Path = $zip
+    ExpectedVersion = '1.0.0'
+    ExpectedDownloadUrl = $manifest.download
+    ExpectedModuleId = 'test-module'
+    RequiredPaths = @('module.json', 'main.js', 'packs', 'CHANGELOG.md')
+}
+Assert-Archive @withChangelog
+
+$Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+$changelogFixture = Join-Path (Split-Path $fixture -Parent) ('changelog-' + [guid]::NewGuid().ToString('N'))
+New-Item -ItemType Directory -Path (Join-Path $changelogFixture 'release-notes') -Force | Out-Null
+'{"id":"test-module","title":"Test Module","version":"1.10.0"}' | Set-Content (Join-Path $changelogFixture 'module.json')
+@'
+# Test Module 1.2.0
+
+Intro should stay.
+
+## Added
+
+- First change
+
+## Verification
+
+- secret verification note
+
+---
+
+## Fixed
+
+* Star bullet
+'@ | Set-Content (Join-Path $changelogFixture 'release-notes/RELEASE-NOTES-1.2.0.md')
+@'
+# Test Module 1.9.0
+
+## Validation
+
+- internal validation note
+
+## Changed
+
+- Middle change
+'@ | Set-Content (Join-Path $changelogFixture 'release-notes/RELEASE-NOTES-1.9.0.md')
+@'
+# Test Module 1.10.0
+
+Summary before the standard section.
+
+## What Changed
+
+### Improvements
+
+- Newer change
+
+---
+
+## Verification
+
+Internal only.
+'@ | Set-Content (Join-Path $changelogFixture 'release-notes/RELEASE-NOTES-1.10.0.md')
+@'
+# Unreleased
+
+## What Changed
+
+- Must not appear
+'@ | Set-Content (Join-Path $changelogFixture 'release-notes/UNRELEASED.md')
+'not a version' | Set-Content (Join-Path $changelogFixture 'release-notes/RELEASE-NOTES-draft.md')
+$ProjectRoot = $changelogFixture
+$first = Update-Changelog
+if (-not $first.Changed) { throw 'The first changelog build must write CHANGELOG.md.' }
+$changelogPath = Join-Path $changelogFixture 'CHANGELOG.md'
+$changelog = [System.IO.File]::ReadAllText($changelogPath)
+if ($changelog -notmatch '(?m)^# Test Module Changelog$') { throw 'Changelog title must come from module.json.' }
+$order = @($changelog.IndexOf("## 1.10.0"), $changelog.IndexOf("## 1.9.0"), $changelog.IndexOf("## 1.2.0"))
+if ($order[0] -lt 0 -or $order[1] -lt 0 -or $order[2] -lt 0 -or $order[0] -ge $order[1] -or $order[1] -ge $order[2]) {
+    throw 'Changelog versions must be descending semantic versions.'
+}
+if ($changelog -match '(?m)^---\s*$') { throw 'Changelog must not contain horizontal rules.' }
+if ($changelog -match 'secret verification note|internal validation note|Internal only|Must not appear|Summary before') {
+    throw 'Changelog must omit verification, validation, and unreleased notes.'
+}
+if ($changelog -notmatch '(?m)^### Improvements\r?\n\r?\n- Newer change$') { throw 'What Changed subsections must be preserved.' }
+if ($changelog -notmatch '(?m)^### Added\r?\n\r?\n- First change$') { throw 'Older change sections must be included.' }
+if ($changelog -notmatch '(?m)^- Star bullet$') { throw 'Star bullets must be normalized to - bullets.' }
+if ($changelog -notmatch '(?m)^Intro should stay\.$') { throw 'Older user-facing prose must be included.' }
+$second = Update-Changelog
+if ($second.Changed) { throw 'An up-to-date CHANGELOG.md must not be rewritten.' }
+if ([System.IO.File]::ReadAllText($changelogPath) -ne $changelog) { throw 'The second changelog build changed file contents.' }
+$beforeWhatIf = [System.IO.File]::ReadAllText($changelogPath)
+@'
+# Test Module 1.10.0
+
+## What Changed
+
+### Improvements
+
+- Newer change
+- Another change
+'@ | Set-Content (Join-Path $changelogFixture 'release-notes/RELEASE-NOTES-1.10.0.md')
+$preview = Update-Changelog -WhatIf
+if (-not $preview.Changed) { throw 'WhatIf must report a stale changelog.' }
+if ([System.IO.File]::ReadAllText($changelogPath) -ne $beforeWhatIf) { throw '-WhatIf must not dirty CHANGELOG.md.' }
+Remove-Item -LiteralPath $changelogFixture -Recurse -Force
+Write-Output 'PASS: runtime and LevelDB logs accepted; diagnostic logs, tmp, and release-notes rejected; CHANGELOG.md packaged and generated.'

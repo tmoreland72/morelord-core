@@ -9,6 +9,7 @@
   "websiteUrl": "https://morelordgaming.com",
   "requiredPaths": [
     "module.json",
+    "CHANGELOG.md",
     "README.md",
     "CORE-GM-PRODUCT-GUIDE.md",
     "assets/icons",
