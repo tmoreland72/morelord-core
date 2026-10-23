@@ -337,6 +337,11 @@
 .ml-stepper { display: grid; grid-template-columns: 2.25rem minmax(4rem, 1fr) 2.25rem; align-items: stretch; gap: var(--ml-space-1); }
 .ml-stepper > button { min-height: 2.25rem; padding: 0; }
 .ml-stepper > input { min-width: 0; text-align: center; }
+.ml-stepper[data-layout="stacked"] { grid-template-columns: minmax(4rem, 1fr) 1.5rem; grid-template-rows: 1fr 1fr; gap: 0; }
+.ml-stepper[data-layout="stacked"] > input { grid-column: 1; grid-row: 1 / 3; }
+.ml-stepper[data-layout="stacked"] > button { grid-column: 2; min-height: 0; height: auto; line-height: 1; }
+.ml-stepper[data-layout="stacked"] > button[data-step="up"] { grid-row: 1; }
+.ml-stepper[data-layout="stacked"] > button[data-step="down"] { grid-row: 2; }
 .ml-list-toolbar { display: flex; width: 100%; justify-content: space-between; align-items: center; gap: var(--ml-space-3); flex-wrap: wrap; }
 .ml-toggle { display: inline-flex; align-items: center; gap: var(--ml-space-2); white-space: nowrap; }
 .ml-toggle > input { margin: 0; }

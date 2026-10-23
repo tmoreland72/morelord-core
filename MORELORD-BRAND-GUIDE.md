@@ -992,3 +992,8 @@ Single-action chat requests may supply `modes: false, actionLabel: "Long Rest"` 
 Collapsible sidebars may use details.ml-collapsible-section with data-layout="sidebar", the usual section key, and a labeled summary. Core collapses the heading to its chevron; the module grid determines the freed column width. Use .ml-truncate on fixed-width text with a full-value title for ellipsis. Marketplace Buy filters and Source labels consume these components.
 
 Wide tables use .ml-horizontal-scroll on their wrapper. Core preserves horizontal scrolling while removing constrained ancestor panes, retaining one vertical page scrollbar. Marketplace inventory tables use this component.
+
+### Stacked number controls
+
+Use `.ml-stepper[data-layout="stacked"]` for a number field with increment/decrement arrows stacked on its right. Its direct children are an `input[type="number"]`, an accessible increment button with `data-step="up"`, and an accessible decrement button with `data-step="down"`. Consumers own domain limits and change handling; reuse native `stepUp()` / `stepDown()` and dispatch `change`. The unmodified `.ml-stepper` preserves its existing horizontal layout.
+Labels containing a shared .ml-stepper receive the same uppercase, muted field-label styling and spacing as labels with direct inputs. Keep the label text in its first span.

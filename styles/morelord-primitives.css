@@ -138,12 +138,12 @@
   font-weight: var(--ml-font-weight-medium);
 }
 .ml-window .window-content :where(input[type="checkbox"], input[type="radio"]) { accent-color: var(--ml-color-accent); }
-.ml-window .window-content label:has(> :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea)) {
+.ml-window .window-content label:is(:has(> :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea)), :has(> .ml-stepper)) {
   display: grid;
   gap: var(--ml-space-1);
   align-content: start;
 }
-.ml-window .window-content label:has(> :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea)) > span:first-child {
+.ml-window .window-content label:is(:has(> :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea)), :has(> .ml-stepper)) > span:first-child {
   color: var(--ml-color-muted);
   font-size: var(--ml-font-size-xs);
   font-weight: var(--ml-font-weight-bold);
