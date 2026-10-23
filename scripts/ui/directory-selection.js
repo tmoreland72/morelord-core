@@ -30,33 +30,21 @@ export function installDirectoryCheckboxIsolation(target = globalThis.window) {
 }
 
 /**
- * Journals are a name-only flex row, so a checkbox before the name stays visible.
- * Thumbnail rows (Actors, Items, Roll Tables, Macros, Cards) are flex rows whose image is a fixed
- * sibling of the name; the checkbox belongs between those two. Scene names cover the card, so the
- * checkbox stays on the row and is painted above that overlay. Playlist rows are vertical, so the
- * checkbox belongs in the header rather than above it.
+ * The checkbox is always the leftmost control. Thumbnail rows are ordinary flex items, so prepending
+ * the label places it before the image and the name. Scene names cover the card, so that checkbox is
+ * positioned over the upper left. Playlist rows are a column, so the checkbox is the first child of
+ * the header, before the expand control and the playlist name.
  */
 function placeCheckbox(row, label, collection) {
   const header = row.querySelector(':scope > .playlist-header, :scope > header.playlist-header');
   if (header) {
-    const name = header.querySelector('.playlist-name, .entry-name');
-    if (name) name.before(label);
-    else header.prepend(label);
+    header.prepend(label);
     return;
   }
   if (row.classList.contains('scene') || collection.documentName === 'Scene') {
     label.classList.add('ml-core-directory-check--scene');
-    row.prepend(label);
-    return;
   }
-  let name = row.querySelector(':scope > .entry-name, :scope > .document-name');
-  if (!name) {
-    const nested = row.querySelector('.entry-name, .document-name');
-    const holder = nested?.parentElement;
-    if (holder?.parentElement === row && holder.tagName !== 'IMG' && !holder.classList.contains('thumbnail')) name = holder;
-  }
-  if (name) name.before(label);
-  else row.prepend(label);
+  row.prepend(label);
 }
 
 /** Select native world-directory entries without replacing Foundry's directory behavior. */

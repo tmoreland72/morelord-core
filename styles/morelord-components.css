@@ -25,12 +25,11 @@
 .ml-core-directory-selection .window-content.ml-app { padding: var(--ml-space-2); --ml-color-text: light-dark(var(--color-cool-5), var(--color-light-2)); --ml-color-border: light-dark(var(--color-cool-3), var(--color-light-5)); }
 .ml-core-directory-selection .ml-toolbar > button { flex: 1 1 auto; height: auto; max-height: none; white-space: normal; color: var(--ml-color-text); --button-text-color: var(--ml-color-text); --button-background-color: var(--ml-color-surface-raised); --button-border-color: var(--ml-color-border); }
 /*
- * Directory rows with a thumbnail are flex rows: `.flexrow > *` grows every child and `.ml-check`
- * adds an empty second grid track, so the checkbox collapses into a gap beside the fixed thumbnail.
- * Journals have no thumbnail, which is why the same control stayed visible there. Playlist items are
- * a column, so the checkbox is placed in the header instead. Scene names cover the card; the checkbox
- * is painted above that overlay. Native appearance keeps the control visible on Foundry's dark sidebar,
- * where the theme checkbox glyph uses a near-background color.
+ * The checkbox is the first flex item on the row, or the first item in a playlist header.
+ * `.flexrow > *` would otherwise grow the label, and `.ml-check` would add an empty grid track.
+ * Foundry draws a flat Font Awesome checkbox (`appearance: none`). Its default square uses a
+ * near-background color and a transparent checkmark, so these rows set a visible square and a
+ * dark check on the accent fill. Scene names cover the card; that checkbox is painted at the upper left.
  */
 .flexrow > .ml-core-directory-check,
 .directory .directory-item > .ml-core-directory-check,
@@ -46,17 +45,22 @@
   max-width: max-content;
   height: auto;
   min-height: 0;
-  margin: 0;
-  padding: 2px;
+  margin: 0 0 0 6px;
+  padding: 0;
   gap: 0;
   grid-template-columns: none;
   white-space: normal;
   position: relative;
   z-index: 3;
   pointer-events: auto;
-  border: 1px solid var(--ml-color-accent);
-  border-radius: 3px;
-  background: light-dark(var(--color-light-1, #fff), var(--color-cool-4, #3a3844));
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+.journal-sidebar .directory-item.entry > .ml-core-directory-check,
+.playlists-sidebar .playlist-header > .ml-core-directory-check {
+  margin-left: 0;
 }
 .directory .directory-item.flexrow:has(> .ml-core-directory-check) {
   flex-wrap: nowrap;
@@ -69,23 +73,38 @@
 .directory .directory-item.scene > .ml-core-directory-check--scene {
   position: absolute;
   z-index: 3;
-  inset-block-start: 6px;
-  inset-inline-start: 6px;
+  top: 6px;
+  left: 6px;
+  margin: 0;
+  padding: 1px;
+  border: 0;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--color-dark-2, #0b0a13) 70%, transparent);
+  box-shadow: none;
 }
 .directory .ml-core-directory-check > input[type="checkbox"],
 .playlist-header > .ml-core-directory-check > input[type="checkbox"] {
-  appearance: auto;
-  -webkit-appearance: auto;
-  width: 1rem;
-  height: 1rem;
-  min-width: 1rem;
-  min-height: 1rem;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  --checkbox-size: var(--font-size-16, 16px);
+  --checkbox-background-color: var(--color-cool-3, #584a75);
+  --checkbox-checked-color: var(--ml-color-accent, var(--color-warm-1, #ee9b3a));
+  --checkbox-checkmark-color: var(--ml-color-on-accent, var(--color-dark-1, #111));
+  --checkbox-font-weight: bold;
+  flex: 0 0 var(--checkbox-size);
+  width: var(--checkbox-size);
+  height: var(--checkbox-size);
+  min-width: var(--checkbox-size);
+  min-height: var(--checkbox-size);
   margin: 0;
-  flex: 0 0 auto;
-  accent-color: var(--ml-color-accent);
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  font-weight: bold;
   opacity: 1;
   visibility: visible;
-  position: static;
   pointer-events: auto;
   cursor: pointer;
 }

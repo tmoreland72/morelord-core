@@ -321,8 +321,8 @@ test('directory checkboxes follow each sidebar row structure', async () => {
       mounted.section.querySelector('button').click();
       const row = mounted.section.querySelector(`[data-entry-id="${id}"]`);
       const check = row.querySelector('.ml-core-directory-check');
-      assert.equal(row.children[0].classList.contains('thumbnail'), true, documentName);
-      assert.equal(row.children[1], check, documentName);
+      assert.equal(row.children[0], check, documentName);
+      assert.equal(row.children[1].classList.contains('thumbnail'), true, documentName);
       assert.equal(row.children[2].classList.contains('entry-name'), true, documentName);
       assert.equal(check.querySelector('input').type, 'checkbox');
     }
@@ -336,8 +336,8 @@ test('directory checkboxes follow each sidebar row structure', async () => {
     nestedRow.append(stack);
     activateDirectorySelection(nested.app, nested.section);
     nested.section.querySelector('button').click();
-    assert.equal(nestedRow.children[0].classList.contains('thumbnail'), true);
-    assert.equal(nestedRow.children[1].classList.contains('ml-core-directory-check'), true);
+    assert.equal(nestedRow.children[0].classList.contains('ml-core-directory-check'), true);
+    assert.equal(nestedRow.children[1].classList.contains('thumbnail'), true);
     assert.equal(nestedRow.children[2], stack);
 
     const journal = mount(harness, 'JournalEntry', [{ id: 'notes', name: 'Session Notes' }]);
@@ -366,8 +366,8 @@ test('directory checkboxes follow each sidebar row structure', async () => {
       const header = row.querySelector('.playlist-header');
       const check = row.querySelector('.ml-core-directory-check');
       assert.equal(check.parentElement, header);
-      assert.equal(header.children[0].classList.contains('expand'), true);
-      assert.equal(header.children[1], check);
+      assert.equal(header.children[0], check);
+      assert.equal(header.children[1].classList.contains('expand'), true);
       assert.equal(header.children[2].classList.contains('playlist-name'), true);
       assert.equal(row.children[0], header);
       assert.equal(row.querySelector('.sound .ml-core-directory-check'), null);
@@ -447,12 +447,36 @@ test('players, compendium packs, and unrelated directories get no deletion contr
   });
 });
 
-test('directory checkbox CSS keeps thumbnail rows, scenes, and playlist headers from collapsing the control', () => {
+test('directory checkbox CSS uses Foundry\'s flat checkbox and does not frame it', () => {
   const css = readFileSync(new URL('../styles/morelord-components.css', import.meta.url), 'utf8');
-  assert.match(css, /\.flexrow > \.ml-core-directory-check[\s\S]*display:\s*inline-flex;/);
+  const labelRule = /\.flexrow > \.ml-core-directory-check[\s\S]*?\{[^}]*\}/.exec(css)?.[0] ?? '';
+  assert.match(labelRule, /display:\s*inline-flex;/);
+  assert.match(labelRule, /padding:\s*0;/);
+  assert.match(labelRule, /border:\s*0;/);
+  assert.match(labelRule, /background:\s*none;/);
+  assert.match(labelRule, /box-shadow:\s*none;/);
+  assert.match(labelRule, /margin:\s*0 0 0 6px;/);
+  assert.match(css, /\.journal-sidebar \.directory-item\.entry > \.ml-core-directory-check,\s*\.playlists-sidebar \.playlist-header > \.ml-core-directory-check\s*\{[^}]*margin-left:\s*0;/);
   assert.match(css, /\.directory \.directory-item\.flexrow:has\(> \.ml-core-directory-check\)\s*\{[^}]*flex-wrap:\s*nowrap;/);
-  assert.match(css, /\.directory \.directory-item\.scene > \.ml-core-directory-check--scene\s*\{[^}]*position:\s*absolute;/);
-  assert.match(css, /\.playlist-header > \.ml-core-directory-check > input\[type="checkbox"\]\s*\{[^}]*appearance:\s*auto;/);
-  assert.match(css, /min-width:\s*1rem;/);
+  const sceneRule = /\.directory \.directory-item\.scene > \.ml-core-directory-check--scene\s*\{[^}]*\}/.exec(css)?.[0] ?? '';
+  assert.match(sceneRule, /position:\s*absolute;/);
+  assert.match(sceneRule, /top:\s*6px;/);
+  assert.match(sceneRule, /left:\s*6px;/);
+  assert.match(sceneRule, /margin:\s*0;/);
+  assert.match(sceneRule, /border:\s*0;/);
+  const inputRule = /\.playlist-header > \.ml-core-directory-check > input\[type="checkbox"\]\s*\{[^}]*\}/.exec(css)?.[0] ?? '';
+  assert.match(inputRule, /appearance:\s*none;/);
+  assert.match(inputRule, /-webkit-appearance:\s*none;/);
+  assert.match(inputRule, /-moz-appearance:\s*none;/);
+  assert.match(inputRule, /--checkbox-size:\s*var\(--font-size-16,\s*16px\);/);
+  assert.match(inputRule, /--checkbox-background-color:\s*var\(--color-cool-3,\s*#584a75\);/);
+  assert.match(inputRule, /--checkbox-checked-color:\s*var\(--ml-color-accent,\s*var\(--color-warm-1,\s*#ee9b3a\)\);/);
+  assert.match(inputRule, /--checkbox-checkmark-color:\s*var\(--ml-color-on-accent,\s*var\(--color-dark-1,\s*#111\)\);/);
+  assert.match(inputRule, /--checkbox-font-weight:\s*bold;/);
+  assert.match(inputRule, /flex:\s*0 0 var\(--checkbox-size\);/);
+  assert.match(inputRule, /border:\s*0;/);
+  assert.match(inputRule, /background:\s*none;/);
+  assert.match(inputRule, /box-shadow:\s*none;/);
+  assert.doesNotMatch(css, /appearance:\s*auto/);
   assert.match(css, /z-index:\s*3;/);
 });

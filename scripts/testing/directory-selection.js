@@ -46,12 +46,18 @@ export const directorySelectionCheck = {
             const box = input.getBoundingClientRect();
             assert(box.width >= 12 && box.height >= 12, `${tab} checkbox for ${id} is visible.`);
             const header = row.querySelector(':scope > .playlist-header, :scope > header.playlist-header');
-            if (header) assert(check.parentElement === header && header.querySelector('.playlist-name, .entry-name')?.previousElementSibling === check, `${tab} checkbox sits in the playlist header.`);
-            else if (row.classList.contains('scene')) assert(check.classList.contains('ml-core-directory-check--scene') && check.parentElement === row, `${tab} checkbox overlays the scene row.`);
-            else {
-              const name = row.querySelector(':scope > .entry-name, :scope > .document-name');
-              if (name) assert(name.previousElementSibling === check, `${tab} checkbox sits directly before the name.`);
-            }
+            const follows = (earlier, later) => Boolean(later) && Boolean(earlier.compareDocumentPosition(later) & Node.DOCUMENT_POSITION_FOLLOWING);
+            if (header) assert(header.firstElementChild === check, `${tab} checkbox is the leftmost playlist header control.`);
+            else assert(row.firstElementChild === check, `${tab} checkbox is the leftmost row control.`);
+            if (row.classList.contains('scene')) assert(check.classList.contains('ml-core-directory-check--scene'), `${tab} checkbox overlays the scene row.`);
+            const thumbnail = row.querySelector('img.thumbnail, .thumbnail');
+            const name = (header ?? row).querySelector('.playlist-name, .entry-name, .document-name');
+            if (thumbnail) assert(follows(check, thumbnail), `${tab} checkbox sits to the left of the thumbnail.`);
+            if (name) assert(follows(check, name), `${tab} checkbox sits to the left of the name.`);
+            const appearance = getComputedStyle(input).appearance;
+            assert(appearance === 'none', `${tab} checkbox uses Foundry's flat checkbox.`);
+            const frame = getComputedStyle(check);
+            assert(parseFloat(frame.borderTopWidth) === 0 && parseFloat(frame.borderLeftWidth) === 0, `${tab} checkbox has no framed box.`);
             if (!probed) {
               const before = input.checked;
               input.click();
