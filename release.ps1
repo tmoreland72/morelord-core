@@ -268,12 +268,16 @@ function Copy-ReleaseContent {
     }
     New-Item -ItemType Directory -Path $Destination -Force | Out-Null
     foreach ($RelativePath in $RequiredPaths) {
-        Copy-Item -Path (Join-Path $ProjectRoot $RelativePath) -Destination $Destination -Recurse -Force
+        $TargetParent = Split-Path -Parent (Join-Path $Destination $RelativePath)
+        New-Item -ItemType Directory -Path $TargetParent -Force | Out-Null
+        Copy-Item -Path (Join-Path $ProjectRoot $RelativePath) -Destination $TargetParent -Recurse -Force
     }
     foreach ($RelativePath in $OptionalPaths) {
         $Source = Join-Path $ProjectRoot $RelativePath
         if (Test-Path $Source) {
-            Copy-Item -Path $Source -Destination $Destination -Recurse -Force
+            $TargetParent = Split-Path -Parent (Join-Path $Destination $RelativePath)
+            New-Item -ItemType Directory -Path $TargetParent -Force | Out-Null
+            Copy-Item -Path $Source -Destination $TargetParent -Recurse -Force
         }
     }
 }
