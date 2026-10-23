@@ -24,8 +24,90 @@
 .ml-core-directory-selection { flex: none; }
 .ml-core-directory-selection .window-content.ml-app { padding: var(--ml-space-2); --ml-color-text: light-dark(var(--color-cool-5), var(--color-light-2)); --ml-color-border: light-dark(var(--color-cool-3), var(--color-light-5)); }
 .ml-core-directory-selection .ml-toolbar > button { flex: 1 1 auto; height: auto; max-height: none; white-space: normal; color: var(--ml-color-text); --button-text-color: var(--ml-color-text); --button-background-color: var(--ml-color-surface-raised); --button-border-color: var(--ml-color-border); }
-.ml-core-directory-check { flex: 0 0 auto; padding-inline: var(--ml-space-2); align-self: center; }
-.ml-core-directory-check input { accent-color: var(--ml-color-accent); }
+/*
+ * The checkbox is the first flex item on the row, or the first item in a playlist header.
+ * `.flexrow > *` would otherwise grow the label, and `.ml-check` would add an empty grid track.
+ * Foundry draws a flat Font Awesome checkbox (`appearance: none`). Its default square uses a
+ * near-background color and a transparent checkmark, so these rows set a visible square and a
+ * dark check on the accent fill. Scene names cover the card; that checkbox is painted at the upper left.
+ */
+.flexrow > .ml-core-directory-check,
+.directory .directory-item > .ml-core-directory-check,
+.playlist-header > .ml-core-directory-check,
+.playlists-sidebar .playlist-header > .ml-core-directory-check {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  width: auto;
+  min-width: max-content;
+  max-width: max-content;
+  height: auto;
+  min-height: 0;
+  margin: 0 0 0 6px;
+  padding: 0;
+  gap: 0;
+  grid-template-columns: none;
+  white-space: normal;
+  position: relative;
+  z-index: 3;
+  pointer-events: auto;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+.journal-sidebar .directory-item.entry > .ml-core-directory-check,
+.playlists-sidebar .playlist-header > .ml-core-directory-check {
+  margin-left: 0;
+}
+.directory .directory-item.flexrow:has(> .ml-core-directory-check) {
+  flex-wrap: nowrap;
+  align-items: center;
+}
+.directory .directory-item.flexrow:has(> .ml-core-directory-check) > .entry-name {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.directory .directory-item.scene > .ml-core-directory-check--scene {
+  position: absolute;
+  z-index: 3;
+  top: 6px;
+  left: 6px;
+  margin: 0;
+  padding: 1px;
+  border: 0;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--color-dark-2, #0b0a13) 70%, transparent);
+  box-shadow: none;
+}
+.directory .ml-core-directory-check > input[type="checkbox"],
+.playlist-header > .ml-core-directory-check > input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  --checkbox-size: var(--font-size-16, 16px);
+  --checkbox-background-color: var(--color-cool-3, #584a75);
+  --checkbox-checked-color: var(--ml-color-accent, var(--color-warm-1, #ee9b3a));
+  --checkbox-checkmark-color: var(--ml-color-on-accent, var(--color-dark-1, #111));
+  --checkbox-font-weight: bold;
+  flex: 0 0 var(--checkbox-size);
+  width: var(--checkbox-size);
+  height: var(--checkbox-size);
+  min-width: var(--checkbox-size);
+  min-height: var(--checkbox-size);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  font-weight: bold;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  cursor: pointer;
+}
 .ml-core-directory-check input:focus-visible { outline: 2px solid var(--ml-color-focus); outline-offset: 2px; }
 .ml-core-directory-delete-list { max-height: 40vh; overflow-y: auto; }
 .ml-actions { justify-content: flex-end; }
