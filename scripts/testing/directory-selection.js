@@ -29,6 +29,44 @@ export const directorySelectionCheck = {
         const app = ui[tab];
         await app.render({ force: true });
         assert(app.element.querySelector('.ml-core-directory-selection'), `${tab} has shared selection controls.`);
+        const press = text => [...app.element.querySelectorAll('.ml-core-directory-selection button')].find(button => button.textContent.startsWith(text))?.click();
+        press('Select multiple');
+        const seen = [];
+        const compete = event => { seen.push(event.type); event.preventDefault(); };
+        app.element.addEventListener('click', compete, true);
+        app.element.addEventListener('pointerdown', compete, true);
+        let probed = false;
+        try {
+          for (const row of app.element.querySelectorAll('.directory-item[data-entry-id], .directory-item[data-document-id]')) {
+            if (!row.getClientRects().length) continue;
+            const check = row.querySelector('.ml-core-directory-check');
+            const id = row.dataset.entryId ?? row.dataset.documentId;
+            assert(check, `${tab} shows a checkbox for ${id}.`);
+            const input = check.querySelector('input');
+            const box = input.getBoundingClientRect();
+            assert(box.width >= 12 && box.height >= 12, `${tab} checkbox for ${id} is visible.`);
+            const header = row.querySelector(':scope > .playlist-header, :scope > header.playlist-header');
+            if (header) assert(check.parentElement === header && header.querySelector('.playlist-name, .entry-name')?.previousElementSibling === check, `${tab} checkbox sits in the playlist header.`);
+            else if (row.classList.contains('scene')) assert(check.classList.contains('ml-core-directory-check--scene') && check.parentElement === row, `${tab} checkbox overlays the scene row.`);
+            else {
+              const name = row.querySelector(':scope > .entry-name, :scope > .document-name');
+              if (name) assert(name.previousElementSibling === check, `${tab} checkbox sits directly before the name.`);
+            }
+            if (!probed) {
+              const before = input.checked;
+              input.click();
+              const selector = row.dataset.entryId ? `[data-entry-id="${id}"]` : `[data-document-id="${id}"]`;
+              const after = app.element.querySelector(`${selector} .ml-core-directory-check input`);
+              assert(after && after.checked !== before, `${tab} checkbox still toggles.`);
+              assert(seen.length === 0, `${tab} checkbox clicks ignore directory capture listeners.`);
+              probed = true;
+            }
+          }
+        } finally {
+          app.element.removeEventListener('click', compete, true);
+          app.element.removeEventListener('pointerdown', compete, true);
+          press('Done selecting');
+        }
       }
       for (const [tab, cls, data] of [['macros', Macro, { type: 'script', command: '' }], ['tables', RollTable, {}]]) {
         const app = ui[tab];
