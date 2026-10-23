@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Reaction Used">
+  <circle cx="256" cy="256" r="250" fill="#100c08"/>
+  <circle cx="256" cy="256" r="250" fill="none" stroke="#050302" stroke-width="20"/>
+  <circle cx="256" cy="256" r="214" fill="#2b1c10"/>
+  <path d="M 403.7 282.0 A 150 150 0 1 1 307.3 115.0 L 266.9 100.4 L 393.8 146.5 L 287.9 196.0 L 282.7 182.7 A 78 78 0 1 0 332.8 269.5 Z" fill="#ffc233" stroke="#120c07" stroke-width="18" stroke-linejoin="round"/>
+  <path d="M 266.9 100.4 L 404 142 L 292 204 Z" fill="#ff6a00" stroke="#120c07" stroke-width="16" stroke-linejoin="round"/>
+</svg>
