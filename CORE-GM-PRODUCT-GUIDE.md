@@ -74,6 +74,16 @@ While **Reaction Used** is checked, a creature in a started combat that uses suc
 
 The Core video is a concise options reference for GMs already familiar with Foundry. It focuses on Morelord-specific choices and their effects; these installation steps remain available as a written reference. A complete suite installation is not required to use Core. Character Export does not declare Core as a required dependency in its reviewed local manifest.
 
+<div class="docs-video">
+	<iframe
+		src="https://www.youtube-nocookie.com/embed/2advzIa3o9Q"
+		title="Morelord Core demo"
+		loading="lazy"
+		allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+		allowfullscreen
+	></iframe>
+</div>
+
 The account connection applies to the current world. Repeat the connection process in each world that should use your Morelord Gaming access.
 
 ## Connect a Morelord Gaming Account
@@ -183,6 +193,8 @@ Shared Locations give Morelord Gaming modules a common description of a place. D
 
 Open **Morelord Core → Manage Shared Locations**. Choose **Create First Location** when empty, or the plus button to add another. Select a saved location in the left list to edit it.
 
+![New shared location named Phandalin, with settlement type Village and a Forge capability set to Common.](/images/foundry/core-locations.png)
+
 Enter a **Name**, **Settlement Type**, and optional GM-facing **Notes**. Settlement choices are Road, Hamlet (1–100 people), Village (101–1,000), Town (1,001–6,000), City (6,001–25,000), Metropolis (25,001+), and Other. Population ranges are suggestions, not enforced limits.
 
 Choose **Add Capability** for each service the location provides. Core registers Forge, Marketplace, Alchemist, Library, Temple, Contractor, Instructor, and Workshop; enabled integrations can register additional types. A capability describes facilities or services; it does not create a shop, NPC, recipe, or project.
@@ -198,6 +210,8 @@ Choose **Save Location** to persist changes; the editor stays open. Reopen a sav
 ## Export and Import Settings
 
 Open **Morelord Core → Export / Import Settings**. The list shows enabled modules with eligible settings and their counts. **Export Settings** downloads `morelord-settings.json`, including eligible world settings and preferences from the current browser.
+
+![Settings transfer listing enabled Morelord modules, with Export Settings and Import Settings.](/images/foundry/core-settings-transfer.png)
 
 To import, enable the relevant modules, choose a JSON file under **Settings File**, then select **Import Settings**. Matching settings are replaced; settings absent from the file remain unchanged. Missing or disabled modules and unknown settings are skipped. Review the imported/skipped counts and reload Foundry to refresh module views. Export your current configuration before replacing it.
 
