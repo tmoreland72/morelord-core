@@ -3,8 +3,11 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { createToolsRegistry } from "../scripts/ui/tools-registry.js";
 import {
+  MORELORD_DISCORD_INVITE,
   MORELORD_MODULE_CATALOG,
   MORELORD_MODULES_APP,
+  MORELORD_WEBSITE,
+  MORELORD_YOUTUBE,
   bindMorelordModulesButton,
   morelordModuleRows,
   morelordModulesContext,
@@ -51,8 +54,22 @@ test("Morelord Modules lists every module with live status and a link only when 
   for (const entry of MORELORD_MODULE_CATALOG) {
     assert.equal(lang[`morelord-core.modules.${entry.id}.title`], entry.title);
     assert.equal(lang[`morelord-core.modules.${entry.id}.description`], entry.description);
-    assert.equal(rows.find(row => row.id === entry.id).icon, entry.icon);
+    const row = rows.find(item => item.id === entry.id);
+    assert.equal(row.icon, entry.icon);
+    if (entry.docs) {
+      const docs = new URL(row.documentationUrl);
+      assert.equal(`${docs.origin}${docs.pathname}`, entry.docs);
+      assert.equal(docs.searchParams.get("utm_source"), "foundry");
+      assert.equal(docs.searchParams.get("utm_medium"), "morelord_tools");
+      assert.equal(docs.searchParams.get("utm_campaign"), entry.id);
+      assert.equal(row.documentation, "Documentation");
+      assert.equal(row.documentationLabel, `Documentation for ${row.title}`);
+    } else {
+      assert.equal(row.documentationUrl, "");
+    }
   }
+  assert.equal(rows.find(row => row.id === "morelord-core").documentationUrl.includes("/docs/morelord-core"), true);
+  assert.equal(rows.find(row => row.id === "morelord-journeys").documentationUrl.includes("/docs/morelord-journeys"), true);
 });
 
 test("missing translations fall back to the module.json copy for players and GMs", () => {
@@ -62,7 +79,22 @@ test("missing translations fall back to the module.json copy for players and GMs
   assert.equal(context.modules.length, 8);
   assert.equal(context.modules[0].statusLabel, "Not installed");
   assert.equal(context.modules[0].description, MORELORD_MODULE_CATALOG[0].description);
+  assert.equal(context.supportHeading, "Support");
+  assert.deepEqual(context.links.map(link => link.label), ["Get support", "Morelord Gaming", "YouTube"]);
+  const [support, website, youtube] = context.links.map(link => new URL(link.url));
+  assert.equal(`${support.origin}${support.pathname}`, MORELORD_DISCORD_INVITE);
+  assert.equal(support.searchParams.get("utm_campaign"), "support");
+  assert.equal(`${website.origin}${website.pathname}`, `${MORELORD_WEBSITE}/`);
+  assert.equal(website.searchParams.get("utm_campaign"), "website");
+  assert.equal(decodeURIComponent(`${youtube.origin}${youtube.pathname}`), MORELORD_YOUTUBE);
+  assert.equal(youtube.searchParams.get("utm_campaign"), "youtube");
+  for (const url of [support, website, youtube]) {
+    assert.equal(url.searchParams.get("utm_source"), "foundry");
+    assert.equal(url.searchParams.get("utm_medium"), "morelord_tools");
+  }
   assert.match(template, /class="ml-app ml-app-shell ml-stack"/);
+  assert.match(template, /\{\{supportHeading\}\}/);
+  assert.match(template, /\{\{documentation\}\}/);
   assert.match(template, /class="ml-card ml-item-row"/);
   assert.match(template, /class="ml-status" data-tone="\{\{tone\}\}"/);
   assert.match(template, /target="_blank" rel="noopener noreferrer"/);

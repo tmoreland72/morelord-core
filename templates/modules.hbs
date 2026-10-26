@@ -6,8 +6,17 @@
       <i class="{{icon}}" aria-hidden="true"></i>
       <div class="ml-stack" data-gap="1"><strong>{{title}}</strong><small class="notes">{{description}}</small></div>
       <span class="ml-status" data-tone="{{tone}}">{{statusLabel}}</span>
-      {{#if url}}<a href="{{url}}" target="_blank" rel="noopener noreferrer" aria-label="{{learnMoreLabel}}">{{learnMore}}</a>{{/if}}
+      <div class="ml-actions">
+        {{#if documentationUrl}}<a href="{{documentationUrl}}" target="_blank" rel="noopener noreferrer" aria-label="{{documentationLabel}}">{{documentation}}</a>{{/if}}
+        {{#if url}}<a href="{{url}}" target="_blank" rel="noopener noreferrer" aria-label="{{learnMoreLabel}}">{{learnMore}}</a>{{/if}}
+      </div>
     </article>
     {{/each}}
   </div>
+  <section class="ml-surface ml-stack">
+    <div class="ml-section-heading"><div><h2>{{supportHeading}}</h2></div></div>
+    <div class="ml-actions">
+      {{#each links}}<a href="{{url}}" target="_blank" rel="noopener noreferrer">{{label}}</a>{{/each}}
+    </div>
+  </section>
 </section>
