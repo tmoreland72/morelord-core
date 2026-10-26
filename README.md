@@ -75,17 +75,19 @@ Hooks.once("morelord-core.registerTools", tools => {
 });
 ```
 
-`id` is unique. Registering the same id again replaces that tool. The scene-control key is the camel-case id, so `morelord-craftworks` remains `morelordCraftworks`. `morelordHome` is reserved.
+`id` is unique. Registering the same id again replaces that tool. The scene-control key is the camel-case id, so `morelord-craftworks` remains `morelordCraftworks`. `morelordHome` is reserved for the **Overview** entry.
 
-`title` is the palette label, or an i18n key. `icon` is the Font Awesome class string. `order` is accepted and ignored. Core sorts the visible tools by the localized title, without regard to case. Equal titles then use the id. Titles Craftworks, Downtime, Encounters, Journeys, Manage Shops, and Marketplace therefore appear in that order.
+`title` is the palette label, or an i18n key. `icon` is the Font Awesome class string. `description` is optional. It is a short sentence, or an i18n key, shown under that tool's title in the **Overview** dialog. Leave it out to list the title only. `order` is accepted and ignored. Core sorts the visible tools by the localized title, without regard to case. Equal titles then use the id. Titles Craftworks, Downtime, Encounters, Journeys, Manage Shops, and Marketplace therefore appear in that order.
 
 `visible` runs every time the controls are built. Return false to hide that tool from the current user. When none of the tools are visible, the **Morelord Tools** control is hidden.
 
 `onClick` is called from the tool's `onChange`. Each registered tool is `button: true`. Core catches a thrown error or a rejected promise and shows `error.message` with `ui.notifications.error`. The click does not change the active scene control.
 
-`unregister(id)` removes a tool. `list()` returns the tools visible to the current user in that alphabetical order, as `{id, title, icon, order}`. The returned `order` is the value the module passed and does not change the palette. `refresh()` rebuilds the scene controls with `{controls: true, reset: true}` after a short debounce, and only once the controls are already rendered. Entitlement updates, `userConnected`, and user changes call `refresh()` so visibility follows the current user.
+`unregister(id)` removes a tool. `list()` returns the tools visible to the current user in that alphabetical order, as `{id, title, icon, order, description}`. The returned `order` is the value the module passed and does not change the palette. `refresh()` rebuilds the scene controls with `{controls: true, reset: true}` after a short debounce, and only once the controls are already rendered. Entitlement updates, `userConnected`, and user changes call `refresh()` so visibility follows the current user.
 
-Foundry v14 treats `SceneControl.activeTool` as optional and otherwise selects the first tool. A button cannot be the active tool, and a tool with `visible: false` is not kept, so the control sets `activeTool` to `morelordHome`. That tool is labeled **Morelord Tools**, uses an info icon, and does not open a window. It stays selected while the module buttons run.
+The first palette entry is **Overview**. It uses an info icon and stays selected. Choosing **Overview** opens a **Morelord Tools** dialog. The dialog says "These are the Morelord tools available to you. Choose one in the scene controls to open it." and lists each visible tool, with its description when one was registered. **Close** dismisses the dialog. Choosing the crown does not open that dialog or a module window.
+
+That entry has to stay. Foundry 13 requires a visible tool that is not a button as `SceneControl.activeTool`. In v13.351, omitting it makes `SceneControls.#onChange` throw `toolOrControl is undefined` when the control changes, and a tool with `visible: false` is removed before it can stay active. A button cannot be the active tool: selecting the control runs that tool and would open its window. Foundry 14 makes `activeTool` optional, then selects the first tool when any tool exists (issue 12966, release 14.349). With only module buttons, that would open the first tool. Module tools stay `button: true`, so choosing one leaves **Morelord Tools** selected.
 
 ## Discord community
 

@@ -55,7 +55,7 @@ While **Reaction Used** is checked, a creature in a started combat that uses suc
 
 **Morelord Tools** is a button on the left scene controls. Its icon is a sharp crown. It is shown to the current user only when at least one Morelord tool is visible to that user, and it is hidden when none are. Players and GMs use the same control. Choosing **Morelord Tools** opens its tool palette and leaves **Morelord Tools** selected. Choosing a tool runs that tool and does not switch the scene controls back to Tokens.
 
-The tools are listed alphabetically by title, ignoring capitalization. The info entry in the palette is also labeled **Morelord Tools**. It stays selected and does not open a window. Core does not put **Connect or Manage Account** or the Game Master tray in this palette. The entries come from the other Morelord modules. There is no Game Settings field for this control, and it does not require a Morelord account.
+The tools are listed alphabetically by title, ignoring capitalization. The first entry is labeled **Overview** and uses an info icon. It stays selected. Choosing **Overview** opens a dialog titled **Morelord Tools**. The dialog says "These are the Morelord tools available to you. Choose one in the scene controls to open it." and lists each tool available to the current user. A short description appears under a tool's name when that module provided one. **Close** dismisses the dialog. Choosing the crown does not open the dialog or a tool window. Core does not put **Connect or Manage Account** or the Game Master tray in this palette. The entries come from the other Morelord modules. There is no Game Settings field for this control, and it does not require a Morelord account.
 
 ## Requirements
 

@@ -54,6 +54,7 @@ Hooks.on("getSceneControlButtons", controls => {
   if (!controls) return;
   controls.morelord = toolsRegistry.buildSceneControl(controls);
 });
+Hooks.on("renderSceneControls", (application, element) => toolsRegistry.bindOverview(application, element));
 for (const hookName of ["morelordCoreEntitlementsUpdated", "userConnected", "updateUser"]) {
   Hooks.on(hookName, () => toolsRegistry.api.refresh());
 }
