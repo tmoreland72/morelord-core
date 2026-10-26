@@ -104,6 +104,40 @@ test("palette titles sort alphabetically regardless of registered order", () => 
   }
 });
 
+test("a leading Morelord prefix is ignored when sorting and the labels stay unchanged", () => {
+  const registry = createToolsRegistry();
+  globalThis.game = { i18n: { lang: "en", localize(key) { return key; } } };
+  try {
+    for (const [id, title, order] of [
+      ["morelord-marketplace", "Morelord Marketplace", 1],
+      ["morelord-shops", "Manage Marketplace Shops", 2],
+      ["morelord-journeys", "Morelord Journeys", 40],
+      ["morelord-encounters", "Morelord Encounters", 90],
+      ["morelord-downtime", "Morelord Downtime", 3],
+      ["morelord-craftworks", "Morelord Craftworks", 80]
+    ]) registry.api.register(tool(id, { title, order }));
+    const control = registry.buildSceneControl({});
+    const buttons = Object.values(control.tools).filter(entry => entry.button).sort((a, b) => a.order - b.order);
+    assert.deepEqual(buttons.map(entry => entry.title), [
+      "Morelord Craftworks",
+      "Morelord Downtime",
+      "Morelord Encounters",
+      "Morelord Journeys",
+      "Manage Marketplace Shops",
+      "Morelord Marketplace"
+    ]);
+    assert.deepEqual(registry.api.list().map(entry => entry.title), buttons.map(entry => entry.title));
+    assert.deepEqual(buttons.map(entry => entry.order), [1, 2, 3, 4, 5, 6]);
+    const prefixed = createToolsRegistry();
+    prefixed.api.register(tool("morelord-zebra", { title: "morelord Zebra", order: 1 }));
+    prefixed.api.register(tool("morelord-apple", { title: "MORELORD Apple", order: 9 }));
+    const prefixedButtons = Object.values(prefixed.buildSceneControl({}).tools).filter(entry => entry.button).sort((a, b) => a.order - b.order);
+    assert.deepEqual(prefixedButtons.map(entry => entry.title), ["MORELORD Apple", "morelord Zebra"]);
+  } finally {
+    delete globalThis.game;
+  }
+});
+
 test("scene control is built from visible tools and keeps a non-button active tool", () => {
   const registry = createToolsRegistry();
   registry.api.register(tool("morelord-craftworks", { title: "Morelord Craftworks", icon: "fa-solid fa-hammer", order: 30 }));

@@ -56,9 +56,14 @@ export function createToolsRegistry() {
     }
   }
 
+  /** Compare without a leading "Morelord ". The palette label stays the registered title. */
+  function sortTitle(title) {
+    return localizedTitle(title).replace(/^morelord /i, "");
+  }
+
   function compareTools(a, b) {
     const locale = globalThis.game?.i18n?.lang || undefined;
-    const byTitle = localizedTitle(a.title).localeCompare(localizedTitle(b.title), locale, { sensitivity: "base" });
+    const byTitle = sortTitle(a.title).localeCompare(sortTitle(b.title), locale, { sensitivity: "base" });
     return byTitle || String(a.id).localeCompare(String(b.id), locale, { sensitivity: "base" });
   }
 
