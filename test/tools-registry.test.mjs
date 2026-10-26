@@ -8,7 +8,6 @@ function tool(id, overrides = {}) {
     id,
     title: overrides.title ?? id,
     icon: overrides.icon ?? "fa-solid fa-hammer",
-    description: overrides.description ?? "",
     order: overrides.order ?? 0,
     visible: overrides.visible ?? (() => true),
     onClick: overrides.onClick ?? (() => {})
@@ -118,7 +117,7 @@ test("scene control is built from visible tools and keeps a non-button active to
   assert.equal(control.visible, true);
   assert.equal(control.activeTool, "morelordHome");
   assert.equal(control.tools.morelordHome.name, "morelordHome");
-  assert.equal(control.tools.morelordHome.title, "Overview");
+  assert.equal(control.tools.morelordHome.title, "morelord-core.modules.title");
   assert.equal(control.tools.morelordHome.button, undefined);
   assert.equal(control.tools.morelordHome.visible, true);
   assert.equal(control.tools.morelordCraftworks.name, "morelordCraftworks");
@@ -183,109 +182,9 @@ test("init publishes tools and ready merges them into that same api object", () 
   assert.match(main, /globalThis\.MorelordCore = api/);
   assert.match(main, /Hooks\.callAll\("morelord-core\.registerTools", tools\)/);
   assert.match(main, /controls\.morelord = toolsRegistry\.buildSceneControl\(controls\)/);
-  assert.match(main, /renderSceneControls", \(application, element\) => toolsRegistry\.bindOverview\(application, element\)/);
+  assert.match(main, /renderSceneControls", \(application, element\) => bindMorelordModulesButton\(application, element\)/);
   assert.match(main, /mergeCoreApi\(api, \{/);
   assert.doesNotMatch(main, /const api = \{/);
-});
-
-test("Overview lists visible tools and opens only from its own click", async () => {
-  const registry = createToolsRegistry();
-  const activations = [];
-  const errors = [];
-  const calls = [];
-  const gate = {};
-  const arm = () => { gate.pending = new Promise(resolve => { gate.release = resolve; }); };
-  arm();
-  globalThis.game = {
-    i18n: { lang: "en", localize(key) { return key === "TOOL.Shops" ? "Manage Shops" : key; } }
-  };
-  globalThis.ui = {
-    notifications: { error(message) { errors.push(message); } },
-    controls: { activate(options) { activations.push(options); } }
-  };
-  globalThis.foundry = {
-    applications: { api: { DialogV2: { wait(options) { calls.push(options); return gate.pending; } } } }
-  };
-  try {
-    registry.api.register(tool("morelord-downtime", {
-      title: "Downtime", description: "Track downtime.", order: 70, icon: "fa-solid fa-hourglass"
-    }));
-    registry.api.register(tool("morelord-craftworks", {
-      title: "A & B <C>", description: 'say "hi"', order: 1, icon: "fa-solid fa-hammer"
-    }));
-    registry.api.register(tool("morelord-shops", { title: "TOOL.Shops", description: "  ", order: 3 }));
-    registry.api.register(tool("hidden-tool", {
-      title: "Hidden", description: "nope", visible: () => false, icon: `"><script>`
-    }));
-    const control = registry.buildSceneControl({});
-    control.tools.morelordHome.onChange({ target: { dataset: { control: "morelord" } } }, true);
-    control.tools.morelordCraftworks.onChange({}, true);
-    assert.equal(calls.length, 0);
-    const listeners = [];
-    const button = { dataset: {}, addEventListener(_type, fn) { listeners.push(fn); } };
-    const element = {
-      querySelector: selector => selector === 'button[data-tool="morelordHome"]' ? button : null
-    };
-    registry.bindOverview(null, element);
-    registry.bindOverview({ element }, null);
-    assert.equal(listeners.length, 1);
-    listeners[0]();
-    listeners[0]();
-    assert.equal(calls.length, 1);
-    const content = calls[0].content;
-    assert.match(content, /^<div><div class="ml-app ml-app-shell ml-dialog-shell ml-stack">/);
-    assert.equal(calls[0].window.title, "Morelord Tools");
-    assert.equal(calls[0].buttons[0].label, "Close");
-    assert.ok(content.indexOf("A &amp; B &lt;C&gt;") < content.indexOf("Downtime"));
-    assert.ok(content.indexOf("Downtime") < content.indexOf("Manage Shops"));
-    assert.match(content, /fa-solid fa-hammer/);
-    assert.match(content, /say &quot;hi&quot;/);
-    assert.match(content, /Track downtime\./);
-    assert.match(content, /These are the Morelord tools available to you\. Choose one in the scene controls to open it\./);
-    assert.doesNotMatch(content, /Hidden|nope|<script/);
-    assert.doesNotMatch(content.slice(content.indexOf("Manage Shops"), content.indexOf("Manage Shops") + 90), /<small/);
-    assert.deepEqual(registry.api.list().map(entry => [entry.title, entry.description]), [
-      ["A & B <C>", 'say "hi"'],
-      ["Downtime", "Track downtime."],
-      ["TOOL.Shops", ""]
-    ]);
-    gate.release();
-    await gate.pending;
-    arm();
-    listeners[0]();
-    assert.equal(calls.length, 2);
-    gate.release();
-    await gate.pending;
-    gate.pending = Promise.reject(new Error("dialog failed"));
-    listeners[0]();
-    await new Promise(resolve => setTimeout(resolve, 0));
-    assert.deepEqual(errors, ["dialog failed"]);
-    assert.deepEqual(activations, []);
-  } finally {
-    delete globalThis.game;
-    delete globalThis.ui;
-    delete globalThis.foundry;
-  }
-});
-
-test("an empty Overview does not open when the active tool changes", async () => {
-  const registry = createToolsRegistry();
-  const calls = [];
-  globalThis.foundry = {
-    applications: { api: { DialogV2: { async wait(options) { calls.push(options); } } } }
-  };
-  try {
-    const control = registry.buildSceneControl({});
-    control.tools.morelordHome.onChange({}, true);
-    assert.equal(calls.length, 0);
-    await registry.openOverview();
-    assert.match(calls[0].content, /No Morelord tools are available\./);
-    delete globalThis.foundry.applications.api.DialogV2.wait;
-    await registry.openOverview();
-    assert.equal(calls.length, 1);
-  } finally {
-    delete globalThis.foundry;
-  }
 });
 
 test("reserved and blank tool ids are rejected", () => {
