@@ -28,16 +28,16 @@ test("registry orders tools, hides invisible ones, and replaces the same id", ()
   registry.api.register(tool("morelord-craftworks", { title: "Alpha", order: 20 }));
   registry.api.register(tool("morelord-beta", { title: "Beta", order: 20 }));
   assert.deepEqual(registry.api.list().map(entry => [entry.id, entry.title]), [
-    ["morelord-journeys", "Morelord Journeys"],
     ["morelord-craftworks", "Alpha"],
     ["morelord-beta", "Beta"],
-    ["morelord-downtime", "Morelord Downtime"]
+    ["morelord-downtime", "Morelord Downtime"],
+    ["morelord-journeys", "Morelord Journeys"]
   ]);
   craftworksVisible = false;
   registry.api.register(tool("morelord-craftworks", { title: "Alpha", order: 20, visible: () => craftworksVisible }));
-  assert.deepEqual(registry.api.list().map(entry => entry.title), ["Morelord Journeys", "Beta", "Morelord Downtime"]);
+  assert.deepEqual(registry.api.list().map(entry => entry.title), ["Beta", "Morelord Downtime", "Morelord Journeys"]);
   assert.equal(registry.api.unregister("morelord-downtime"), true);
-  assert.deepEqual(registry.api.list().map(entry => entry.id), ["morelord-journeys", "morelord-beta"]);
+  assert.deepEqual(registry.api.list().map(entry => entry.id), ["morelord-beta", "morelord-journeys"]);
   assert.equal(registry.api.unregister("missing"), false);
 });
 
@@ -64,6 +64,44 @@ test("tool clicks call onClick, isolate errors, and leave the active control alo
   assert.deepEqual(errors, ["boom", "later"]);
   assert.deepEqual(activations, []);
   delete globalThis.ui;
+});
+
+test("palette titles sort alphabetically regardless of registered order", () => {
+  const registry = createToolsRegistry();
+  globalThis.game = {
+    i18n: {
+      lang: "en",
+      localize(key) { return key === "TOOL.Shops" ? "Manage Shops" : key; }
+    }
+  };
+  try {
+    for (const [id, title, order] of [
+      ["morelord-marketplace", "Marketplace", 1],
+      ["morelord-craftworks", "Craftworks", 90],
+      ["morelord-journeys", "Journeys", 2],
+      ["morelord-shops", "TOOL.Shops", 3],
+      ["morelord-encounters", "encounters", 80],
+      ["morelord-downtime", "Downtime", 70],
+      ["zeta-same", "Same", 1],
+      ["alpha-same", "same", 100]
+    ]) registry.api.register(tool(id, { title, order }));
+    const control = registry.buildSceneControl({});
+    const buttons = Object.values(control.tools).filter(entry => entry.button).sort((a, b) => a.order - b.order);
+    assert.deepEqual(buttons.map(entry => entry.title), [
+      "Craftworks", "Downtime", "encounters", "Journeys", "TOOL.Shops", "Marketplace", "same", "Same"
+    ]);
+    assert.deepEqual(buttons.map(entry => entry.order), [1, 2, 3, 4, 5, 6, 7, 8]);
+    assert.deepEqual(registry.api.list().map(entry => entry.id), [
+      "morelord-craftworks", "morelord-downtime", "morelord-encounters", "morelord-journeys",
+      "morelord-shops", "morelord-marketplace", "alpha-same", "zeta-same"
+    ]);
+    assert.equal(control.activeTool, "morelordHome");
+    assert.equal(control.tools.morelordHome.order, 0);
+    assert.equal(control.tools.morelordHome.button, undefined);
+    assert.equal(control.tools.morelordHome.visible, true);
+  } finally {
+    delete globalThis.game;
+  }
 });
 
 test("scene control is built from visible tools and keeps a non-button active tool", () => {

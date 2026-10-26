@@ -44,10 +44,24 @@ export function createToolsRegistry() {
     }
   }
 
+  function localizedTitle(title) {
+    const text = String(title ?? "");
+    try {
+      const localized = globalThis.game?.i18n?.localize?.(text);
+      return localized == null || localized === "" ? text : String(localized);
+    } catch {
+      return text;
+    }
+  }
+
+  function compareTools(a, b) {
+    const locale = globalThis.game?.i18n?.lang || undefined;
+    const byTitle = localizedTitle(a.title).localeCompare(localizedTitle(b.title), locale, { sensitivity: "base" });
+    return byTitle || String(a.id).localeCompare(String(b.id), locale, { sensitivity: "base" });
+  }
+
   function visibleTools() {
-    return [...tools.values()]
-      .filter(shown)
-      .sort((a, b) => a.order - b.order || a.title.localeCompare(b.title));
+    return [...tools.values()].filter(shown).sort(compareTools);
   }
 
   function refresh() {
@@ -104,13 +118,13 @@ export function createToolsRegistry() {
         onChange() {}
       }
     };
-    for (const tool of entries) {
+    for (const [index, tool] of entries.entries()) {
       const name = sceneControlKey(tool.id);
       palette[name] = {
         name,
         title: tool.title,
         icon: tool.icon,
-        order: tool.order,
+        order: index + 1,
         button: true,
         visible: true,
         onChange(event) { runClick(tool, event); }

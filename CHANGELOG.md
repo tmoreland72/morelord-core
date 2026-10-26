@@ -1,5 +1,11 @@
 # Morelord Core Changelog
 
+## 0.6.1
+
+### Changed
+
+- **Morelord Tools** lists its tools alphabetically by title, ignoring capitalization. A module's order value no longer changes the sequence. With the titles Craftworks, Downtime, Encounters, Journeys, Manage Shops, and Marketplace, that is the palette order.
+
 ## 0.6.0
 
 ### Added

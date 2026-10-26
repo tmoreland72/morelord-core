@@ -69,7 +69,6 @@ Hooks.once("morelord-core.registerTools", tools => {
     id: "morelord-craftworks",
     title: "Morelord Craftworks",
     icon: "fa-solid fa-hammer",
-    order: 30,
     visible: () => true,
     onClick: () => {}
   });
@@ -78,13 +77,13 @@ Hooks.once("morelord-core.registerTools", tools => {
 
 `id` is unique. Registering the same id again replaces that tool. The scene-control key is the camel-case id, so `morelord-craftworks` remains `morelordCraftworks`. `morelordHome` is reserved.
 
-`title` is the palette label, or an i18n key. `icon` is the Font Awesome class string. `order` sorts the palette, and equal orders use the title. The shared order is Journeys 10, Encounters 20, Craftworks 30, Downtime 40, Marketplace 50, and Shop Manager 51.
+`title` is the palette label, or an i18n key. `icon` is the Font Awesome class string. `order` is accepted and ignored. Core sorts the visible tools by the localized title, without regard to case. Equal titles then use the id. Titles Craftworks, Downtime, Encounters, Journeys, Manage Shops, and Marketplace therefore appear in that order.
 
 `visible` runs every time the controls are built. Return false to hide that tool from the current user. When none of the tools are visible, the **Morelord Tools** control is hidden.
 
 `onClick` is called from the tool's `onChange`. Each registered tool is `button: true`. Core catches a thrown error or a rejected promise and shows `error.message` with `ui.notifications.error`. The click does not change the active scene control.
 
-`unregister(id)` removes a tool. `list()` returns the tools visible to the current user, sorted by order then title, as `{id, title, icon, order}`. `refresh()` rebuilds the scene controls with `{controls: true, reset: true}` after a short debounce, and only once the controls are already rendered. Entitlement updates, `userConnected`, and user changes call `refresh()` so visibility follows the current user.
+`unregister(id)` removes a tool. `list()` returns the tools visible to the current user in that alphabetical order, as `{id, title, icon, order}`. The returned `order` is the value the module passed and does not change the palette. `refresh()` rebuilds the scene controls with `{controls: true, reset: true}` after a short debounce, and only once the controls are already rendered. Entitlement updates, `userConnected`, and user changes call `refresh()` so visibility follows the current user.
 
 Foundry v14 treats `SceneControl.activeTool` as optional and otherwise selects the first tool. A button cannot be the active tool, and a tool with `visible: false` is not kept, so the control sets `activeTool` to `morelordHome`. That tool is labeled **Morelord Tools**, uses an info icon, and does not open a window. It stays selected while the module buttons run.
 
