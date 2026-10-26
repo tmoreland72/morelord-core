@@ -91,6 +91,16 @@ The **Support** section has **Get support**, **Morelord Gaming**, and **YouTube*
 
 That entry has to stay in the control data for players as well. Foundry 13 requires a visible tool that is not a button as `SceneControl.activeTool`. In v13.351, omitting it makes `SceneControls.#onChange` throw `toolOrControl is undefined` when the control changes, and a tool with `visible: false` is removed before it can stay active. A button cannot be the active tool: selecting the control runs that tool and would open its window. Foundry 14 makes `activeTool` optional, then selects the first tool when any tool exists (issue 12966, release 14.349). With only module buttons, that would open the first tool. Core therefore keeps the non-button entry for every user and removes its rendered button unless `game.user.isGM` is true. Module tools stay `button: true`, so choosing one leaves **Morelord Tools** selected.
 
+## Run macros on load
+
+Right-click a macro on the hotbar to mark it to run when a world loads. The menu has **Run on load for me**. Choosing it again shows **Running on load for me** and choosing that turns it off. That choice is stored on the current user as a list of macro UUIDs and runs only for that user.
+
+A GM also sees **Run on load for everyone**. Choosing it again shows **Running on load for everyone** and choosing that turns it off. That choice is stored on the macro and runs for every user who loads the world. Players do not see those two labels.
+
+Core runs the marked macros once in the `ready` hook. A macro marked both ways runs once. A macro the user cannot see, or cannot execute, is skipped. One macro that throws does not stop the others; the failure is written to the console.
+
+A slot that runs on load shows a marker on its right edge. **Runs on load for you** is a user icon in the info color. **Runs on load for everyone** is a group icon in the accent color. Both markers show when both choices are on. They are drawn again whenever the hotbar renders, including after either choice changes.
+
 ## Discord community
 
 Select **Join Discord** under **Discord Community** in Core’s Module Settings to open the [Morelord Gaming Discord server](https://discord.gg/B5YKQf579E) for support, feature requests, and general discussions. The button is available to GMs and players without connecting a Morelord account.

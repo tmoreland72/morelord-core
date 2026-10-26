@@ -31,6 +31,7 @@ import { actorSkillModifier, extractNaturalD20, rollSkill } from "./services/ski
 import { SUBSCRIPTION_TIERS, normalizeSubscriptionTier, capSubscriptionTier, applySubscriptionTesting } from "./services/subscription-testing.js";
 import { createToolsRegistry, mergeCoreApi } from "./ui/tools-registry.js";
 import { bindMorelordModulesButton } from "./ui/morelord-modules.js";
+import { registerRunOnLoad, runMacrosOnLoad } from "./ui/run-macros-on-load.js";
 
 const MODULE_ID = "morelord-core";
 registerDirectorySelection();
@@ -56,6 +57,7 @@ Hooks.on("getSceneControlButtons", controls => {
   controls.morelord = toolsRegistry.buildSceneControl(controls);
 });
 Hooks.on("renderSceneControls", (application, element) => bindMorelordModulesButton(application, element));
+registerRunOnLoad();
 for (const hookName of ["morelordCoreEntitlementsUpdated", "userConnected", "updateUser"]) {
   Hooks.on(hookName, () => toolsRegistry.api.refresh());
 }
@@ -734,4 +736,5 @@ Hooks.once("ready", async () => {
   if (game.user.isGM && api.isConnected()) {
     await refreshEntitlements(PRODUCT_SLUG, { quiet: true });
   }
+  await runMacrosOnLoad();
 });

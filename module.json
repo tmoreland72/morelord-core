@@ -2,7 +2,7 @@
     "id":  "morelord-core",
     "title":  "Morelord Core",
     "description":  "Shared account connection and premium entitlement services for Morelord Tools modules.",
-    "version":  "0.6.1",
+    "version":  "0.7.0",
     "authors":  [
                     {
                         "name":  "Morelord Gaming",

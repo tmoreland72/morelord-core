@@ -26,5 +26,11 @@
   "morelord-core.modules.morelord-downtime.title": "Morelord Downtime",
   "morelord-core.modules.morelord-downtime.description": "Persistent, location-aware downtime Projects and campaign-time orchestration for the Morelord suite.",
   "morelord-core.modules.morelord-game-master.title": "Morelord Game Master",
-  "morelord-core.modules.morelord-game-master.description": "A GM tray for roll requests, sound, macros, and triggers."
+  "morelord-core.modules.morelord-game-master.description": "A GM tray for roll requests, sound, macros, and triggers.",
+  "morelord-core.macros.runForMe": "Run on load for me",
+  "morelord-core.macros.runningForMe": "Running on load for me",
+  "morelord-core.macros.runForEveryone": "Run on load for everyone",
+  "morelord-core.macros.runningForEveryone": "Running on load for everyone",
+  "morelord-core.macros.indicatorForMe": "Runs on load for you",
+  "morelord-core.macros.indicatorForEveryone": "Runs on load for everyone"
 }
