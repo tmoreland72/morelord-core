@@ -1,5 +1,5 @@
 <section class="ml-app ml-app-shell ml-stack">
-  <header class="ml-hero"><i class="fa-solid fa-circle-info ml-hero__icon" aria-hidden="true"></i><div class="ml-hero__body"><h1>{{title}}</h1><p>{{intro}}</p></div></header>
+  <header class="ml-hero"><i class="fa-solid fa-circle-info ml-hero__icon" aria-hidden="true"></i><div class="ml-hero__body"><h1>{{title}}</h1><p>{{intro}}</p></div><div class="ml-actions"><a href="{{documentationUrl}}" target="_blank" rel="noopener noreferrer">{{documentation}}</a></div></header>
   <div class="ml-stack" data-gap="2">
     {{#each modules}}
     <article class="ml-card ml-item-row">
@@ -7,7 +7,6 @@
       <div class="ml-stack" data-gap="1"><strong>{{title}}</strong><small class="notes">{{description}}</small></div>
       <span class="ml-status" data-tone="{{tone}}">{{statusLabel}}</span>
       <div class="ml-actions">
-        {{#if documentationUrl}}<a href="{{documentationUrl}}" target="_blank" rel="noopener noreferrer" aria-label="{{documentationLabel}}">{{documentation}}</a>{{/if}}
         {{#if url}}<a href="{{url}}" target="_blank" rel="noopener noreferrer" aria-label="{{learnMoreLabel}}">{{learnMore}}</a>{{/if}}
       </div>
     </article>
