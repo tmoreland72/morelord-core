@@ -78,7 +78,7 @@ Hooks.once("morelord-core.registerTools", tools => {
 
 `id` is unique. Registering the same id again replaces that tool. The scene-control key is the camel-case id, so `morelord-craftworks` remains `morelordCraftworks`. `morelordHome` is reserved.
 
-`title` is the palette label, or an i18n key. `icon` is the Font Awesome class string. `order` sorts the palette, and equal orders use the title. The shared order is Journeys 10, Encounters 20, Craftworks 30, Harvest 31, Downtime 40, Marketplace 50, and Shop Manager 51.
+`title` is the palette label, or an i18n key. `icon` is the Font Awesome class string. `order` sorts the palette, and equal orders use the title. The shared order is Journeys 10, Encounters 20, Craftworks 30, Downtime 40, Marketplace 50, and Shop Manager 51.
 
 `visible` runs every time the controls are built. Return false to hide that tool from the current user. When none of the tools are visible, the **Morelord Tools** control is hidden.
 

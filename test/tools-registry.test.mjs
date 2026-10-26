@@ -26,18 +26,18 @@ test("registry orders tools, hides invisible ones, and replaces the same id", ()
     visible: () => craftworksVisible
   }));
   registry.api.register(tool("morelord-craftworks", { title: "Alpha", order: 20 }));
-  registry.api.register(tool("morelord-harvest", { title: "Beta", order: 20 }));
+  registry.api.register(tool("morelord-beta", { title: "Beta", order: 20 }));
   assert.deepEqual(registry.api.list().map(entry => [entry.id, entry.title]), [
     ["morelord-journeys", "Morelord Journeys"],
     ["morelord-craftworks", "Alpha"],
-    ["morelord-harvest", "Beta"],
+    ["morelord-beta", "Beta"],
     ["morelord-downtime", "Morelord Downtime"]
   ]);
   craftworksVisible = false;
   registry.api.register(tool("morelord-craftworks", { title: "Alpha", order: 20, visible: () => craftworksVisible }));
   assert.deepEqual(registry.api.list().map(entry => entry.title), ["Morelord Journeys", "Beta", "Morelord Downtime"]);
   assert.equal(registry.api.unregister("morelord-downtime"), true);
-  assert.deepEqual(registry.api.list().map(entry => entry.id), ["morelord-journeys", "morelord-harvest"]);
+  assert.deepEqual(registry.api.list().map(entry => entry.id), ["morelord-journeys", "morelord-beta"]);
   assert.equal(registry.api.unregister("missing"), false);
 });
 
