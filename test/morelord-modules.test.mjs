@@ -11,6 +11,7 @@ import {
   bindMorelordModulesButton,
   morelordModuleRows,
   morelordModulesContext,
+  morelordUserIsGM,
   openMorelordModules
 } from "../scripts/ui/morelord-modules.js";
 
@@ -100,17 +101,17 @@ test("missing translations fall back to the module.json copy for players and GMs
   assert.match(template, /target="_blank" rel="noopener noreferrer"/);
 });
 
-test("the info tool stays selected and opens Morelord Modules only when clicked", async () => {
-  const registry = createToolsRegistry();
-  registry.api.register({ id: "morelord-craftworks", title: "Craftworks", icon: "fa-solid fa-hammer", onClick() {} });
-  const control = registry.buildSceneControl({});
-  const renders = [];
-  const instances = new Map();
+function modulesHost(renders, instances, extra = {}) {
   class ApplicationV2 {
     render(options) {
       instances.set(this.constructor.DEFAULT_OPTIONS.id, this);
       renders.push(this);
       this.options = options;
+      return this;
+    }
+
+    close() {
+      instances.delete(this.constructor.DEFAULT_OPTIONS.id);
       return this;
     }
   }
@@ -121,21 +122,33 @@ test("the info tool stays selected and opens Morelord Modules only when clicked"
     }
   };
   globalThis.game = {
-    user: { isGM: false },
+    user: { isGM: true },
     modules: installed({ "morelord-core": { active: true } }),
-    i18n: { localize: key => lang[key] ?? key, format: (key, data) => lang[key].replace("{title}", data.title) }
+    i18n: { localize: key => lang[key] ?? key, format: (key, data) => lang[key].replace("{title}", data.title) },
+    ...extra
   };
+}
+
+test("the info tool stays selected and opens Morelord Modules only when a GM clicks it", async () => {
+  const registry = createToolsRegistry();
+  registry.api.register({ id: "morelord-craftworks", title: "Craftworks", icon: "fa-solid fa-hammer", onClick() {} });
+  const control = registry.buildSceneControl({});
+  const renders = [];
+  const instances = new Map();
+  modulesHost(renders, instances);
   try {
     control.tools.morelordHome.onChange({}, true);
     control.tools.morelordCraftworks.onChange({}, true);
     assert.equal(renders.length, 0);
     assert.equal(control.activeTool, "morelordHome");
     assert.equal(control.tools.morelordHome.button, undefined);
+    assert.equal(control.tools.morelordHome.visible, true);
     const listeners = [];
-    const button = { dataset: {}, addEventListener(_type, fn) { listeners.push(fn); } };
+    const button = { dataset: {}, removed: false, remove() { this.removed = true; }, addEventListener(_type, fn) { listeners.push(fn); } };
     const element = { querySelector: selector => selector === 'button[data-tool="morelordHome"]' ? button : null };
     bindMorelordModulesButton(null, element);
     bindMorelordModulesButton(null, element);
+    assert.equal(button.removed, false);
     assert.equal(listeners.length, 1);
     await listeners[0]();
     await listeners[0]();
@@ -151,6 +164,69 @@ test("the info tool stays selected and opens Morelord Modules only when clicked"
     assert.equal(context.modules.find(row => row.id === "morelord-downtime").state, "missing");
     await openMorelordModules();
     assert.equal(renders.length, 3);
+    globalThis.game.user.isGM = false;
+    await renders[0].render({ force: true });
+    assert.equal(renders.length, 3);
+    assert.equal(instances.has(MORELORD_MODULES_APP.id), false);
+  } finally {
+    delete globalThis.foundry;
+    delete globalThis.game;
+  }
+});
+
+test("players keep the module buttons and never see or open Morelord Modules", async () => {
+  const registry = createToolsRegistry();
+  const clicks = [];
+  registry.api.register({ id: "morelord-marketplace", title: "Marketplace", order: 1, onClick() { clicks.push("marketplace"); } });
+  registry.api.register({ id: "morelord-craftworks", title: "Craftworks", order: 90, onClick() { clicks.push("craftworks"); } });
+  registry.api.register({ id: "morelord-downtime", title: "Downtime", order: 70, onClick() { clicks.push("downtime"); } });
+  const renders = [];
+  const instances = new Map();
+  modulesHost(renders, instances);
+  globalThis.game.user.isGM = false;
+  try {
+    assert.equal(morelordUserIsGM(), false);
+    const control = registry.buildSceneControl({});
+    assert.equal(control.visible, true);
+    assert.equal(control.activeTool, "morelordHome");
+    assert.equal(control.tools.morelordHome.button, undefined);
+    assert.equal(control.tools.morelordHome.visible, true);
+    const buttons = Object.values(control.tools).filter(entry => entry.button).sort((a, b) => a.order - b.order);
+    assert.deepEqual(buttons.map(entry => entry.title), ["Craftworks", "Downtime", "Marketplace"]);
+    control.tools.morelordHome.onChange({}, true);
+    control.tools.morelordHome.onChange({}, false);
+    assert.deepEqual(clicks, []);
+    control.tools.morelordCraftworks.onChange({}, true);
+    assert.equal(control.activeTool, "morelordHome");
+    assert.deepEqual(clicks, ["craftworks"]);
+    const removed = [];
+    const button = {
+      dataset: {},
+      closest(selector) { return selector === "li" ? row : null; },
+      addEventListener() { throw new Error("players must not bind the info button"); }
+    };
+    const row = { remove() { removed.push(row); } };
+    const element = { querySelector: selector => selector === 'button[data-tool="morelordHome"]' ? button : null };
+    bindMorelordModulesButton(null, element);
+    assert.deepEqual(removed, [row]);
+    const craftworks = { dataset: { tool: "morelordCraftworks" }, remove() { removed.push("craftworks"); } };
+    const playerTools = {
+      querySelector(selector) {
+        if (selector === 'button[data-tool="morelordHome"]') return null;
+        if (selector === 'button[data-tool="morelordCraftworks"]') return craftworks;
+        return null;
+      }
+    };
+    bindMorelordModulesButton(null, playerTools);
+    assert.equal(removed.includes("craftworks"), false);
+    instances.set(MORELORD_MODULES_APP.id, { render() { renders.push("player"); }, close() { instances.delete(MORELORD_MODULES_APP.id); } });
+    await openMorelordModules();
+    assert.equal(renders.includes("player"), false);
+    assert.equal(instances.has(MORELORD_MODULES_APP.id), false);
+    delete globalThis.game.user;
+    assert.equal(morelordUserIsGM(), false);
+    await openMorelordModules();
+    assert.equal(renders.length, 0);
   } finally {
     delete globalThis.foundry;
     delete globalThis.game;

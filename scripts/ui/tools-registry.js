@@ -109,7 +109,8 @@ export function createToolsRegistry() {
    * hidden tool is deleted, and a button cannot be active: selecting the
    * control would run it. v14 selects the first tool when activeTool is
    * omitted (issue 12966), which would open that module. This entry stays
-   * selected. Its onChange stays empty so the crown does not open a window.
+   * selected for GMs and players. Its onChange stays empty so the crown does
+   * not open a window. Players do not see the rendered button.
    */
   function buildSceneControl(controls = {}) {
     const entries = visibleTools();

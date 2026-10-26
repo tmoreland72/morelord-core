@@ -133,6 +133,11 @@ function modulesApp() {
       content: { template: MORELORD_MODULES_APP.template }
     };
 
+    render(options) {
+      if (!morelordUserIsGM()) return Promise.resolve(this.close?.());
+      return super.render(options);
+    }
+
     async _prepareContext() {
       return morelordModulesContext(globalThis.game?.modules, globalThis.game?.i18n);
     }
@@ -145,16 +150,44 @@ function notify(error) {
   globalThis.ui?.notifications?.error?.(message);
 }
 
+/** Assistant GMs count as GMs. Everyone else is refused, including a missing user. */
+export function morelordUserIsGM(user = globalThis.game?.user) {
+  return user?.isGM === true;
+}
+
+function existingModulesApp() {
+  return globalThis.foundry?.applications?.instances?.get?.(MORELORD_MODULES_APP.id);
+}
+
 export function openMorelordModules() {
+  if (!morelordUserIsGM()) {
+    const existing = existingModulesApp();
+    return Promise.resolve(existing?.close?.());
+  }
   try {
     const App = modulesApp();
-    const existing = globalThis.foundry?.applications?.instances?.get?.(MORELORD_MODULES_APP.id);
+    const existing = existingModulesApp();
     const app = existing?.render ? existing : new App();
     return Promise.resolve(app.render({ force: true })).catch(notify);
   } catch (error) {
     notify(error);
     return Promise.resolve();
   }
+}
+
+/**
+ * Players never see the info button. The tool stays in the control data:
+ * v13.351 deletes `visible: false` tools, then `#onChange` throws
+ * `toolOrControl is undefined` when the control changes (issue 12966, not
+ * backported). A button cannot be `activeTool`; selecting the control would
+ * run it. v14.349 leaves `activeTool` optional and, when it is omitted,
+ * activates the first tool if any tool exists (issue 12966). Removing only
+ * the rendered button keeps the non-button active tool, so the crown does
+ * not open a module and a `button: true` tool leaves Morelord Tools selected.
+ */
+function hideModulesButton(button) {
+  const row = typeof button.closest === "function" ? button.closest("li") : null;
+  (row ?? button).remove?.();
 }
 
 export function bindMorelordModulesButton(application, element) {
@@ -164,6 +197,10 @@ export function bindMorelordModulesButton(application, element) {
   for (const root of roots) {
     const button = root.querySelector('button[data-tool="morelordHome"]');
     if (!button) continue;
+    if (!morelordUserIsGM()) {
+      hideModulesButton(button);
+      return;
+    }
     if (button.dataset.mlModulesBound !== "bound") {
       button.dataset.mlModulesBound = "bound";
       button.addEventListener("click", () => openMorelordModules());
