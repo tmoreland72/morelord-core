@@ -62,3 +62,21 @@
   .ml-location-manager__capability { grid-template-columns: 1fr 1fr; }
   .ml-location-manager__capability button { justify-self: end; }
 }
+
+/* Foundry ships the Sharp webfont but its Font Awesome CSS never loads it, so .fa-sharp falls back to Classic. */
+@font-face {
+  font-family: "Font Awesome 7 Sharp";
+  font-style: normal;
+  font-weight: 900;
+  font-display: block;
+  src: url("/fonts/fontawesome/webfonts/fa-sharp-solid-900.woff2") format("woff2");
+}
+
+.fa-sharp.fa-solid {
+  --fa-family-sharp: "Font Awesome 7 Sharp";
+  --fa-family: var(--fa-family-sharp);
+  --_fa-family: var(--fa-family);
+  --fa-style: 900;
+  font-family: var(--_fa-family);
+  font-weight: var(--fa-style, 900);
+}

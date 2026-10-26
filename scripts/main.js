@@ -29,6 +29,7 @@ import { DocumentationApp } from "./documentation/documentation-app.js";
 import { canUseActorInventory, listCharacterActors, listCharacterChoices, participantRecords, primaryPartyGroup, selectedCharacterUuids } from "./ui/actor-participation.js";
 import { actorSkillModifier, extractNaturalD20, rollSkill } from "./services/skill-roll-service.js";
 import { SUBSCRIPTION_TIERS, normalizeSubscriptionTier, capSubscriptionTier, applySubscriptionTesting } from "./services/subscription-testing.js";
+import { createToolsRegistry, mergeCoreApi } from "./ui/tools-registry.js";
 
 const MODULE_ID = "morelord-core";
 registerDirectorySelection();
@@ -48,6 +49,14 @@ const windowGeometry = new WindowGeometryService({ moduleId: MODULE_ID, settingK
 const capabilityRegistry = new CapabilityRegistry();
 const locationService = new LocationService({ moduleId: MODULE_ID, settingKey: "locations" });
 const documentationService = new DocumentationService();
+const toolsRegistry = createToolsRegistry();
+Hooks.on("getSceneControlButtons", controls => {
+  if (!controls) return;
+  controls.morelord = toolsRegistry.buildSceneControl(controls);
+});
+for (const hookName of ["morelordCoreEntitlementsUpdated", "userConnected", "updateUser"]) {
+  Hooks.on(hookName, () => toolsRegistry.api.refresh());
+}
 DocumentationApp.configure(documentationService);
 LocationManagerApp.configure({ locationService, capabilityRegistry });
 const PRODUCT_SLUG = "morelord-core";
@@ -538,6 +547,12 @@ class MorelordDiscordApp extends ApplicationV2 {
 }
 
 Hooks.once("init", () => {
+  const coreModule = game.modules.get(MODULE_ID);
+  if (coreModule) {
+    const api = coreModule.api ??= {};
+    api.tools ??= toolsRegistry.api;
+    globalThis.MorelordCore = api;
+  }
   registerTokenDistance();
   registerReactionTracker();
   game.settings.register(MODULE_ID, "compendiumOrganization", {scope:"world", config:false, type:Object, default:{}});
@@ -637,8 +652,14 @@ Hooks.once("init", () => {
   });
 });
 
+Hooks.once("setup", () => {
+  const tools = game.modules.get(MODULE_ID)?.api?.tools ?? toolsRegistry.api;
+  Hooks.callAll("morelord-core.registerTools", tools);
+});
+
 Hooks.once("ready", async () => {
-  const api = {
+  const api = game.modules.get(MODULE_ID).api ??= {};
+  mergeCoreApi(api, {
     compendiums: Object.freeze({organize: organizeCompendiums, labels: labelCompendiums}),
     telemetry,
     chatRequests,
@@ -700,8 +721,9 @@ Hooks.once("ready", async () => {
       evaluateRequirements,
       open: options => new LocationManagerApp(options).render({ force: true })
     }),
-    openLocations: options => new LocationManagerApp(options).render({ force: true })
-  };
+    openLocations: options => new LocationManagerApp(options).render({ force: true }),
+    tools: toolsRegistry.api
+  });
   game.modules.get(MODULE_ID).api = api;
   globalThis.MorelordCore = api;
   telemetry.start();

@@ -51,6 +51,12 @@ Select exactly one token, then hover over another visible token to see distance 
 
 While **Reaction Used** is checked, a creature in a started combat that uses such an activity is marked on its token. In the right-click token HUD status effects the status is labeled **Reaction**, so the name fits the grid. Anyone allowed to update that token can toggle **Reaction** there, including for an opportunity attack, a readied action, or a mark that should not stay on. The active GM removes the mark when that creature's turn starts. When the turn is a shared mob turn from Morelord Encounters, the active GM removes it from every token in that mob on the scene. When combat is deleted, ends, or the round returns to 0, the active GM removes it from tokens on that combat's scene. A player client, and a GM who is not the active GM, does not clear marks. Unchecking **Reaction Used** stops automatic marking and clearing. The status remains on the token HUD for manual use.
 
+### Morelord Tools
+
+**Morelord Tools** is a button on the left scene controls. Its icon is a sharp crown. It is shown to the current user only when at least one Morelord tool is visible to that user, and it is hidden when none are. Players and GMs use the same control. Choosing **Morelord Tools** opens its tool palette and leaves **Morelord Tools** selected. Choosing a tool runs that tool and does not switch the scene controls back to Tokens.
+
+The info entry in the palette is also labeled **Morelord Tools**. It stays selected and does not open a window. Core does not put **Connect or Manage Account** or the Game Master tray in this palette. The entries come from the other Morelord modules. There is no Game Settings field for this control, and it does not require a Morelord account.
+
 ## Requirements
 
 - Foundry Virtual Tabletop 13 or later, within the installed manifest's supported range. The reviewed manifest records 14.368 as verified; this guide does not establish additional version testing.
