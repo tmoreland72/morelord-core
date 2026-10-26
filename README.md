@@ -99,7 +99,7 @@ A GM also sees **Run on load for everyone**. Choosing it again shows **Running o
 
 Core runs the marked macros once in the `ready` hook. A macro marked both ways runs once. A macro the user cannot see, or cannot execute, is skipped. One macro that throws does not stop the others; the failure is written to the console.
 
-A slot that runs on load shows a marker on its right edge. **Runs on load for you** is a user icon in the info color. **Runs on load for everyone** is a group icon in the accent color. Both markers show when both choices are on. They are drawn again whenever the hotbar renders, including after either choice changes.
+A slot that runs on load shows a marker on its right edge. **Runs on load for you** is a blue user icon. **Runs on load for everyone** is a gold group icon. Each icon is 14px on a small dark pad so it stays visible on the macro image. Both markers show when both choices are on. They are drawn again whenever the hotbar renders, including after either choice changes.
 
 ## Discord community
 

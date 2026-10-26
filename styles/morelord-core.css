@@ -83,6 +83,8 @@
 
 #hotbar .slot.ml-core-hotbar-marked { position: relative; }
 #hotbar .ml-core-hotbar-runs {
+  --ml-color-info: var(--color-level-info, #6997dc);
+  --ml-color-accent: var(--color-warm-1, #d6a34a);
   position: absolute;
   z-index: 2;
   inset-inline-end: 2px;
@@ -91,11 +93,18 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1px;
+  gap: 2px;
   pointer-events: none;
-  font-size: 10px;
   line-height: 1;
 }
-#hotbar .ml-core-hotbar-run { pointer-events: auto; }
+#hotbar .ml-core-hotbar-run {
+  pointer-events: auto;
+  padding: 1px;
+  border-radius: 3px;
+  background: rgb(0 0 0 / 62%);
+  font-size: 14px;
+  line-height: 1;
+  text-shadow: 0 1px 1px rgb(0 0 0 / 85%);
+}
 #hotbar .ml-core-hotbar-run[data-scope="user"] { color: var(--ml-color-info); }
 #hotbar .ml-core-hotbar-run[data-scope="world"] { color: var(--ml-color-accent); }

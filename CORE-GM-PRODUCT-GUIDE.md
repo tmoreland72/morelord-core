@@ -65,7 +65,7 @@ A GM also sees **Run on load for everyone**. The entry then reads **Running on l
 
 The macros run once when the world finishes loading. A macro marked for the user and for everyone runs once. Core skips a macro the user cannot see or cannot execute. If one macro fails, the others still run, and the failure is recorded in the browser console.
 
-While a mark is on, the hotbar slot shows a small icon on its right side. The user mark is a single-person icon in the info color, and its tooltip is **Runs on load for you**. The everyone mark is a group icon in the accent color, and its tooltip is **Runs on load for everyone**. Both icons show when both marks are on. There is no Game Settings field for this, and it does not require a Morelord account.
+While a mark is on, the hotbar slot shows an icon on its right side. The user mark is a blue single-person icon, and its tooltip is **Runs on load for you**. The everyone mark is a gold group icon, and its tooltip is **Runs on load for everyone**. Each icon is 14px and sits on a small dark pad so it stays visible on the macro image. Both icons show when both marks are on. There is no Game Settings field for this, and it does not require a Morelord account.
 
 ## Requirements
 

@@ -304,6 +304,23 @@ test("slot markers use different icons, colors, and tooltips and clear when the 
   }
 });
 
+test("hotbar indicators own distinct palette colors, a 14px size, and a dark pad", () => {
+  const css = readFileSync(new URL("../styles/morelord-core.css", import.meta.url), "utf8");
+  const containerStart = css.indexOf("#hotbar .ml-core-hotbar-runs");
+  const iconStart = css.indexOf("#hotbar .ml-core-hotbar-run {");
+  assert.ok(containerStart >= 0 && iconStart > containerStart);
+  const container = css.slice(containerStart, iconStart);
+  const icons = css.slice(iconStart);
+  assert.match(container, /--ml-color-info:\s*var\(--color-level-info,\s*#6997dc\)/);
+  assert.match(container, /--ml-color-accent:\s*var\(--color-warm-1,\s*#d6a34a\)/);
+  assert.match(container, /inset-inline-end:\s*2px/);
+  assert.match(icons, /font-size:\s*14px/);
+  assert.match(icons, /background:\s*rgb\(0 0 0 \/ 62%\)/);
+  assert.match(icons, /text-shadow:\s*0 1px 1px rgb\(0 0 0 \/ 85%\)/);
+  assert.match(icons, /\[data-scope="user"\]\s*\{[^}]*color:\s*var\(--ml-color-info\)/);
+  assert.match(icons, /\[data-scope="world"\]\s*\{[^}]*color:\s*var\(--ml-color-accent\)/);
+});
+
 test("registration listens for the hotbar menu and render hooks", () => {
   const hooks = [];
   const hooksApi = { on(name) { hooks.push(name); } };
