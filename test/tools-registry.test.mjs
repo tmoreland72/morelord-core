@@ -28,16 +28,16 @@ test("registry orders tools, hides invisible ones, and replaces the same id", ()
   registry.api.register(tool("morelord-craftworks", { title: "Alpha", order: 20 }));
   registry.api.register(tool("morelord-beta", { title: "Beta", order: 20 }));
   assert.deepEqual(registry.api.list().map(entry => [entry.id, entry.title]), [
-    ["morelord-journeys", "Morelord Journeys"],
     ["morelord-craftworks", "Alpha"],
     ["morelord-beta", "Beta"],
-    ["morelord-downtime", "Morelord Downtime"]
+    ["morelord-downtime", "Morelord Downtime"],
+    ["morelord-journeys", "Morelord Journeys"]
   ]);
   craftworksVisible = false;
   registry.api.register(tool("morelord-craftworks", { title: "Alpha", order: 20, visible: () => craftworksVisible }));
-  assert.deepEqual(registry.api.list().map(entry => entry.title), ["Morelord Journeys", "Beta", "Morelord Downtime"]);
+  assert.deepEqual(registry.api.list().map(entry => entry.title), ["Beta", "Morelord Downtime", "Morelord Journeys"]);
   assert.equal(registry.api.unregister("morelord-downtime"), true);
-  assert.deepEqual(registry.api.list().map(entry => entry.id), ["morelord-journeys", "morelord-beta"]);
+  assert.deepEqual(registry.api.list().map(entry => entry.id), ["morelord-beta", "morelord-journeys"]);
   assert.equal(registry.api.unregister("missing"), false);
 });
 
@@ -66,6 +66,78 @@ test("tool clicks call onClick, isolate errors, and leave the active control alo
   delete globalThis.ui;
 });
 
+test("palette titles sort alphabetically regardless of registered order", () => {
+  const registry = createToolsRegistry();
+  globalThis.game = {
+    i18n: {
+      lang: "en",
+      localize(key) { return key === "TOOL.Shops" ? "Manage Shops" : key; }
+    }
+  };
+  try {
+    for (const [id, title, order] of [
+      ["morelord-marketplace", "Marketplace", 1],
+      ["morelord-craftworks", "Craftworks", 90],
+      ["morelord-journeys", "Journeys", 2],
+      ["morelord-shops", "TOOL.Shops", 3],
+      ["morelord-encounters", "encounters", 80],
+      ["morelord-downtime", "Downtime", 70],
+      ["zeta-same", "Same", 1],
+      ["alpha-same", "same", 100]
+    ]) registry.api.register(tool(id, { title, order }));
+    const control = registry.buildSceneControl({});
+    const buttons = Object.values(control.tools).filter(entry => entry.button).sort((a, b) => a.order - b.order);
+    assert.deepEqual(buttons.map(entry => entry.title), [
+      "Craftworks", "Downtime", "encounters", "Journeys", "TOOL.Shops", "Marketplace", "same", "Same"
+    ]);
+    assert.deepEqual(buttons.map(entry => entry.order), [1, 2, 3, 4, 5, 6, 7, 8]);
+    assert.deepEqual(registry.api.list().map(entry => entry.id), [
+      "morelord-craftworks", "morelord-downtime", "morelord-encounters", "morelord-journeys",
+      "morelord-shops", "morelord-marketplace", "alpha-same", "zeta-same"
+    ]);
+    assert.equal(control.activeTool, "morelordHome");
+    assert.equal(control.tools.morelordHome.order, 0);
+    assert.equal(control.tools.morelordHome.button, undefined);
+    assert.equal(control.tools.morelordHome.visible, true);
+  } finally {
+    delete globalThis.game;
+  }
+});
+
+test("a leading Morelord prefix is ignored when sorting and the labels stay unchanged", () => {
+  const registry = createToolsRegistry();
+  globalThis.game = { i18n: { lang: "en", localize(key) { return key; } } };
+  try {
+    for (const [id, title, order] of [
+      ["morelord-marketplace", "Morelord Marketplace", 1],
+      ["morelord-shops", "Manage Marketplace Shops", 2],
+      ["morelord-journeys", "Morelord Journeys", 40],
+      ["morelord-encounters", "Morelord Encounters", 90],
+      ["morelord-downtime", "Morelord Downtime", 3],
+      ["morelord-craftworks", "Morelord Craftworks", 80]
+    ]) registry.api.register(tool(id, { title, order }));
+    const control = registry.buildSceneControl({});
+    const buttons = Object.values(control.tools).filter(entry => entry.button).sort((a, b) => a.order - b.order);
+    assert.deepEqual(buttons.map(entry => entry.title), [
+      "Morelord Craftworks",
+      "Morelord Downtime",
+      "Morelord Encounters",
+      "Morelord Journeys",
+      "Manage Marketplace Shops",
+      "Morelord Marketplace"
+    ]);
+    assert.deepEqual(registry.api.list().map(entry => entry.title), buttons.map(entry => entry.title));
+    assert.deepEqual(buttons.map(entry => entry.order), [1, 2, 3, 4, 5, 6]);
+    const prefixed = createToolsRegistry();
+    prefixed.api.register(tool("morelord-zebra", { title: "morelord Zebra", order: 1 }));
+    prefixed.api.register(tool("morelord-apple", { title: "MORELORD Apple", order: 9 }));
+    const prefixedButtons = Object.values(prefixed.buildSceneControl({}).tools).filter(entry => entry.button).sort((a, b) => a.order - b.order);
+    assert.deepEqual(prefixedButtons.map(entry => entry.title), ["MORELORD Apple", "morelord Zebra"]);
+  } finally {
+    delete globalThis.game;
+  }
+});
+
 test("scene control is built from visible tools and keeps a non-button active tool", () => {
   const registry = createToolsRegistry();
   registry.api.register(tool("morelord-craftworks", { title: "Morelord Craftworks", icon: "fa-solid fa-hammer", order: 30 }));
@@ -79,6 +151,7 @@ test("scene control is built from visible tools and keeps a non-button active to
   assert.equal(control.visible, true);
   assert.equal(control.activeTool, "morelordHome");
   assert.equal(control.tools.morelordHome.name, "morelordHome");
+  assert.equal(control.tools.morelordHome.title, "morelord-core.modules.title");
   assert.equal(control.tools.morelordHome.button, undefined);
   assert.equal(control.tools.morelordHome.visible, true);
   assert.equal(control.tools.morelordCraftworks.name, "morelordCraftworks");
@@ -143,6 +216,7 @@ test("init publishes tools and ready merges them into that same api object", () 
   assert.match(main, /globalThis\.MorelordCore = api/);
   assert.match(main, /Hooks\.callAll\("morelord-core\.registerTools", tools\)/);
   assert.match(main, /controls\.morelord = toolsRegistry\.buildSceneControl\(controls\)/);
+  assert.match(main, /renderSceneControls", \(application, element\) => bindMorelordModulesButton\(application, element\)/);
   assert.match(main, /mergeCoreApi\(api, \{/);
   assert.doesNotMatch(main, /const api = \{/);
 });

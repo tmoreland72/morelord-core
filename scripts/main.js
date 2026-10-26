@@ -30,6 +30,7 @@ import { canUseActorInventory, listCharacterActors, listCharacterChoices, partic
 import { actorSkillModifier, extractNaturalD20, rollSkill } from "./services/skill-roll-service.js";
 import { SUBSCRIPTION_TIERS, normalizeSubscriptionTier, capSubscriptionTier, applySubscriptionTesting } from "./services/subscription-testing.js";
 import { createToolsRegistry, mergeCoreApi } from "./ui/tools-registry.js";
+import { bindMorelordModulesButton } from "./ui/morelord-modules.js";
 
 const MODULE_ID = "morelord-core";
 registerDirectorySelection();
@@ -54,6 +55,7 @@ Hooks.on("getSceneControlButtons", controls => {
   if (!controls) return;
   controls.morelord = toolsRegistry.buildSceneControl(controls);
 });
+Hooks.on("renderSceneControls", (application, element) => bindMorelordModulesButton(application, element));
 for (const hookName of ["morelordCoreEntitlementsUpdated", "userConnected", "updateUser"]) {
   Hooks.on(hookName, () => toolsRegistry.api.refresh());
 }

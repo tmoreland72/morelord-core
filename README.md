@@ -69,24 +69,27 @@ Hooks.once("morelord-core.registerTools", tools => {
     id: "morelord-craftworks",
     title: "Morelord Craftworks",
     icon: "fa-solid fa-hammer",
-    order: 30,
     visible: () => true,
     onClick: () => {}
   });
 });
 ```
 
-`id` is unique. Registering the same id again replaces that tool. The scene-control key is the camel-case id, so `morelord-craftworks` remains `morelordCraftworks`. `morelordHome` is reserved.
+`id` is unique. Registering the same id again replaces that tool. The scene-control key is the camel-case id, so `morelord-craftworks` remains `morelordCraftworks`. `morelordHome` is reserved for the **Morelord Modules** entry.
 
-`title` is the palette label, or an i18n key. `icon` is the Font Awesome class string. `order` sorts the palette, and equal orders use the title. The shared order is Journeys 10, Encounters 20, Craftworks 30, Downtime 40, Marketplace 50, and Shop Manager 51.
+`title` is the palette label, or an i18n key. `icon` is the Font Awesome class string. `order` is accepted and ignored. Core sorts the visible tools by the localized title, without regard to case, and ignores a leading `Morelord ` when comparing. The button still shows the registered title. Equal titles then use the id. The titles Morelord Craftworks, Morelord Downtime, Morelord Encounters, Morelord Journeys, Manage Marketplace Shops, and Morelord Marketplace therefore appear in that order.
 
 `visible` runs every time the controls are built. Return false to hide that tool from the current user. When none of the tools are visible, the **Morelord Tools** control is hidden.
 
 `onClick` is called from the tool's `onChange`. Each registered tool is `button: true`. Core catches a thrown error or a rejected promise and shows `error.message` with `ui.notifications.error`. The click does not change the active scene control.
 
-`unregister(id)` removes a tool. `list()` returns the tools visible to the current user, sorted by order then title, as `{id, title, icon, order}`. `refresh()` rebuilds the scene controls with `{controls: true, reset: true}` after a short debounce, and only once the controls are already rendered. Entitlement updates, `userConnected`, and user changes call `refresh()` so visibility follows the current user.
+`unregister(id)` removes a tool. `list()` returns the tools visible to the current user in that alphabetical order, as `{id, title, icon, order}`. The returned `order` is the value the module passed and does not change the palette. `refresh()` rebuilds the scene controls with `{controls: true, reset: true}` after a short debounce, and only once the controls are already rendered. Entitlement updates, `userConnected`, and user changes call `refresh()` so visibility follows the current user.
 
-Foundry v14 treats `SceneControl.activeTool` as optional and otherwise selects the first tool. A button cannot be the active tool, and a tool with `visible: false` is not kept, so the control sets `activeTool` to `morelordHome`. That tool is labeled **Morelord Tools**, uses an info icon, and does not open a window. It stays selected while the module buttons run.
+The first palette entry is **Morelord Modules**. It uses an info icon and stays selected. Only a GM sees that button. Choosing it opens the **Morelord Modules** window. A player does not see the button, and opening the window for a player does nothing, including a call through `openMorelordModules`. Players still see the other tools in the column, such as **Morelord Craftworks**, **Morelord Downtime**, and **Morelord Marketplace**. Choosing the crown does not open that window or a module tool. The window says "Each module shows whether it is active, installed but inactive, or not installed in this world." It lists Core, Journeys, Encounters, Character Export, Craftworks, Marketplace, Downtime, and Game Master. Each row has the module icon, its name, the one-line description from that module's manifest, and a status: **Active**, **Installed but inactive**, or **Not installed**. **Documentation** opens `https://morelordgaming.com/docs`. **Not installed** rows also include **Learn more**, which opens that module's tools page in a new tab. The address is `https://morelordgaming.com/tools/<id>`. Game Master has no tools page and no Foundry package listing, so **Learn more** opens `https://github.com/tmoreland72/morelord-game-master`.
+
+The **Support** section has **Get support**, **Morelord Gaming**, and **YouTube**. **Get support** opens the Discord invite published by the website, `https://discord.gg/B5YKQf579E`. **Morelord Gaming** opens `https://morelordgaming.com`. **YouTube** opens `https://www.youtube.com/@MorelordGaming`. Every documentation, website, Discord, and YouTube address adds `utm_source=foundry`, `utm_medium=morelord_tools`, and `utm_campaign` set to the module id, or to `docs`, `support`, `website`, or `youtube`. The Discord invite still resolves with those parameters, so they stay on that link.
+
+That entry has to stay in the control data for players as well. Foundry 13 requires a visible tool that is not a button as `SceneControl.activeTool`. In v13.351, omitting it makes `SceneControls.#onChange` throw `toolOrControl is undefined` when the control changes, and a tool with `visible: false` is removed before it can stay active. A button cannot be the active tool: selecting the control runs that tool and would open its window. Foundry 14 makes `activeTool` optional, then selects the first tool when any tool exists (issue 12966, release 14.349). With only module buttons, that would open the first tool. Core therefore keeps the non-button entry for every user and removes its rendered button unless `game.user.isGM` is true. Module tools stay `button: true`, so choosing one leaves **Morelord Tools** selected.
 
 ## Discord community
 

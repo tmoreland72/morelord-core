@@ -1,3 +1,5 @@
+import { MORELORD_MODULES_HOME_TITLE } from "./morelord-modules.js";
+
 const HOME_TOOL = "morelordHome";
 const CONTROL_ICON = "fa-sharp fa-solid fa-user-crown";
 const REFRESH_DELAY_MS = 50;
@@ -44,10 +46,29 @@ export function createToolsRegistry() {
     }
   }
 
+  function localizedTitle(title) {
+    const text = String(title ?? "");
+    try {
+      const localized = globalThis.game?.i18n?.localize?.(text);
+      return localized == null || localized === "" ? text : String(localized);
+    } catch {
+      return text;
+    }
+  }
+
+  /** Compare without a leading "Morelord ". The palette label stays the registered title. */
+  function sortTitle(title) {
+    return localizedTitle(title).replace(/^morelord /i, "");
+  }
+
+  function compareTools(a, b) {
+    const locale = globalThis.game?.i18n?.lang || undefined;
+    const byTitle = sortTitle(a.title).localeCompare(sortTitle(b.title), locale, { sensitivity: "base" });
+    return byTitle || String(a.id).localeCompare(String(b.id), locale, { sensitivity: "base" });
+  }
+
   function visibleTools() {
-    return [...tools.values()]
-      .filter(shown)
-      .sort((a, b) => a.order - b.order || a.title.localeCompare(b.title));
+    return [...tools.values()].filter(shown).sort(compareTools);
   }
 
   function refresh() {
@@ -88,29 +109,33 @@ export function createToolsRegistry() {
   }
 
   /**
-   * v14 SceneControl.activeTool is optional. If it is omitted, Foundry selects the
-   * first tool. A button cannot be that tool, and a hidden tool is removed, so
-   * morelordHome stays available and selected. Clicks do not return to Tokens.
+   * Foundry 13 requires a visible non-button activeTool (scene-controls.mjs,
+   * v13.351). Omitting it makes #onChange throw when the control changes, a
+   * hidden tool is deleted, and a button cannot be active: selecting the
+   * control would run it. v14 selects the first tool when activeTool is
+   * omitted (issue 12966), which would open that module. This entry stays
+   * selected for GMs and players. Its onChange stays empty so the crown does
+   * not open a window. Players do not see the rendered button.
    */
   function buildSceneControl(controls = {}) {
     const entries = visibleTools();
     const palette = {
       [HOME_TOOL]: {
         name: HOME_TOOL,
-        title: "Morelord Tools",
+        title: MORELORD_MODULES_HOME_TITLE,
         icon: "fa-solid fa-circle-info",
         order: 0,
         visible: true,
         onChange() {}
       }
     };
-    for (const tool of entries) {
+    for (const [index, tool] of entries.entries()) {
       const name = sceneControlKey(tool.id);
       palette[name] = {
         name,
         title: tool.title,
         icon: tool.icon,
-        order: tool.order,
+        order: index + 1,
         button: true,
         visible: true,
         onChange(event) { runClick(tool, event); }
