@@ -557,7 +557,7 @@ Hooks.once("init", () => {
   }
   registerTokenDistance();
   registerReactionTracker();
-  game.settings.register(MODULE_ID, "compendiumOrganization", {scope:"world", config:false, type:Object, default:{}});
+  game.settings.register(MODULE_ID, "compendiumOrganization", {scope:"world", config:false, type:Object, default:{}, restricted:true});
   telemetry.registerSettings();
   for (const [key, type, defaultValue] of [
     [SETTINGS.DEVELOPER_MODE, Boolean, false],

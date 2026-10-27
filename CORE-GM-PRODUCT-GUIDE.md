@@ -12,7 +12,7 @@ Reviewed against local Core 0.3.13 on September 23, 2026. This implementation re
 
 Recording check: the public Core 0.3.13 package installed from Foundry's catalog does not include the one-time reporting notice described below from the development worktree. In that package, open **Connect or Manage Account → Core Settings** to choose reporting preferences directly. The video documentation must follow the installed package's actual controls.
 
-This guide is for Game Masters. Players can change their own **Token Distance Indicator** preference in Module Settings; they do not need to configure account access. **Reaction Used** is a world setting changed by a GM.
+This guide is for Game Masters. **Token Distance Indicator** and **Reaction Used** are world settings changed by a GM. Players do not need to configure account access.
 
 ## What Morelord Core Does
 
@@ -41,7 +41,7 @@ For example, search the Actors directory for a batch's common name, choose **Sel
 
 ### Token Distance Indicator
 
-**Token Distance Indicator** accepts checked (enabled) or unchecked (disabled), defaults to checked, and applies only to the current user's client. Choose **Save Core Settings** to apply it in **Connect or Manage Account → Core Settings**, or change the same checkbox directly in **Game Settings → Configure Settings → Morelord Core**. Players use that settings checkbox. No account connection or premium access is required. Disable it when using another distance indicator such as TheRipper's Hover Distance to avoid duplicate displays.
+**Token Distance Indicator** accepts checked (enabled) or unchecked (disabled), defaults to checked, and applies to every client in the world. Only a GM can change it. Choose **Save Core Settings** to apply it in **Connect or Manage Account → Core Settings**, or change the same checkbox directly in **Game Settings → Configure Settings → Morelord Core**. Players do not see that checkbox. No account connection or premium access is required. A world that has never saved the checkbox takes the previous per-client choice from the first GM who loads it, including off. When that GM had not saved a per-client choice, the world stays checked. Disable it when using another distance indicator such as TheRipper's Hover Distance to avoid duplicate displays.
 
 Select exactly one token, then hover over another visible token to see distance between their nearest occupied spaces using native grid/diagonal rules. Adjacent tokens show 5 ft on feet-based scenes, and distances round up to 5-unit intervals in the scene's units. Token size does not add extra center-to-center distance. Gridless scenes measure nearest footprint edges with a half-space allowance for adjacency. Players can instead hover without selecting: Core uses their assigned character's token if exactly one owned, visible token exists. Multiple selections, ambiguous character tokens, and hovering the source itself show nothing. The indicator measures flat map distance without elevation, walls, reach, or movement costs; it never exposes hidden or unseen tokens to players.
 
@@ -171,7 +171,7 @@ Disconnecting clears the account token, installation reference, connection label
 
 ## Core Settings and Reporting Preferences
 
-**Token Distance Indicator** and **Reaction Used** are documented above under What Morelord Core Does. Change either checkbox here with **Save Core Settings**, or in **Game Settings → Configure Settings → Morelord Core**. **Token Distance Indicator** applies only to the current user, including players. **Reaction Used** is a world setting changed by a GM.
+**Token Distance Indicator** and **Reaction Used** are documented above under What Morelord Core Does. Change either checkbox here with **Save Core Settings**, or in **Game Settings → Configure Settings → Morelord Core**. Both apply to the whole world, and only a GM can change them.
 
 Open **Connect or Manage Account**, then scroll to **Core Settings**. These controls are available without connecting an account. Use **Save Core Settings** to apply changes.
 

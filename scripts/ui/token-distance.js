@@ -1,4 +1,6 @@
 const MODULE_ID = 'morelord-core';
+const TOKEN_DISTANCE_KEY = 'tokenDistanceIndicator';
+const TOKEN_DISTANCE_ID = `${MODULE_ID}.${TOKEN_DISTANCE_KEY}`;
 
 export function distanceSource(user, tokens) {
   const controlled = tokens.filter(token => token.controlled);
@@ -40,7 +42,70 @@ export function tokenDistance(source, target, grid, user) {
   return Number.isFinite(distance) ? Math.max(5, Math.ceil((distance - 1e-8) / 5) * 5) : null;
 }
 
-/** Client-only canvas readout; uses native measurement and Core's window/badge surfaces. */
+function readStoredBoolean(storage) {
+  let raw;
+  try { raw = storage?.getItem?.(TOKEN_DISTANCE_ID); }
+  catch { return {stored: false}; }
+  if (raw == null) return {stored: false};
+  try {
+    const value = JSON.parse(raw);
+    return typeof value === 'boolean' ? {stored: true, value} : {stored: false};
+  } catch { return {stored: false}; }
+}
+
+/** Old per-client values live in localStorage, or on Foundry's client settings backend. */
+export function readLegacyClientTokenDistance(storage, clientBackend) {
+  const local = readStoredBoolean(storage);
+  if (local.stored) return local;
+  if (!clientBackend || clientBackend === storage) return {stored: false};
+  try {
+    const doc = clientBackend.getSetting?.(TOKEN_DISTANCE_ID);
+    if (doc && typeof doc.value === 'boolean') return {stored: true, value: doc.value};
+  } catch { /* Fall through to a storage-shaped backend. */ }
+  return readStoredBoolean(clientBackend);
+}
+
+export function tokenDistanceWorldStored(settings) {
+  const world = settings?.storage?.get?.('world');
+  if (!world) return false;
+  try {
+    if (typeof world.getSetting === 'function') return world.getSetting(TOKEN_DISTANCE_ID) != null;
+  } catch { /* Fall through to a key scan. Document id is not the setting key. */ }
+  const docs = typeof world.values === 'function' ? world.values() : world;
+  for (const doc of docs ?? []) if (doc?.key === TOKEN_DISTANCE_ID) return true;
+  return false;
+}
+
+/**
+ * The world has one GM choice. A GM records a previous client value, or the default on,
+ * the first time the world has no saved setting. Players never write it. A saved world
+ * value is left alone. Each browser then drops its old client value.
+ */
+export function tokenDistanceMigration({worldStored, legacy, isGM}) {
+  const clearLegacy = legacy?.stored === true;
+  if (worldStored || isGM !== true) return {write: false, clearLegacy};
+  if (legacy?.stored === true) return {write: true, value: legacy.value === true, clearLegacy};
+  return {write: true, value: true, clearLegacy: false};
+}
+
+export async function migrateTokenDistanceSetting(settings, {storage, clientBackend, isGM} = {}) {
+  const legacy = readLegacyClientTokenDistance(storage, clientBackend);
+  const decision = tokenDistanceMigration({
+    worldStored: tokenDistanceWorldStored(settings),
+    legacy,
+    isGM
+  });
+  if (decision.write) await settings.set(MODULE_ID, TOKEN_DISTANCE_KEY, decision.value);
+  if (decision.clearLegacy) {
+    try { storage?.removeItem?.(TOKEN_DISTANCE_ID); }
+    catch { /* The world value remains authoritative. */ }
+    try { clientBackend?.removeItem?.(TOKEN_DISTANCE_ID); }
+    catch { /* Same key, if the client backend is storage-shaped. */ }
+  }
+  return decision;
+}
+
+/** Canvas readout on every client. The GM's world choice turns it on or off for the table. */
 export function registerTokenDistance() {
   let target = null, readout = null;
   let pointer = {x: 0, y: 0};
@@ -62,9 +127,14 @@ export function registerTokenDistance() {
     readout.style.left = `${Math.max(0, Math.min(pointer.x + 16, innerWidth - readout.offsetWidth - 8))}px`;
     readout.style.top = `${Math.max(0, Math.min(pointer.y + 16, innerHeight - readout.offsetHeight - 8))}px`;
   };
-  game.settings.register(MODULE_ID, 'tokenDistanceIndicator', {
-    name: 'Token Distance Indicator', scope: 'client', config: true, type: Boolean, default: true,
-    hint: 'Hover to measure from your character or selected token; GMs select one token first. Uses nearest spaces in 5-unit steps. Disable when using Hover Distance.',
+  game.settings.register(MODULE_ID, TOKEN_DISTANCE_KEY, {
+    name: 'Token Distance Indicator',
+    hint: 'Hover to measure from your character or selected token; GMs select one token first. The GM choice applies to everyone. Uses nearest spaces in 5-unit steps. Disable when using Hover Distance.',
+    scope: 'world',
+    config: true,
+    type: Boolean,
+    default: true,
+    restricted: true,
     onChange: update
   });
   Hooks.on('hoverToken', (token, hovered) => {
@@ -75,7 +145,16 @@ export function registerTokenDistance() {
   for (const hook of ['controlToken', 'refreshToken', 'sightRefresh', 'canvasPan', 'updateUser', 'updateScene']) Hooks.on(hook, update);
   Hooks.on('deleteToken', document => { if (target?.document === document) target = null; update(); });
   Hooks.on('canvasTearDown', () => { target = null; clear(); });
-  Hooks.once('ready', () => {
+  Hooks.once('ready', async () => {
+    try {
+      await migrateTokenDistanceSetting(game.settings, {
+        storage: globalThis.localStorage,
+        clientBackend: game.settings?.storage?.get?.('client'),
+        isGM: game.user?.isGM === true
+      });
+    } catch (error) {
+      console.error(`${MODULE_ID} | Token Distance Indicator`, error);
+    }
     document.addEventListener('pointermove', event => { pointer = {x: event.clientX, y: event.clientY}; if (target) update(); });
     window.addEventListener('blur', () => { target = null; clear(); });
     window.addEventListener('resize', update);
