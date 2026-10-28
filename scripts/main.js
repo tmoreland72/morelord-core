@@ -21,6 +21,7 @@ import { renderPreservingScroll } from "./ui/scroll-preservation.js";
 import { applyPageLayout } from "./ui/page-layout.js";
 import { activateTabs } from "./ui/tabs.js";
 import { activateCardSelection } from "./ui/card-selection.js";
+import { sortable } from "./ui/sortable.js";
 import { activateCollapsibleSections, createCollapsibleSection } from "./ui/collapsible-section.js";
 import { actorIdentity, decorateActorSelect } from "./ui/actor-identity.js";
 import { createChoiceGroup } from './ui/choice-group.js';
@@ -720,6 +721,7 @@ Hooks.once("ready", async () => {
         open: id => documentationService.open(id)
       })
     }),
+    sortable,
     sources: publishedSources(),
     rolls: Object.freeze({ skill: rollSkill, skillModifier: actorSkillModifier, naturalD20: extractNaturalD20 }),
     socket: Object.freeze({
