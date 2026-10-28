@@ -1,4 +1,5 @@
 import { Dnd5eSourceFilterService } from "../services/dnd5e-source-filter-service.js";
+import { filterAllowed, isUuidAllowed, onConfigureSourcesChanged } from "../services/allowed-packs.js";
 import { resolvePackLabel } from "../services/source-book-service.js";
 import { itemRarity } from "../services/item-rarity.js";
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
@@ -19,8 +20,18 @@ export class ItemPickerApp extends HandlebarsApplicationMixin(ApplicationV2) {
     this.query = "";
     this.packId = "";
     this.results = [];
+    this.stopConfigureSourcesWatch = onConfigureSourcesChanged(() => {
+      this.results = filterAllowed(this.results);
+      if (this.rendered) void this.render({ force: true });
+    });
+  }
+  async close(options) {
+    this.stopConfigureSourcesWatch?.();
+    this.stopConfigureSourcesWatch = null;
+    return super.close(options);
   }
   async _prepareContext() {
+    this.results = filterAllowed(this.results);
     return { query: this.query, searched: this.query.length >= 2, results: this.results,
       packs: sources.enabledPacks({ documentName: "Item" }).map(pack => ({ id: pack.collection, label: resolvePackLabel({ pack }), selected: pack.collection === this.packId })) };
   }
@@ -36,9 +47,10 @@ export class ItemPickerApp extends HandlebarsApplicationMixin(ApplicationV2) {
           const index = await pack.getIndex({ fields: ["name", "img", "type", "system.source", "system.rarity", "system.rarities"] });
           for (const entry of index) {
             if (!physicalTypes.has(entry.type) || !entry.name.toLocaleLowerCase().includes(this.query.toLocaleLowerCase())) continue;
+            const uuid = `Compendium.${pack.collection}.Item.${entry._id}`;
             const source = sources.sourceLabelForItem(entry, { pack });
-            if (!sources.isSourceEnabled(source, { itemType: entry.type })) continue;
-            this.results.push({ uuid: `Compendium.${pack.collection}.Item.${entry._id}`, name: entry.name, img: entry.img, source, rarity: itemRarity(entry.system) ?? "Mundane" });
+            if (!isUuidAllowed(uuid) || !sources.isSourceEnabled(source, { itemType: entry.type })) continue;
+            this.results.push({ uuid, name: entry.name, img: entry.img, source, rarity: itemRarity(entry.system) ?? "Mundane" });
           }
         }
         this.results.sort((a, b) => a.name.localeCompare(b.name));
@@ -53,7 +65,7 @@ export class ItemPickerApp extends HandlebarsApplicationMixin(ApplicationV2) {
       const result = this.results.find(item => item.uuid === target.dataset.uuid);
       if (!result) return;
       const item = await fromUuid(result.uuid);
-      if (!item || !sources.isPackEnabled(item.pack) || !sources.isSourceEnabled(sources.sourceLabelForItem(item, { pack: game.packs.get(item.pack) }), { itemType: item.type })) throw new Error("That item is no longer available from an enabled source.");
+      if (!item || !isUuidAllowed(result.uuid) || (item.uuid && !isUuidAllowed(item.uuid)) || (item.pack && !sources.isPackEnabled(item.pack)) || !sources.isSourceEnabled(sources.sourceLabelForItem(item, { pack: game.packs.get(item.pack) }), { itemType: item.type })) throw new Error("That item is no longer available from an enabled source.");
       await this.onSelect?.(item);
       await this.close();
     } catch (error) { ui.notifications.error(error.message); target.disabled = false; }

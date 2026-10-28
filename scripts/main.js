@@ -11,6 +11,7 @@ import { IGNORED_USERS_SETTING, isIgnored, listUsers, activePlayerForActor } fro
 import { IgnoredUsersApp } from "./ui/ignored-users-app.js";
 import { WindowGeometryService } from "./services/window-geometry-service.js";
 import { Dnd5eSourceFilterService } from "./services/dnd5e-source-filter-service.js";
+import { CONFIGURE_SOURCES_CHANGED, filterAllowed, getAllowedPack, getAllowedPacks, installConfigureSourcesWatcher, isPackAllowed, isSourceAllowed, isUuidAllowed, onConfigureSourcesChanged } from "./services/allowed-packs.js";
 import { resolveBookLabel, resolvePackLabel } from "./services/source-book-service.js";
 import { CapabilityRegistry } from "./location/capability-registry.js";
 import { LocationService } from "./location/location-service.js";
@@ -33,6 +34,23 @@ import { createToolsRegistry, mergeCoreApi } from "./ui/tools-registry.js";
 import { bindMorelordModulesButton } from "./ui/morelord-modules.js";
 
 const MODULE_ID = "morelord-core";
+const sourceFilter = new Dnd5eSourceFilterService();
+
+function publishedSources() {
+  return Object.freeze({
+    resolveBookLabel,
+    resolvePackLabel,
+    filter: sourceFilter,
+    getAllowedPacks,
+    getAllowedPack,
+    isSourceAllowed,
+    isPackAllowed,
+    isUuidAllowed,
+    filterAllowed,
+    onConfigureSourcesChanged,
+    configureSourcesChanged: CONFIGURE_SOURCES_CHANGED
+  });
+}
 registerDirectorySelection();
 const telemetry = new TelemetryService();
 Hooks.on("renderApplicationV2", applyPageLayout);
@@ -553,8 +571,10 @@ Hooks.once("init", () => {
   if (coreModule) {
     const api = coreModule.api ??= {};
     api.tools ??= toolsRegistry.api;
+    api.sources = publishedSources();
     globalThis.MorelordCore = api;
   }
+  installConfigureSourcesWatcher();
   registerTokenDistance();
   registerReactionTracker();
   game.settings.register(MODULE_ID, "compendiumOrganization", {scope:"world", config:false, type:Object, default:{}, restricted:true});
@@ -660,6 +680,7 @@ Hooks.once("setup", () => {
 });
 
 Hooks.once("ready", async () => {
+  installConfigureSourcesWatcher();
   const api = game.modules.get(MODULE_ID).api ??= {};
   mergeCoreApi(api, {
     compendiums: Object.freeze({organize: organizeCompendiums, labels: labelCompendiums}),
@@ -699,7 +720,7 @@ Hooks.once("ready", async () => {
         open: id => documentationService.open(id)
       })
     }),
-    sources: Object.freeze({ resolveBookLabel, resolvePackLabel, filter: new Dnd5eSourceFilterService() }),
+    sources: publishedSources(),
     rolls: Object.freeze({ skill: rollSkill, skillModifier: actorSkillModifier, naturalD20: extractNaturalD20 }),
     socket: Object.freeze({
       get ready() { return contextualSocket.ready; },

@@ -243,9 +243,32 @@ The shared release validator supports required runtime files (including root mai
 
 `scripts/services/item-rarity.js` exports `itemRarities(system)` and `itemRarity(system)`. They accept legacy rarity strings/choice objects and D&D 5e v6 rarity arrays/Sets without modifying data. An explicitly empty v6 collection is mundane. Single-rarity workflows use the lowest listed rarity, matching the v6 Item getter. Compendium consumers must request both `system.rarity` and `system.rarities`.
 
-## Shared source filtering and item selection
+## Configure Sources
 
-`MorelordCore.sources.filter` exposes the shared `Dnd5eSourceFilterService` used by Craftworks and Marketplace. It honors D&D5e Configure Sources and canonical SRD provenance on copied documents. `ItemPickerApp` in `scripts/ui/item-picker-app.js` searches enabled physical Item compendiums and calls `onSelect(item)` with the selected document. Downtime commissions consume this Core UI.
+D&D 5e **Configure Sources** (Game Settings menu **Compendium Browser Sources**, label **Configure Sources**) is the primary compendium filter for every Morelord module. The screen lists Actor and Item compendiums. dnd5e stores the choices in the world setting `packSourceConfiguration`. `CompendiumBrowserSettingsConfig.isSourceEnabled(pack)` is the decision, and Core calls that method when dnd5e has loaded it:
+
+- When `packSourceConfiguration[collection]` is set, that boolean is the answer. Unchecking the **System** package writes `false` for every system pack id, so those packs stay out. `true` keeps a pack even when its rules version does not match.
+- When the collection has no entry, the pack is allowed only if `metadata.flags.dnd5e.rulesVersion` is empty or equal to the world **Rules Version** (`modern` or `legacy`). A 2014 SRD pack flagged `legacy` is omitted while the world is `modern`, and Core does not substitute another pack.
+
+```javascript
+const sources = game.modules.get("morelord-core").api.sources;
+const packs = sources.getAllowedPacks({ documentName: "Actor" });
+const offered = packs.filter(pack => modulePackIds.has(pack.collection));
+const pack = sources.getAllowedPack("dnd5e.actors24");
+if (!sources.isSourceAllowed(savedPackId)) return;
+if (!sources.isUuidAllowed(uuid)) return;
+const stop = sources.onConfigureSourcesChanged(() => refresh());
+```
+
+`getAllowedPacks({ documentName })` returns allowed compendiums in `game.packs` order. Omit `documentName` for every document type. `getAllowedPack(collection)` returns that pack, or `null` when it is missing or excluded. `isSourceAllowed` accepts a pack or a collection id. `sources.isPackAllowed` and `sources.filter.isPackEnabled` are the same pack decision. `isUuidAllowed` checks `Compendium.<package>.<pack>.<Document>.<id>`, the legacy form without a document type, and embedded ids. A UUID that is not a compendium document stays allowed. `filterAllowed` keeps entries only when every `uuid`, `pack`, `packId`, or `sourceId` on them is allowed.
+
+These four functions are also exported from `scripts/services/dnd5e-source-filter-service.js`. Craftworks and Marketplace should import `getAllowedPacks` and `isUuidAllowed` from there, or call `api.sources`. A module source picker starts from `getAllowedPacks` and may only remove more packs.
+
+Call `onConfigureSourcesChanged(callback)` or listen for `morelordCoreConfigureSourcesChanged` (`sources.configureSourcesChanged`) when Configure Sources or Rules Version changes. The callback reads the current decision; Core does not cache the allow-list.
+
+Outside dnd5e, Core does not apply this filter. Pack ids are full collection ids.
+
+`sources.filter.isSourceEnabled(label, { itemType })` is a separate book-label narrowing for copied SRD items. It can reject an SRD label whose canonical pack is excluded, and it cannot make an excluded pack allowed. `ItemPickerApp` searches allowed physical Item compendiums and drops a result if Configure Sources changes while it is open. Downtime commissions use that picker.
 
 Locations stay open after Save. Shared field labels align their controls at the top, checkbox labels remain on one line, resource rows have room for multi-line descriptions, and dialog buttons grow to fit their text.
 
