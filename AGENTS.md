@@ -3,7 +3,7 @@
 ## Hard rules
 
 - HARD RULE: Use D&D 5e 2024 rules (SRD 5.2) only. Never use or add 2014 rules, never add a 2014/2024 rules-version switch or detection, and use 2024 terms and mechanics in code, data, UI text and docs.
-- D&D 5e Configure Sources is the primary compendium filter for every module. Use Core's `sources.getAllowedPacks`, `sources.isPackAllowed`, `sources.isUuidAllowed`, and `sources.filterAllowed`. A compendium that setting excludes is never listed, offered, searched, or used as a fallback, and module source pickers only narrow that set. Refresh open lists on `morelordCoreConfigureSourcesChanged`. The Core README has the contract.
+- D&D 5e Configure Sources is the primary compendium filter for every module. Use Core's `sources.getAllowedPacks`, `sources.getAllowedPack`, `sources.isSourceAllowed`, and `sources.isUuidAllowed`. An explicit `packSourceConfiguration` boolean wins; otherwise a pack is allowed only when its `rulesVersion` flag is empty or matches the dnd5e rules version. Module source pickers only narrow that set. Refresh open lists on `morelordCoreConfigureSourcesChanged`. The Core README has the contract.
 - All module settings are world-scoped and GM-only unless Troy says otherwise.
 
 ## Shared assets in Morelord Core

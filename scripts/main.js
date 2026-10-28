@@ -11,7 +11,7 @@ import { IGNORED_USERS_SETTING, isIgnored, listUsers, activePlayerForActor } fro
 import { IgnoredUsersApp } from "./ui/ignored-users-app.js";
 import { WindowGeometryService } from "./services/window-geometry-service.js";
 import { Dnd5eSourceFilterService } from "./services/dnd5e-source-filter-service.js";
-import { CONFIGURE_SOURCES_CHANGED, filterAllowed, getAllowedPacks, installConfigureSourcesWatcher, isPackAllowed, isUuidAllowed, onConfigureSourcesChanged } from "./services/allowed-packs.js";
+import { CONFIGURE_SOURCES_CHANGED, filterAllowed, getAllowedPack, getAllowedPacks, installConfigureSourcesWatcher, isPackAllowed, isSourceAllowed, isUuidAllowed, onConfigureSourcesChanged } from "./services/allowed-packs.js";
 import { resolveBookLabel, resolvePackLabel } from "./services/source-book-service.js";
 import { CapabilityRegistry } from "./location/capability-registry.js";
 import { LocationService } from "./location/location-service.js";
@@ -42,6 +42,8 @@ function publishedSources() {
     resolvePackLabel,
     filter: sourceFilter,
     getAllowedPacks,
+    getAllowedPack,
+    isSourceAllowed,
     isPackAllowed,
     isUuidAllowed,
     filterAllowed,

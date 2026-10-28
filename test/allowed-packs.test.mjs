@@ -4,13 +4,15 @@ import { readFileSync } from "node:fs";
 import {
   CONFIGURE_SOURCES_CHANGED,
   filterAllowed,
+  getAllowedPack,
   getAllowedPacks,
   installConfigureSourcesWatcher,
   isPackAllowed,
+  isSourceAllowed,
   isUuidAllowed,
   onConfigureSourcesChanged
 } from "../scripts/services/allowed-packs.js";
-import { Dnd5eSourceFilterService } from "../scripts/services/dnd5e-source-filter-service.js";
+import { Dnd5eSourceFilterService, getAllowedPack as exportedGetAllowedPack, getAllowedPacks as exportedGetAllowedPacks, isSourceAllowed as exportedIsSourceAllowed, isUuidAllowed as exportedIsUuidAllowed } from "../scripts/services/dnd5e-source-filter-service.js";
 
 function pack(collection, documentName, metadata = {}) {
   const [packageName, name] = collection.split(".");
@@ -21,11 +23,16 @@ function pack(collection, documentName, metadata = {}) {
   };
 }
 
-function world({ packs, configuration = {}, systemId = "dnd5e", actors, scenes, fromUuidSync }) {
+function rulesPack(collection, documentName, rulesVersion) {
+  return pack(collection, documentName, { flags: { dnd5e: { rulesVersion } } });
+}
+
+function world({ packs, configuration = {}, systemId = "dnd5e", rulesVersion = "modern", actors, scenes, fromUuidSync }) {
   const previous = {
     game: globalThis.game,
     fromUuidSync: globalThis.fromUuidSync,
-    Hooks: globalThis.Hooks
+    Hooks: globalThis.Hooks,
+    dnd5e: globalThis.dnd5e
   };
   globalThis.game = {
     packs,
@@ -33,6 +40,7 @@ function world({ packs, configuration = {}, systemId = "dnd5e", actors, scenes, 
     settings: {
       get(namespace, key) {
         if (namespace === "dnd5e" && key === "packSourceConfiguration") return configuration;
+        if (namespace === "dnd5e" && key === "rulesVersion") return rulesVersion;
         throw new Error(`Unexpected setting ${namespace}.${key}`);
       }
     },
@@ -44,6 +52,7 @@ function world({ packs, configuration = {}, systemId = "dnd5e", actors, scenes, 
     globalThis.game = previous.game;
     globalThis.fromUuidSync = previous.fromUuidSync;
     globalThis.Hooks = previous.Hooks;
+    globalThis.dnd5e = previous.dnd5e;
   };
 }
 
@@ -116,7 +125,83 @@ test("a module picker can only narrow the allowed set", () => {
   }
 });
 
-test("rejects compendium references carried by world actors, items, and tokens", () => {
+test("an unset Configure Sources entry follows the pack rulesVersion flag", () => {
+  const packs = [
+    rulesPack("dnd5e.monsters", "Actor", "legacy"),
+    rulesPack("dnd5e.actors24", "Actor", "modern"),
+    rulesPack("dnd5e.spells", "Item", "legacy"),
+    pack("kobold.monsters", "Actor"),
+    pack("notes.journal", "JournalEntry")
+  ];
+  const restore = world({ packs, rulesVersion: "modern" });
+  try {
+    assert.equal(isSourceAllowed("dnd5e.monsters"), false);
+    assert.equal(isSourceAllowed(packs[1]), true);
+    assert.equal(getAllowedPack("dnd5e.monsters"), null);
+    assert.equal(getAllowedPack("dnd5e.actors24"), packs[1]);
+    assert.deepEqual(getAllowedPacks({ documentName: "Actor" }).map(entry => entry.collection), ["dnd5e.actors24", "kobold.monsters"]);
+    assert.deepEqual(getAllowedPacks({ documentName: "Item" }).map(entry => entry.collection), []);
+    assert.deepEqual(getAllowedPacks({ documentName: "JournalEntry" }).map(entry => entry.collection), ["notes.journal"]);
+    assert.equal(isUuidAllowed("Compendium.dnd5e.monsters.Actor.goblin"), false);
+    assert.equal(isUuidAllowed("Compendium.dnd5e.actors24.Actor.wolf"), true);
+    assert.equal(isUuidAllowed("Actor.worldHero"), true);
+  } finally {
+    restore();
+  }
+
+  const legacyWorld = world({ packs, rulesVersion: "legacy" });
+  try {
+    assert.equal(isSourceAllowed("dnd5e.monsters"), true);
+    assert.equal(isSourceAllowed("dnd5e.actors24"), false);
+    assert.equal(getAllowedPack("missing.pack"), null);
+  } finally {
+    legacyWorld();
+  }
+});
+
+test("an explicit Configure Sources boolean overrides rulesVersion", () => {
+  const monsters = rulesPack("dnd5e.monsters", "Actor", "legacy");
+  const modern = rulesPack("dnd5e.actors24", "Actor", "modern");
+  const restore = world({
+    packs: [monsters, modern],
+    configuration: { "dnd5e.monsters": true, "dnd5e.actors24": false },
+    rulesVersion: "modern"
+  });
+  try {
+    assert.equal(isSourceAllowed(monsters), true);
+    assert.equal(isSourceAllowed(modern), false);
+    assert.deepEqual(getAllowedPacks().map(entry => entry.collection), ["dnd5e.monsters"]);
+  } finally {
+    restore();
+  }
+});
+
+test("uses dnd5e CompendiumBrowserSettingsConfig.isSourceEnabled when that method exists", () => {
+  const legacy = rulesPack("dnd5e.monsters", "Actor", "legacy");
+  const seen = [];
+  const restore = world({ packs: [legacy], rulesVersion: "modern" });
+  globalThis.dnd5e = {
+    applications: {
+      settings: {
+        CompendiumBrowserSettingsConfig: {
+          isSourceEnabled(candidate) {
+            seen.push(candidate);
+            return true;
+          }
+        }
+      }
+    }
+  };
+  try {
+    assert.equal(isSourceAllowed(legacy), true);
+    assert.equal(seen[0], legacy);
+    assert.equal(new Dnd5eSourceFilterService().isPackEnabled(legacy), true);
+  } finally {
+    restore();
+  }
+});
+
+test("compendium UUIDs follow the pack and other UUIDs stay allowed", () => {
   const actors = new Map();
   const referenced = {
     documentName: "Actor",
@@ -172,15 +257,16 @@ test("rejects compendium references carried by world actors, items, and tokens",
     })[uuid] ?? null
   });
   try {
-    assert.equal(isUuidAllowed("Actor.ref"), false);
-    assert.equal(isUuidAllowed("Actor.imported"), false);
-    assert.equal(isUuidAllowed("Actor.flagged"), false);
-    assert.equal(isUuidAllowed("Actor.granted"), false);
-    assert.equal(isUuidAllowed("Actor.clone"), false);
-    assert.equal(isUuidAllowed("Actor.imported.Item.sword"), false);
-    assert.equal(isUuidAllowed("Scene.scene.Token.token"), false);
+    assert.equal(isUuidAllowed("Actor.ref"), true);
+    assert.equal(isUuidAllowed("Actor.imported"), true);
+    assert.equal(isUuidAllowed("Actor.flagged"), true);
+    assert.equal(isUuidAllowed("Actor.granted"), true);
+    assert.equal(isUuidAllowed("Actor.clone"), true);
+    assert.equal(isUuidAllowed("Actor.imported.Item.sword"), true);
+    assert.equal(isUuidAllowed("Scene.scene.Token.token"), true);
     assert.equal(isUuidAllowed("Actor.native"), true);
-    assert.equal(isUuidAllowed("Actor.missing"), false);
+    assert.equal(isUuidAllowed("Actor.missing"), true);
+    assert.equal(isUuidAllowed("Compendium.dnd5e.monsters.Actor.goblin"), false);
     assert.equal(isUuidAllowed(""), false);
   } finally {
     restore();
@@ -257,8 +343,11 @@ test("reads the live setting again when Configure Sources changes", () => {
   installConfigureSourcesWatcher(hooks);
   try {
     assert.equal(isPackAllowed("dnd5e.monsters"), false);
-    hooks.handlers[0].callback({ key: "dnd5e.rulesVersion" });
+    hooks.handlers[0].callback({ key: "dnd5e.metricWeightUnits" });
     assert.deepEqual(calls, []);
+    hooks.handlers[0].callback({ key: "dnd5e.rulesVersion" });
+    assert.deepEqual(calls, ["listener", CONFIGURE_SOURCES_CHANGED]);
+    calls.length = 0;
     configuration["dnd5e.monsters"] = true;
     hooks.handlers[0].callback({ key: "dnd5e.packSourceConfiguration" });
     assert.equal(isPackAllowed("dnd5e.monsters"), true);
@@ -325,11 +414,15 @@ test("the existing source filter uses the same Configure Sources rule", () => {
 
 test("Core publishes the allowed-pack helpers", () => {
   const main = readFileSync(new URL("../scripts/main.js", import.meta.url), "utf8");
-  for (const name of ["getAllowedPacks", "isPackAllowed", "isUuidAllowed", "filterAllowed", "onConfigureSourcesChanged", "configureSourcesChanged: CONFIGURE_SOURCES_CHANGED"]) {
+  for (const name of ["getAllowedPacks", "getAllowedPack", "isSourceAllowed", "isUuidAllowed", "filterAllowed", "onConfigureSourcesChanged", "configureSourcesChanged: CONFIGURE_SOURCES_CHANGED"]) {
     assert.equal(main.includes(name), true, name);
   }
   assert.equal(main.includes("installConfigureSourcesWatcher()"), true);
   assert.equal(CONFIGURE_SOURCES_CHANGED, "morelordCoreConfigureSourcesChanged");
+  assert.equal(typeof exportedGetAllowedPacks, "function");
+  assert.equal(typeof exportedGetAllowedPack, "function");
+  assert.equal(typeof exportedIsSourceAllowed, "function");
+  assert.equal(typeof exportedIsUuidAllowed, "function");
 });
 
 });

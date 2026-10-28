@@ -1,4 +1,14 @@
-import { getAllowedPacks, isPackAllowed, packSourceConfiguration } from "./allowed-packs.js";
+export {
+  CONFIGURE_SOURCES_CHANGED,
+  filterAllowed,
+  getAllowedPack,
+  getAllowedPacks,
+  isPackAllowed,
+  isSourceAllowed,
+  isUuidAllowed,
+  onConfigureSourcesChanged
+} from "./allowed-packs.js";
+import { getAllowedPacks, isSourceAllowed, packSourceConfiguration } from "./allowed-packs.js";
 import { resolveBookLabel } from "./source-book-service.js";
 
 export class Dnd5eSourceFilterService {
@@ -7,7 +17,7 @@ export class Dnd5eSourceFilterService {
   }
 
   isPackEnabled(packOrCollection) {
-    return isPackAllowed(packOrCollection);
+    return isSourceAllowed(packOrCollection);
   }
 
   isSourceEnabled(sourceLabel, { itemType = null } = {}) {

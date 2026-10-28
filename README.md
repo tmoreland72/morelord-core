@@ -245,25 +245,30 @@ The shared release validator supports required runtime files (including root mai
 
 ## Configure Sources
 
-D&D 5e **Configure Sources** (Game Settings menu **Compendium Browser Sources**, label **Configure Sources**) is the primary compendium filter for every Morelord module. dnd5e 6.0.6 stores it in the world setting `dnd5e.packSourceConfiguration`. A pack is available unless that object maps its collection id to `false`, which is the same rule as `CompendiumBrowserSettingsConfig.collateSources`. Unchecking the **System** package writes `false` for every system compendium id (`dnd5e.monsters`, `dnd5e.actors24`, and the rest of `game.system.packs`, including packs that are not Actors or Items). Core does not substitute an SRD pack, another edition, or any other compendium when the requested one is excluded.
+D&D 5e **Configure Sources** (Game Settings menu **Compendium Browser Sources**, label **Configure Sources**) is the primary compendium filter for every Morelord module. The screen lists Actor and Item compendiums. dnd5e stores the choices in the world setting `packSourceConfiguration`. `CompendiumBrowserSettingsConfig.isSourceEnabled(pack)` is the decision, and Core calls that method when dnd5e has loaded it:
+
+- When `packSourceConfiguration[collection]` is set, that boolean is the answer. Unchecking the **System** package writes `false` for every system pack id, so those packs stay out. `true` keeps a pack even when its rules version does not match.
+- When the collection has no entry, the pack is allowed only if `metadata.flags.dnd5e.rulesVersion` is empty or equal to the world **Rules Version** (`modern` or `legacy`). A 2014 SRD pack flagged `legacy` is omitted while the world is `modern`, and Core does not substitute another pack.
 
 ```javascript
 const sources = game.modules.get("morelord-core").api.sources;
 const packs = sources.getAllowedPacks({ documentName: "Actor" });
 const offered = packs.filter(pack => modulePackIds.has(pack.collection));
-if (!sources.isPackAllowed(savedPackId)) return;
-if (!sources.isUuidAllowed(actorUuid)) return;
-const rows = sources.filterAllowed(entries);
+const pack = sources.getAllowedPack("dnd5e.actors24");
+if (!sources.isSourceAllowed(savedPackId)) return;
+if (!sources.isUuidAllowed(uuid)) return;
 const stop = sources.onConfigureSourcesChanged(() => refresh());
 ```
 
-`getAllowedPacks({ documentName })` returns the allowed compendiums in `game.packs` order. Omit `documentName` for every document type. `isPackAllowed` accepts a pack or a collection id (`package.name`, also `metadata.id`). `isUuidAllowed` accepts `Compendium.<package>.<pack>.<Document>.<id>`, the legacy form without a document type, and embedded ids. For a world actor, item, or token it also rejects a document whose uuid, `pack`, `_stats.compendiumSource`, `_stats.duplicateSource`, `flags.core.sourceId`, or `flags.dnd5e.sourceId` names an excluded pack, and an item whose parent actor does. `filterAllowed` keeps strings and objects only when every `uuid`, `pack`, `packId`, `sourceId`, or pack identity on them is allowed. An entry with none of those is dropped.
+`getAllowedPacks({ documentName })` returns allowed compendiums in `game.packs` order. Omit `documentName` for every document type. `getAllowedPack(collection)` returns that pack, or `null` when it is missing or excluded. `isSourceAllowed` accepts a pack or a collection id. `sources.isPackAllowed` and `sources.filter.isPackEnabled` are the same pack decision. `isUuidAllowed` checks `Compendium.<package>.<pack>.<Document>.<id>`, the legacy form without a document type, and embedded ids. A UUID that is not a compendium document stays allowed. `filterAllowed` keeps entries only when every `uuid`, `pack`, `packId`, or `sourceId` on them is allowed.
 
-A module source picker starts from `getAllowedPacks` and may only remove more packs. It must not search a disabled compendium and it must not fall back to one. Call `onConfigureSourcesChanged(callback)` or listen for `morelordCoreConfigureSourcesChanged` (`sources.configureSourcesChanged`) and rebuild open lists. The callback reads the setting again; Core does not cache the allow-list.
+These four functions are also exported from `scripts/services/dnd5e-source-filter-service.js`. Craftworks and Marketplace should import `getAllowedPacks` and `isUuidAllowed` from there, or call `api.sources`. A module source picker starts from `getAllowedPacks` and may only remove more packs.
 
-Outside dnd5e, or when that setting cannot be read, Core does not invent exclusions. A key that is missing or any value other than `false` stays enabled. Pack ids are full collection ids; a different compendium with the same short name is a different pack.
+Call `onConfigureSourcesChanged(callback)` or listen for `morelordCoreConfigureSourcesChanged` (`sources.configureSourcesChanged`) when Configure Sources or Rules Version changes. The callback reads the current decision; Core does not cache the allow-list.
 
-`sources.filter` remains the label, SRD-provenance, and sorted-pack helper used by Craftworks, Marketplace, and the shared item picker. `filter.isPackEnabled` and `filter.enabledPacks` use this same allow-list. `filter.isSourceEnabled` can still narrow an SRD-labeled copy when its canonical pack is excluded, and it cannot make an excluded pack allowed. `ItemPickerApp` searches allowed physical Item compendiums and drops a result if Configure Sources changes while it is open. Downtime commissions use that picker.
+Outside dnd5e, Core does not apply this filter. Pack ids are full collection ids.
+
+`sources.filter.isSourceEnabled(label, { itemType })` is a separate book-label narrowing for copied SRD items. It can reject an SRD label whose canonical pack is excluded, and it cannot make an excluded pack allowed. `ItemPickerApp` searches allowed physical Item compendiums and drops a result if Configure Sources changes while it is open. Downtime commissions use that picker.
 
 Locations stay open after Save. Shared field labels align their controls at the top, checkbox labels remain on one line, resource rows have room for multi-line descriptions, and dialog buttons grow to fit their text.
 
