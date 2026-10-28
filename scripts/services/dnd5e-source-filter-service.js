@@ -1,83 +1,13 @@
+import { getAllowedPacks, isPackAllowed, packSourceConfiguration } from "./allowed-packs.js";
 import { resolveBookLabel } from "./source-book-service.js";
 
 export class Dnd5eSourceFilterService {
   get configuration() {
-    if (game.system.id !== "dnd5e") return {};
-
-    try {
-      return game.settings.get(
-        "dnd5e",
-        "packSourceConfiguration"
-      ) ?? {};
-    } catch {
-      return {};
-    }
+    return packSourceConfiguration();
   }
 
   isPackEnabled(packOrCollection) {
-    if (game.system.id !== "dnd5e") return true;
-
-    const collection =
-      typeof packOrCollection === "string"
-        ? packOrCollection
-        : packOrCollection?.collection;
-
-    if (!collection) return true;
-
-    // D&D5e's Compendium Browser source configuration is exclusion-based.
-    // Current versions store pack collections directly, but tolerate nested
-    // configuration shapes so Craftworks remains compatible with source
-    // configuration produced by add-on content packages.
-    const config = this.configuration;
-    if (config?.[collection] === false) return false;
-
-    const shortCollection = String(collection)
-      .split(".")
-      .at(-1);
-
-    if (config?.[shortCollection] === false) return false;
-
-    const pack =
-      typeof packOrCollection === "string"
-        ? game.packs.get(packOrCollection)
-        : packOrCollection;
-
-    const packageName = String(
-      pack?.metadata?.packageName
-      ?? pack?.metadata?.package
-      ?? ""
-    );
-
-    if (
-      packageName
-      && config?.[packageName]?.[collection] === false
-    ) {
-      return false;
-    }
-
-    if (
-      Array.isArray(config?.disabled)
-      && config.disabled.includes(collection)
-    ) {
-      return false;
-    }
-
-    const identifiers = new Set([
-      collection,
-      shortCollection,
-      packageName,
-      pack?.metadata?.label,
-      pack?.metadata?.name,
-      pack?.metadata?.sourceBook,
-      pack?.title,
-      this.sourceLabelForPack(pack)
-    ].filter(Boolean).map(value => this.#normalizeIdentifier(value)));
-
-    if (this.#configurationDisables(config, identifiers)) {
-      return false;
-    }
-
-    return true;
+    return isPackAllowed(packOrCollection);
   }
 
   isSourceEnabled(sourceLabel, { itemType = null } = {}) {
@@ -206,75 +136,8 @@ export class Dnd5eSourceFilterService {
     includeWorld = true
   } = {}) {
     return this.sortPacks(
-      Array.from(game.packs ?? [])
-        .filter(pack =>
-          !documentName
-          || pack.documentName === documentName
-        )
-        .filter(pack =>
-          includeWorld
-          || pack.metadata?.packageType !== "world"
-        )
-        .filter(pack =>
-          this.isPackEnabled(pack)
-        )
-    );
-  }
-
-  #configurationDisables(value, identifiers, key = "") {
-    if (value == null) return false;
-
-    const normalizedKey = this.#normalizeIdentifier(key);
-    const keyMatches = normalizedKey && identifiers.has(normalizedKey);
-
-    if (keyMatches && value === false) return true;
-
-    if (Array.isArray(value)) {
-      if (
-        /disabled|excluded/i.test(key)
-        && value.some(entry =>
-          identifiers.has(this.#normalizeIdentifier(entry))
-        )
-      ) return true;
-
-      return value.some(entry =>
-        this.#configurationDisables(entry, identifiers)
-      );
-    }
-
-    if (typeof value !== "object") return false;
-
-    if (
-      keyMatches
-      && (
-        value.enabled === false
-        || value.load === false
-        || value.active === false
-      )
-    ) return true;
-
-    const identity =
-      value.collection
-      ?? value.id
-      ?? value.key
-      ?? value.name
-      ?? value.label
-      ?? value.source;
-
-    if (
-      identifiers.has(this.#normalizeIdentifier(identity))
-      && (
-        value.enabled === false
-        || value.load === false
-        || value.active === false
-      )
-    ) return true;
-
-    return Object.entries(value).some(([childKey, childValue]) =>
-      this.#configurationDisables(
-        childValue,
-        identifiers,
-        childKey
+      getAllowedPacks({ documentName }).filter(pack =>
+        includeWorld || pack.metadata?.packageType !== "world"
       )
     );
   }
