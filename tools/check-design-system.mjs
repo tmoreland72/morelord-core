@@ -48,7 +48,13 @@ const PROTECTED = [
   "actor-identity",
   "avatar",
   "actor-select-field",
-  "progress"
+  "progress",
+  "sortable",
+  "sortable__item",
+  "sortable__origin",
+  "sortable__drag-image",
+  "sortable__drag-host",
+  "sortable__indicator"
 ];
 
 function sourceFiles(path) {
