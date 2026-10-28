@@ -284,15 +284,19 @@ async function withGlobals(run) {
   }
 }
 
+function rowEntryId(row) {
+  return row.dataset.pack || row.dataset.entryId || row.dataset.documentId;
+}
+
 function checkedIds(section) {
   return [...section.querySelectorAll('.ml-core-directory-check input')]
     .filter(input => input.checked)
-    .map(input => input.closest('.directory-item').dataset.entryId ?? input.closest('.directory-item').dataset.documentId);
+    .map(input => rowEntryId(input.closest('.directory-item')));
 }
 
 function clickCheckbox(section, id, init = {}) {
   const input = [...section.querySelectorAll('.ml-core-directory-check input')]
-    .find(control => (control.closest('.directory-item').dataset.entryId ?? control.closest('.directory-item').dataset.documentId) === id);
+    .find(control => rowEntryId(control.closest('.directory-item')) === id);
   input.dispatchEvent(new DomEvent('click', { bubbles: true, cancelable: true, ...init }));
   return input;
 }
@@ -444,6 +448,73 @@ test('players, compendium packs, and unrelated directories get no deletion contr
     assert.equal(mounted.section.querySelector('.ml-core-directory-check'), null);
     activateDirectorySelection({ collection: collectionOf('ChatMessage', [{ id: 'a', name: 'A' }]), element: mounted.section }, mounted.section);
     assert.equal(mounted.section.querySelector('button'), null);
+  });
+});
+
+test('compendium pack checkboxes overlay the card and range-select visible packs', async () => {
+  await withGlobals(harness => {
+    const { document, host } = harness;
+    const section = document.createElement('section');
+    section.className = 'directory compendium-sidebar sidebar-tab';
+    const header = document.createElement('header');
+    header.className = 'directory-header';
+    const list = document.createElement('ol');
+    const folder = document.createElement('li');
+    folder.className = 'directory-item folder';
+    folder.dataset.folderId = 'folder';
+    const specs = [
+      ['world.heroes', 'Heroes', false],
+      ['world.maps', 'Maps', false],
+      ['dnd5e.hidden', 'Hidden', true]
+    ];
+    const rows = [];
+    for (const [id, title, hidden] of specs) {
+      const row = document.createElement('li');
+      row.className = 'directory-item entry compendium';
+      row.dataset.pack = id;
+      if (hidden) row.getClientRects = () => [];
+      const image = document.createElement('img');
+      image.className = 'compendium-banner';
+      const name = document.createElement('a');
+      name.className = 'entry-name compendium-name';
+      name.textContent = title;
+      row.append(image, name);
+      rows.push(row);
+    }
+    const byId = document.createElement('li');
+    byId.className = 'directory-item entry compendium';
+    byId.dataset.entryId = 'dnd5e.items';
+    const byName = document.createElement('a');
+    byName.className = 'entry-name';
+    byName.textContent = 'Items';
+    byId.append(byName);
+    list.append(folder, ...rows, byId);
+    section.append(header, list);
+    host.append(section);
+    const packs = new Map([
+      ['world.heroes', { title: 'Heroes', metadata: { packageType: 'world' }, locked: false }],
+      ['world.maps', { title: 'Maps', metadata: { packageType: 'world' }, locked: true }],
+      ['dnd5e.hidden', { title: 'Hidden', metadata: { packageType: 'system' }, locked: true }],
+      ['dnd5e.items', { title: 'Items', metadata: { packageType: 'system' }, locked: true }]
+    ]);
+    globalThis.game.packs = { has: id => packs.has(id), get: id => packs.get(id), folders: [] };
+    activateDirectorySelection({ tabName: 'compendium', element: section }, section);
+    section.querySelector('button').click();
+    const check = rows[0].querySelector('.ml-core-directory-check');
+    assert.equal(rows[0].children[0], check);
+    assert.equal(check.classList.contains('ml-core-directory-check--compendium'), true);
+    assert.equal(rows[0].children[1].classList.contains('compendium-banner'), true);
+    assert.equal(check.querySelector('input').getAttribute('aria-label'), 'Select Heroes');
+    assert.equal(folder.querySelector('.ml-core-directory-check'), null);
+    assert.equal(byId.children[0].classList.contains('ml-core-directory-check'), true);
+    assert.equal(byId.querySelector('input').getAttribute('aria-label'), 'Select Items');
+    assert.deepEqual([...section.querySelectorAll('button')].map(button => button.attributes.get('data-action')), [
+      'toggle-selection', 'select-visible', 'clear-selection', 'move-selected', 'lock-selected', 'unlock-selected', 'delete-selected'
+    ]);
+    clickCheckbox(section, 'world.heroes');
+    clickCheckbox(section, 'dnd5e.items', { shiftKey: true });
+    assert.deepEqual(checkedIds(section).sort(), ['dnd5e.items', 'world.heroes', 'world.maps']);
+    assert.equal(checkedIds(section).includes('dnd5e.hidden'), false);
   });
 });
 
