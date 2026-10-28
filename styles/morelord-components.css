@@ -82,6 +82,18 @@
   background: color-mix(in srgb, var(--color-dark-2, #0b0a13) 70%, transparent);
   box-shadow: none;
 }
+.directory .directory-item > .ml-core-directory-check--compendium {
+  position: absolute;
+  z-index: 3;
+  top: 6px;
+  left: 6px;
+  margin: 0;
+  padding: 1px;
+  border: 0;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--color-dark-2, #0b0a13) 70%, transparent);
+  box-shadow: none;
+}
 .directory .ml-core-directory-check > input[type="checkbox"],
 .playlist-header > .ml-core-directory-check > input[type="checkbox"] {
   appearance: none;
@@ -114,12 +126,12 @@
 /* Compact directory styles absolutely position .thumbnail at its static slot.
    left is ignored while the portrait is static, and moves it beside the checkbox when it is absolute.
    A name that directly follows the checkbox keeps the flex gap without compact left padding. */
-.directory .directory-item:not(.scene) > .ml-core-directory-check + .thumbnail,
-.directory .directory-item:not(.scene) > .ml-core-directory-check + img {
+.directory .directory-item:not(.scene):not(.compendium):not([data-pack]) > .ml-core-directory-check + .thumbnail,
+.directory .directory-item:not(.scene):not(.compendium):not([data-pack]) > .ml-core-directory-check + img {
   left: calc(6px + var(--font-size-16, 16px) + 8px);
 }
-.directory .directory-item > .ml-core-directory-check + .entry-name,
-.directory .directory-item > .ml-core-directory-check + .document-name {
+.directory .directory-item:not(.compendium):not([data-pack]) > .ml-core-directory-check + .entry-name,
+.directory .directory-item:not(.compendium):not([data-pack]) > .ml-core-directory-check + .document-name {
   padding-left: 0;
 }
 .ml-actions { justify-content: flex-end; }

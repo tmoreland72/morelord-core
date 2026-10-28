@@ -46,12 +46,17 @@ export const directorySelectionCheck = {
     const previouslyExpanded = ui.sidebar.expanded;
     const folderIdOf = doc => doc?.folder?.id ?? (typeof doc?.folder === 'string' ? doc.folder : null);
     try {
-      for (const tab of ['scenes', 'actors', 'items', 'journal', 'tables', 'cards', 'macros', 'playlists']) {
+      for (const tab of ['scenes', 'actors', 'items', 'journal', 'tables', 'cards', 'macros', 'playlists', 'compendium']) {
         const app = ui[tab];
         await app.render({ force: true });
         assert(app.element.querySelector('.ml-core-directory-selection'), `${tab} has shared selection controls.`);
         const press = text => [...app.element.querySelectorAll('.ml-core-directory-selection button')].find(button => button.textContent.startsWith(text))?.click();
         press('Select multiple');
+        if (tab === 'compendium') {
+          for (const action of ['move-selected', 'lock-selected', 'unlock-selected', 'delete-selected']) {
+            assert(app.element.querySelector(`[data-action="${action}"]`), `Compendium toolbar has ${action}.`);
+          }
+        }
         const seen = [];
         const compete = event => { seen.push(event.type); event.preventDefault(); };
         app.element.addEventListener('click', compete, true);
@@ -71,6 +76,7 @@ export const directorySelectionCheck = {
             if (header) assert(header.firstElementChild === check, `${tab} checkbox is the leftmost playlist header control.`);
             else assert(row.firstElementChild === check, `${tab} checkbox is the leftmost row control.`);
             if (row.classList.contains('scene')) assert(check.classList.contains('ml-core-directory-check--scene'), `${tab} checkbox overlays the scene row.`);
+            if (row.dataset.pack || row.classList.contains('compendium')) assert(check.classList.contains('ml-core-directory-check--compendium'), `${tab} checkbox overlays the compendium card.`);
             const thumbnail = row.querySelector('img.thumbnail, .thumbnail');
             const name = (header ?? row).querySelector('.playlist-name, .entry-name, .document-name');
             if (thumbnail) assert(follows(check, thumbnail), `${tab} checkbox sits to the left of the thumbnail.`);

@@ -6,14 +6,20 @@ import { activateDirectorySelection, directoryFolderChoices } from '../scripts/u
 const css = readFileSync(new URL('../styles/morelord-components.css', import.meta.url), 'utf8');
 
 test('absolute directory thumbnails shift past the selection checkbox', () => {
-  const thumbnail = css.match(/\.directory \.directory-item:not\(\.scene\) > \.ml-core-directory-check \+ \.thumbnail[\s\S]*?\}/);
+  const thumbnail = css.match(/\.directory \.directory-item:not\(\.scene\):not\(\.compendium\):not\(\[data-pack\]\) > \.ml-core-directory-check \+ \.thumbnail[\s\S]*?\}/);
   assert.ok(thumbnail, 'thumbnail offset rule exists');
-  assert.match(thumbnail[0], /\.directory \.directory-item:not\(\.scene\) > \.ml-core-directory-check \+ img/);
+  assert.match(thumbnail[0], /\.directory \.directory-item:not\(\.scene\):not\(\.compendium\):not\(\[data-pack\]\) > \.ml-core-directory-check \+ img/);
   assert.match(thumbnail[0], /left:\s*calc\(6px \+ var\(--font-size-16,\s*16px\) \+ 8px\)/);
-  const name = css.match(/\.directory \.directory-item > \.ml-core-directory-check \+ \.entry-name[\s\S]*?\}/);
+  const name = css.match(/\.directory \.directory-item:not\(\.compendium\):not\(\[data-pack\]\) > \.ml-core-directory-check \+ \.entry-name[\s\S]*?\}/);
   assert.ok(name, 'adjacent name padding rule exists');
-  assert.match(name[0], /\.directory \.directory-item > \.ml-core-directory-check \+ \.document-name/);
+  assert.match(name[0], /\.directory \.directory-item:not\(\.compendium\):not\(\[data-pack\]\) > \.ml-core-directory-check \+ \.document-name/);
   assert.match(name[0], /padding-left:\s*0/);
+  const pack = css.match(/\.directory \.directory-item > \.ml-core-directory-check--compendium\s*\{[^}]*\}/);
+  assert.ok(pack, 'compendium checkbox overlay rule exists');
+  assert.match(pack[0], /position:\s*absolute;/);
+  assert.match(pack[0], /top:\s*6px;/);
+  assert.match(pack[0], /left:\s*6px;/);
+  assert.match(pack[0], /margin:\s*0;/);
 });
 
 function installDom() {
@@ -372,5 +378,189 @@ describe('sidebar multi-select move', { concurrency: false }, () => {
     await tick();
     assert.deepEqual(calls, [{ folder: 'pack' }]);
     assert.equal(pending.config.window.title, 'Move 1 selected document');
+  });
+
+  test('compendium packs move, lock, unlock, and delete only where Foundry allows it', async t => {
+    const prior = {
+      document: globalThis.document,
+      game: globalThis.game,
+      foundry: globalThis.foundry,
+      ui: globalThis.ui,
+      getComputedStyle: globalThis.getComputedStyle
+    };
+    t.after(() => Object.assign(globalThis, prior));
+    installDom();
+    const notes = [];
+    const calls = [];
+    const packs = new Map();
+    const define = entry => {
+      const pack = {
+        title: entry.title,
+        locked: entry.locked ?? false,
+        metadata: { packageType: entry.packageType, packageName: entry.packageName ?? entry.packageType, label: entry.title },
+        async setFolder(folder) { calls.push(['setFolder', entry.id, folder]); },
+        async configure(config) {
+          calls.push(['configure', entry.id, { ...config }]);
+          if ('locked' in config) this.locked = config.locked;
+        },
+        async deleteCompendium() { calls.push(['delete', entry.id]); packs.delete(entry.id); }
+      };
+      if (entry.noSetFolder) delete pack.setFolder;
+      packs.set(entry.id, pack);
+    };
+    define({ id: 'heroes', title: '<Heroes>', packageType: 'world' });
+    define({ id: 'maps', title: 'Maps', packageType: 'world', locked: true });
+    define({ id: 'monsters', title: 'Monsters', packageType: 'system', locked: true });
+    define({ id: 'notes', title: 'Notes', packageType: 'module', packageName: 'local-notes', locked: true, noSetFolder: true });
+    globalThis.game = {
+      user: { isGM: true },
+      i18n: { lang: 'en' },
+      folders: [],
+      modules: { get: id => id === 'local-notes' ? { download: '', manifest: '' } : { manifest: 'https://example.test/module.json' } },
+      packs: { has: id => packs.has(id), get: id => packs.get(id), folders: [
+        { id: 'child', name: 'Child', type: 'Compendium', folder: 'parent' },
+        { id: 'parent', name: 'Parent', type: 'Compendium', folder: null },
+        { id: 'actors', name: 'Actors', type: 'Actor', folder: null }
+      ] }
+    };
+    globalThis.ui = { notifications: { info: message => notes.push(['info', message]), error: message => notes.push(['error', message]) } };
+    let pending = null;
+    let confirmation = null;
+    globalThis.foundry = { applications: { api: { DialogV2: {
+      wait: config => new Promise(resolve => { pending = { config, resolve }; }),
+      confirm: config => new Promise(resolve => { confirmation = { config, resolve }; })
+    } } } };
+    const root = document.createElement('section');
+    root.className = 'directory';
+    const header = document.createElement('header');
+    header.className = 'directory-header';
+    const list = document.createElement('ol');
+    const folder = document.createElement('li');
+    folder.className = 'directory-item folder';
+    folder.dataset.folderId = 'parent';
+    list.append(folder);
+    for (const [id, title, hidden] of [['heroes', '<Heroes>', false], ['maps', 'Maps', false], ['monsters', 'Monsters', true], ['notes', 'Notes', false]]) {
+      const row = document.createElement('li');
+      row.className = 'directory-item entry compendium';
+      row.dataset.pack = id;
+      if (hidden) row.getClientRects = () => [];
+      const image = document.createElement('img');
+      image.className = 'compendium-banner';
+      const name = document.createElement('a');
+      name.className = 'entry-name compendium-name';
+      name.textContent = title;
+      row.append(image, name);
+      list.append(row);
+    }
+    root.append(header, list);
+    const app = { constructor: { tabName: 'compendium' }, element: root };
+    activateDirectorySelection(app, root);
+    assert.equal(root.querySelector('.ml-core-directory-check'), null);
+    buttons(root)[0].click();
+    const hero = root.querySelector('[data-pack="heroes"]');
+    assert.equal(hero.childNodes[0].className.includes('ml-core-directory-check--compendium'), true);
+    assert.equal(hero.childNodes[1].className, 'compendium-banner');
+    assert.equal(folder.querySelector('input'), null);
+    assert.equal(buttonByAction(root, 'lock-selected').textContent, 'Lock selected (0)');
+    assert.equal(buttonByAction(root, 'unlock-selected').textContent, 'Unlock selected (0)');
+    assert.equal(buttonByAction(root, 'delete-selected').textContent, 'Delete selected (0)');
+    buttonByAction(root, 'select-visible').click();
+    assert.equal(root.querySelector('[data-pack="monsters"] input').checked, false);
+    assert.equal(buttonByAction(root, 'move-selected').textContent, 'Move selected (3)');
+    assert.equal(buttonByAction(root, 'lock-selected').textContent, 'Lock selected (1)');
+    assert.equal(buttonByAction(root, 'unlock-selected').textContent, 'Unlock selected (2)');
+    assert.equal(buttonByAction(root, 'delete-selected').textContent, 'Delete selected (2)');
+    buttonByAction(root, 'move-selected').click();
+    await tick();
+    assert.equal(pending.config.window.title, 'Move 3 selected compendiums');
+    assert.match(pending.config.content, /&lt;Heroes&gt;/);
+    assert.match(pending.config.content, /<option value="">Root \(no folder\)<\/option>/);
+    assert.match(pending.config.content, /<option value="child">Parent \/ Child<\/option>/);
+    assert.equal(pending.config.content.includes('Actors'), false);
+    pending.resolve(await pending.config.buttons.find(button => button.action === 'cancel').callback());
+    await tick();
+    assert.equal(calls.length, 0);
+    buttonByAction(root, 'move-selected').click();
+    await tick();
+    const move = pending.config.buttons.find(button => button.action === 'move');
+    pending.resolve(await move.callback(null, { form: { elements: { folder: { value: 'child' } } } }));
+    await tick();
+    assert.deepEqual(calls.filter(call => call[0] === 'setFolder'), [
+      ['setFolder', 'heroes', 'child'],
+      ['setFolder', 'maps', 'child']
+    ]);
+    assert.deepEqual(calls.filter(call => call[0] === 'configure' && call[2].folder === 'child'), [
+      ['configure', 'notes', { folder: 'child' }]
+    ]);
+    assert.deepEqual(notes, [['info', 'Moved 3 compendiums to Parent / Child.']]);
+    calls.length = 0;
+    notes.length = 0;
+    buttonByAction(root, 'move-selected').click();
+    await tick();
+    pending.resolve(await move.callback(null, { form: { elements: { folder: { value: '' } } } }));
+    await tick();
+    assert.equal(calls.some(call => call[0] === 'setFolder' && call[2] === null), true);
+    assert.deepEqual(notes, [['info', 'Moved 3 compendiums to Root (no folder).']]);
+    calls.length = 0;
+    notes.length = 0;
+    buttonByAction(root, 'lock-selected').click();
+    await tick();
+    assert.equal(confirmation, null);
+    assert.deepEqual(calls, [['configure', 'heroes', { locked: true }]]);
+    assert.deepEqual(notes, [['info', 'Locked 1 compendium.']]);
+    calls.length = 0;
+    notes.length = 0;
+    buttonByAction(root, 'clear-selection').click();
+    root.querySelector('[data-pack="maps"] input').click();
+    root.querySelector('[data-pack="notes"] input').click();
+    buttonByAction(root, 'unlock-selected').click();
+    await tick();
+    assert.equal(confirmation, null);
+    assert.deepEqual(calls.map(call => call[1]), ['maps', 'notes']);
+    assert.deepEqual(notes, [['info', 'Unlocked 2 compendiums.']]);
+    calls.length = 0;
+    notes.length = 0;
+    confirmation = null;
+    root.querySelector('[data-pack="monsters"] input').click();
+    buttonByAction(root, 'unlock-selected').click();
+    await tick();
+    assert.match(confirmation.config.window.title, /Unlock 1 compendium/);
+    assert.match(confirmation.config.content, /Monsters/);
+    assert.equal(confirmation.config.no.default, true);
+    confirmation.resolve(false);
+    await tick();
+    assert.equal(calls.length, 0);
+    assert.equal(notes.length, 0);
+    buttonByAction(root, 'unlock-selected').click();
+    await tick();
+    confirmation.resolve(true);
+    await tick();
+    assert.deepEqual(calls, [['configure', 'monsters', { locked: false }]]);
+    assert.deepEqual(notes, [['info', 'Unlocked 1 compendium.']]);
+    calls.length = 0;
+    notes.length = 0;
+    confirmation = null;
+    buttonByAction(root, 'clear-selection').click();
+    root.querySelector('[data-pack="heroes"] input').click();
+    root.querySelector('[data-pack="monsters"] input').click();
+    assert.equal(buttonByAction(root, 'delete-selected').textContent, 'Delete selected (1)');
+    buttonByAction(root, 'delete-selected').click();
+    await tick();
+    assert.match(confirmation.config.window.title, /Delete 1 selected compendium/);
+    assert.match(confirmation.config.content, /&lt;Heroes&gt;/);
+    assert.match(confirmation.config.content, /System and module compendiums in the selection are kept/);
+    assert.equal(confirmation.config.no.default, true);
+    confirmation.resolve(false);
+    await tick();
+    assert.equal(packs.has('heroes'), true);
+    confirmation = null;
+    buttonByAction(root, 'delete-selected').click();
+    await tick();
+    confirmation.resolve(true);
+    await tick();
+    assert.deepEqual(calls, [['delete', 'heroes']]);
+    assert.equal(packs.has('heroes'), false);
+    assert.equal(packs.has('monsters'), true);
+    assert.equal(root.querySelector('[data-pack="monsters"] input').checked, true);
   });
 });
