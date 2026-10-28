@@ -205,6 +205,36 @@ Use `ml-grid` with `data-columns="2"` for responsive card collections with Core-
 
 Accent buttons can opt into `data-variant="outline"`: transparent at rest, orange on hover or keyboard focus. Core page layout preserves intentional `ml-card__body[data-scroll]` regions inside large cards.
 
+## Reordering lists and grids
+
+`game.modules.get("morelord-core").api.sortable` reorders cards inside a list or a wrapping grid. It is available from the `ready` hook. It uses Foundry's `foundry.applications.ux.DragDrop` (Foundry 13 and later). Give each card a stable id. The whole card is the drag target, including its text and artwork. Buttons, links, fields, and disclosure summaries inside a card keep their own clicks.
+
+```html
+<div class="ml-grid" data-columns="2">
+  <article class="ml-card" data-ml-sortable-id="alpha">...</article>
+  <article class="ml-card" data-ml-sortable-id="beta">...</article>
+</div>
+```
+
+```js
+const sortable = game.modules.get("morelord-core").api.sortable;
+const control = sortable.bind(container, {
+  onReorder(newOrderIds) {
+    save(newOrderIds);
+    render();
+    control.refresh();
+  }
+});
+```
+
+`onReorder` receives the full id list, such as `["beta", "alpha"]`, and only when the drop changes the order. A drop on the same place, Escape, or a drop outside the container leaves the order alone and clears the preview. `refresh()` rebinds items when the same container element gets new children. If a render replaces the container element, call `bind` on the new element. `destroy()` removes the drag behavior and the preview.
+
+While the pointer is down, a copy of the whole card follows the pointer with an accent outline and shadow. The original card stays in place, dimmed, with an accent outline. A landing line marks the gap where the card will be inserted. Lists use a horizontal line. A single row or a grid uses a vertical line in that row. The line is removed on drop, when the drag ends, and when the drag is cancelled.
+
+`itemSelector` defaults to `[data-ml-sortable-id]`. `idAttribute` defaults to `data-ml-sortable-id`. Pass `id: element => element.dataset.entryId` when the id lives somewhere else, and pass the matching `itemSelector`. Ids must be unique. `direction` is `"ltr"` or `"rtl"`; otherwise the container's computed direction is used. `canDrag: element => false` refuses that card.
+
+`sortable.reorderIds(ids, draggedId, insertAt)` returns a new id list. `insertAt` is the index among the other ids: `0` moves the id to the front, and its current index leaves the list unchanged. `sortable.insertionIndex(items, draggedId, point, direction)` returns that index from client-pixel boxes `{id, top, left, width, height}` and a point `{x, y}`. `sortable.orderAfterDrop(items, draggedId, point, direction)` combines the two.
+
 ## Collapsible sections
 
 Use Core's native disclosure component for sections that can be hidden:

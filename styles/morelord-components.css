@@ -494,3 +494,41 @@
 
 /* Domain layouts can adapt to their actual application width. */
 .ml-app-shell[data-ml-responsive] { container-type: inline-size; }
+
+/* Reorder preview. The landing line and drag clone are portaled to the document. */
+.ml-sortable__item { cursor: grab; }
+.ml-sortable__item:active { cursor: grabbing; }
+.ml-sortable__item :is(img, a) { -webkit-user-drag: none; }
+.ml-sortable__origin {
+  opacity: .4;
+  outline: 2px dashed var(--ml-color-accent);
+  outline-offset: -2px;
+  box-shadow: inset 0 0 0 2px var(--ml-color-accent);
+  cursor: grabbing;
+}
+.ml-sortable__drag-host {
+  position: fixed;
+  top: 0;
+  left: -10000px;
+  z-index: -1;
+  margin: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+.ml-sortable__drag-host > .window-content { margin: 0; padding: 0; overflow: visible; background: transparent; }
+.ml-sortable__drag-image {
+  opacity: 1;
+  outline: 2px solid var(--ml-color-accent);
+  box-shadow: 0 14px 32px rgb(0 0 0 / 40%), inset 0 0 0 2px var(--ml-color-accent);
+  border-radius: var(--ml-radius-lg);
+  cursor: grabbing;
+  user-select: none;
+}
+.ml-sortable__indicator {
+  position: fixed;
+  z-index: 10000;
+  pointer-events: none;
+  background: var(--ml-color-accent);
+  border-radius: var(--ml-radius-pill);
+  box-shadow: 0 0 0 1px var(--ml-color-accent-strong);
+}

@@ -5,7 +5,9 @@
 .ml-app,
 .ml-window,
 .ml-core-directory-check,
-.ml-chat-card {
+.ml-chat-card,
+.ml-sortable__drag-host,
+.ml-sortable__indicator {
   --ml-color-accent: var(--color-warm-1, #d6a34a);
   --ml-color-accent-strong: var(--color-warm-2, #b98227);
   --ml-color-on-accent: #17120d;
