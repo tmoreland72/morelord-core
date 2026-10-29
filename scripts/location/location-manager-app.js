@@ -1,4 +1,6 @@
 import { CAPABILITY_TIERS, SETTLEMENT_TYPES } from "./location-domain.js";
+import { decorateCapabilityRows, listTrainingSpecialties } from "./training-specialties.js";
+import { onConfigureSourcesChanged } from "../services/allowed-packs.js";
 import { renderPreservingScroll } from "../ui/scroll-preservation.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
@@ -45,6 +47,8 @@ export class LocationManagerApp extends HandlebarsApplicationMixin(ApplicationV2
 
   selectedId = null;
   draft = null;
+  #trainingChoiceCache = null;
+  #stopConfigureSourcesWatch = null;
 
   constructor(options = {}) {
     super(options);
@@ -52,6 +56,18 @@ export class LocationManagerApp extends HandlebarsApplicationMixin(ApplicationV2
     if (options.createNew) {
       this.draft = { id: null, name: "", settlementType: "road", sceneIds: [], capabilities: [], notes: "", metadata: {} };
     }
+    this.#stopConfigureSourcesWatch = onConfigureSourcesChanged(() => {
+      this.#trainingChoiceCache = null;
+      if (!this.rendered || !this.element) return;
+      this.#captureDraft();
+      void this.render({ force: true });
+    });
+  }
+
+  async close(options) {
+    this.#stopConfigureSourcesWatch?.();
+    this.#stopConfigureSourcesWatch = null;
+    return super.close(options);
   }
 
   render(options = {}) {
@@ -72,6 +88,12 @@ export class LocationManagerApp extends HandlebarsApplicationMixin(ApplicationV2
     };
     filter?.addEventListener("input", refresh);
     select?.addEventListener("change", refresh);
+    for (const typeSelect of this.element.querySelectorAll("[data-capability-type]")) {
+      typeSelect.addEventListener("change", () => {
+        this.#captureDraft();
+        void this.render({ force: true });
+      });
+    }
     select?.addEventListener("mousedown", event => {
       if (!(event.target instanceof HTMLOptionElement)) return;
       event.preventDefault();
@@ -90,7 +112,15 @@ export class LocationManagerApp extends HandlebarsApplicationMixin(ApplicationV2
     if (!this.draft && this.selectedId) {
       this.draft = foundry.utils.deepClone(this.constructor.locationService.get(this.selectedId));
     }
-    const draft = this.draft;
+    const trainingChoices = await this.#trainingChoices();
+    const source = this.draft;
+    const draft = source ? {
+      ...source,
+      capabilities: decorateCapabilityRows(source.capabilities, {
+        resolveType: typeId => this.constructor.capabilityRegistry?.get(typeId) ?? null,
+        choices: trainingChoices
+      })
+    } : null;
     const selectedSceneIds = new Set(draft?.sceneIds ?? []);
     return {
       locations: locations.map(location => ({ ...location, selected: location.id === draft?.id })),
@@ -188,6 +218,17 @@ export class LocationManagerApp extends HandlebarsApplicationMixin(ApplicationV2
       await this.render({ force: true });
     } finally {
       target.disabled = false;
+    }
+  }
+
+  async #trainingChoices() {
+    if (this.#trainingChoiceCache) return this.#trainingChoiceCache;
+    try {
+      const choices = await listTrainingSpecialties();
+      this.#trainingChoiceCache = choices;
+      return choices;
+    } catch {
+      return [];
     }
   }
 

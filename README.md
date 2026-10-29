@@ -37,6 +37,16 @@ Saved Associated Scenes remain highlighted when the editor reopens, including wh
 
 The Settlement Type dropdown includes suggested population ranges: Hamlet (1–100), Village (101–1,000), Town (1,001–6,000), City (6,001–25,000), and Metropolis (25,001+). Road and Other have no population range. These labels provide guidance only; capability tiers remain independent of settlement size.
 
+An Instructor capability shows **Specialty** as a dropdown. **Any** is the default and stores no specialty. The other choices are languages, skills, tools, weapons, armor, and weapon masteries from `listTrainingSpecialties()`, the same D&D 2024 set Downtime Training discovers. The saved specialty is that subject's id, which Downtime compares with the training proficiency id. A weapon that appears under both weapons and weapon masteries saves the same id. A stored specialty that is not in the list stays in the dropdown. Capability types with no specialty catalog hide **Specialty** and keep any specialty already saved. The capability field labeled **Notes** is still stored as `source`.
+
+```js
+const locations = game.modules.get("morelord-core").api.locations;
+const choices = await locations.listTrainingSpecialties();
+const options = locations.buildSpecialtyOptions("instructor", { choices, current: null });
+```
+
+`listTrainingSpecialties()` reads the active `CONFIG.DND5E` skills, languages, tool proficiencies, weapon proficiencies, armor proficiencies, and the specific tool, weapon, armor, and shield items. Weapon masteries use those weapon ids. Each choice has `kind`, `id`, `label`, `category`, and `trainingValue` (`kind:id`). Compendium items from a pack excluded by Configure Sources are omitted, and an open Locations window refreshes when that setting changes. `buildSpecialtyOptions(typeId, { choices, current })` returns `null` when that registered type has no `specialtyCatalog`, and otherwise returns grouped dropdown options. `registerCapability({ id, name, icon, supportsSpecialty, specialtyCatalog })` accepts `specialtyCatalog: "training"` for this list. Downtime still awards proficiencies through its own adapter.
+
 ## Export and import settings
 
 GMs can open **Morelord Core → Export / Import Settings** in Module Settings. Export downloads `morelord-settings.json` with configuration from every enabled Morelord module, including hidden defaults and current-browser preferences. Import replaces matching settings and leaves settings absent from the file unchanged. Missing or disabled modules and unknown keys are skipped; enable a module before importing its settings. Reload Foundry after importing to refresh module views.

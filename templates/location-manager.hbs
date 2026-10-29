@@ -61,10 +61,27 @@
         <input type="hidden" name="capabilityCount" value="{{draft.capabilities.length}}">
         {{#each draft.capabilities}}
           <div class="ml-location-manager__capability">
-            <label><span>Type</span><select name="capabilities.{{@index}}.type">{{selectOptions ../capabilityTypes selected=type}}</select></label>
+            <label><span>Type</span><select name="capabilities.{{@index}}.type" data-capability-type>{{selectOptions ../capabilityTypes selected=type}}</select></label>
             <label><span>Tier</span><select name="capabilities.{{@index}}.tier">{{selectOptions ../capabilityTiers selected=tier}}</select></label>
-            <label><span>Specialty</span><input type="text" name="capabilities.{{@index}}.specialty" value="{{specialty}}" placeholder="Optional"></label>
-            <label><span>Source</span><input type="text" name="capabilities.{{@index}}.source" value="{{source}}" placeholder="Optional"></label>
+            {{#if specialtyOptions}}
+              <label>
+                <span>Specialty</span>
+                <select name="capabilities.{{@index}}.specialty">
+                  {{#each specialtyOptions.groups}}
+                    {{#if label}}
+                      <optgroup label="{{label}}">
+                        {{#each options}}<option value="{{value}}" {{#if selected}}selected="selected"{{/if}}>{{label}}</option>{{/each}}
+                      </optgroup>
+                    {{else}}
+                      {{#each options}}<option value="{{value}}" {{#if selected}}selected="selected"{{/if}}>{{label}}</option>{{/each}}
+                    {{/if}}
+                  {{/each}}
+                </select>
+              </label>
+            {{else}}
+              <span><input type="hidden" name="capabilities.{{@index}}.specialty" value="{{specialty}}"></span>
+            {{/if}}
+            <label><span>Notes</span><input type="text" name="capabilities.{{@index}}.source" value="{{source}}" placeholder="Optional"></label>
             <button type="button" class="ml-icon-button" data-action="removeCapability" data-index="{{@index}}" title="Remove Capability" aria-label="Remove Capability"><i class="fa-solid fa-trash"></i></button>
           </div>
         {{else}}

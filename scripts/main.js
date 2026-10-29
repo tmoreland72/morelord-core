@@ -13,7 +13,8 @@ import { WindowGeometryService } from "./services/window-geometry-service.js";
 import { Dnd5eSourceFilterService } from "./services/dnd5e-source-filter-service.js";
 import { CONFIGURE_SOURCES_CHANGED, filterAllowed, getAllowedPack, getAllowedPacks, installConfigureSourcesWatcher, isPackAllowed, isSourceAllowed, isUuidAllowed, onConfigureSourcesChanged } from "./services/allowed-packs.js";
 import { resolveBookLabel, resolvePackLabel } from "./services/source-book-service.js";
-import { CapabilityRegistry } from "./location/capability-registry.js";
+import { BUILTIN_CAPABILITY_TYPES, CapabilityRegistry } from "./location/capability-registry.js";
+import { buildSpecialtyOptions, listTrainingSpecialties } from "./location/training-specialties.js";
 import { LocationService } from "./location/location-service.js";
 import { CAPABILITY_TIERS, SETTLEMENT_TYPES, evaluateRequirements, meetsTier } from "./location/location-domain.js";
 import { LocationManagerApp } from "./location/location-manager-app.js";
@@ -593,16 +594,7 @@ Hooks.once("init", () => {
     scope: "world", config: false, type: Array, default: [], restricted: true
   });
   locationService.registerSetting();
-  for (const definition of [
-    { id: "forge", name: "Forge" },
-    { id: "marketplace", name: "Marketplace" },
-    { id: "alchemist", name: "Alchemist" },
-    { id: "library", name: "Library" },
-    { id: "temple", name: "Temple" },
-    { id: "contractor", name: "Contractor" },
-    { id: "instructor", name: "Instructor", supportsSpecialty: true },
-    { id: "workshop", name: "Workshop" }
-  ]) capabilityRegistry.register(definition);
+  for (const definition of BUILTIN_CAPABILITY_TYPES) capabilityRegistry.register(definition);
   windowGeometry.start();
   game.settings.register(MODULE_ID, SETTINGS.SERVER_URL, {
     name: "Morelord Gaming Website",
@@ -736,6 +728,8 @@ Hooks.once("ready", async () => {
       registerCapability: definition => capabilityRegistry.register(definition),
       getCapability: id => capabilityRegistry.get(id),
       listCapabilities: () => capabilityRegistry.all(),
+      listTrainingSpecialties: (options) => listTrainingSpecialties(options),
+      buildSpecialtyOptions: (typeId, options = {}) => buildSpecialtyOptions(capabilityRegistry.get(typeId), options),
       list: () => locationService.list(),
       get: id => locationService.get(id),
       forScene: sceneId => locationService.forScene(sceneId),
