@@ -9,4 +9,4 @@
 
 ## Verification
 
-Node tests cover compendium selection, move, lock, unlock confirmation, and world-only deletion. Live Foundry verification in Dev1 was not run because this environment could not confirm world id `dev1`.
+Node tests cover compendium selection, move, lock, unlock confirmation, and world-only deletion. Tested in Dev1.
