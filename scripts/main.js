@@ -20,6 +20,7 @@ import { LocationService } from "./location/location-service.js";
 import { CAPABILITY_TIERS, SETTLEMENT_TYPES, evaluateRequirements, meetsTier } from "./location/location-domain.js";
 import { LocationManagerApp } from "./location/location-manager-app.js";
 import { renderPreservingScroll } from "./ui/scroll-preservation.js";
+import { guardApplicationRender, renderInBackground } from "./ui/background-render.js";
 import { applyPageLayout } from "./ui/page-layout.js";
 import { activateTabs } from "./ui/tabs.js";
 import { activateCardSelection } from "./ui/card-selection.js";
@@ -37,6 +38,7 @@ import { createToolsRegistry, mergeCoreApi } from "./ui/tools-registry.js";
 import { bindMorelordModulesButton } from "./ui/morelord-modules.js";
 
 const MODULE_ID = "morelord-core";
+guardApplicationRender(globalThis.foundry?.applications?.api?.ApplicationV2);
 const sourceFilter = new Dnd5eSourceFilterService();
 
 function publishedSources() {
@@ -706,6 +708,7 @@ Hooks.once("ready", async () => {
       createCollapsibleSection,
       createChoiceGroup,
       renderPreservingScroll,
+      renderInBackground,
       participation: Object.freeze({ canUseActorInventory, listCharacterActors, listCharacterChoices, participantRecords, primaryPartyGroup, selectedCharacterUuids }),
       documentation: Object.freeze({
         register: definition => documentationService.register(definition),

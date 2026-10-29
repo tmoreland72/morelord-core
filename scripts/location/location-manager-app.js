@@ -2,6 +2,7 @@ import { CAPABILITY_TIERS, SETTLEMENT_TYPES } from "./location-domain.js";
 import { decorateCapabilityRows, listTrainingSpecialties } from "./training-specialties.js";
 import { onConfigureSourcesChanged } from "../services/allowed-packs.js";
 import { renderPreservingScroll } from "../ui/scroll-preservation.js";
+import { renderInBackground } from "../ui/background-render.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -60,7 +61,7 @@ export class LocationManagerApp extends HandlebarsApplicationMixin(ApplicationV2
       this.#trainingChoiceCache = null;
       if (!this.rendered || !this.element) return;
       this.#captureDraft();
-      void this.render({ force: true });
+      void renderInBackground(this);
     });
   }
 

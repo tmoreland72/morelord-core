@@ -2,6 +2,7 @@ import { Dnd5eSourceFilterService } from "../services/dnd5e-source-filter-servic
 import { filterAllowed, isUuidAllowed, onConfigureSourcesChanged } from "../services/allowed-packs.js";
 import { resolvePackLabel } from "../services/source-book-service.js";
 import { itemRarity } from "../services/item-rarity.js";
+import { renderInBackground } from "./background-render.js";
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 const sources = new Dnd5eSourceFilterService();
 const physicalTypes = new Set(["weapon", "equipment", "consumable", "tool", "loot", "container"]);
@@ -22,7 +23,7 @@ export class ItemPickerApp extends HandlebarsApplicationMixin(ApplicationV2) {
     this.results = [];
     this.stopConfigureSourcesWatch = onConfigureSourcesChanged(() => {
       this.results = filterAllowed(this.results);
-      if (this.rendered) void this.render({ force: true });
+      if (this.rendered) void renderInBackground(this);
     });
   }
   async close(options) {

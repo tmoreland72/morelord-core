@@ -220,7 +220,7 @@ Each row has a **Type**, **Tier**, optional **Specialty**, optional **Notes**, a
 
 Under **Associated Scenes**, use **Filter Scenes** to find names. Click a Scene to select it; click again to deselect it. Several Scenes can share a location. Clearing the filter reveals the full list. Saving an association already owned by another location moves that association to the newly saved location. For a user who is not in an active Downtime session, the shared location is the one associated with the scene that user is viewing. An active Downtime session replaces that scene: workflows use the session's location, or **On the Road** when the session has no location. On the Road is not a saved location and has no capabilities.
 
-Choose **Save Location** to persist changes; the editor stays open. Reopen a saved entry to review it. Save edits before selecting another location. Journeys, Craftworks, Marketplace, and Downtime can consume these records.
+Choose **Save Location** to persist changes; the editor stays open and in front. Other open Morelord windows may refresh from that save, and they stay behind this window. Reopen a saved entry to review it. Save edits before selecting another location. Journeys, Craftworks, Marketplace, and Downtime can consume these records.
 
 **Delete** asks for confirmation. Choose **No** to keep the record. Choosing **Yes** removes the location; projects and integrations referring to it may become unavailable. Deleting a location does not delete its Foundry Scenes.
 
