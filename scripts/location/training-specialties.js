@@ -1,4 +1,5 @@
 import { isUuidAllowed as coreUuidAllowed } from "../services/allowed-packs.js";
+import { artisanSpecialtyOptions } from "./artisan-tools.js";
 
 /**
  * D&D 2024 training subjects used by Downtime's Dnd5eProficiencyAdapter.listTrainingChoices:
@@ -176,12 +177,20 @@ export function buildSpecialtyOptions(definition, { choices = [], current = null
   return { groups };
 }
 
-export function decorateCapabilityRows(capabilities = [], { resolveType = () => null, choices = [] } = {}) {
-  return (capabilities ?? []).map(capability => ({
-    ...capability,
-    specialtyOptions: buildSpecialtyOptions(resolveType(capability?.type), {
-      choices,
-      current: capability?.specialty
-    })
-  }));
+export function decorateCapabilityRows(capabilities = [], { resolveType = () => null, choices = [], capabilityTypeIds = null } = {}) {
+  return (capabilities ?? []).map(capability => {
+    const definition = resolveType(capability?.type) ?? null;
+    const current = capability?.specialty ?? null;
+    const artisanOptions = { current, ...(capabilityTypeIds ? { capabilityTypeIds } : {}) };
+    let specialtyOptions = null;
+    if (definition?.specialtyCatalog === TRAINING_SPECIALTY_CATALOG) {
+      specialtyOptions = buildSpecialtyOptions(definition, { choices, current });
+    } else {
+      specialtyOptions = artisanSpecialtyOptions(capability?.type, artisanOptions);
+      if (!specialtyOptions && definition?.specialtyCatalog) {
+        specialtyOptions = buildSpecialtyOptions(definition, { choices, current });
+      }
+    }
+    return { ...capability, specialtyOptions };
+  });
 }

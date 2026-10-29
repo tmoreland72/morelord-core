@@ -118,7 +118,8 @@ export class LocationManagerApp extends HandlebarsApplicationMixin(ApplicationV2
       ...source,
       capabilities: decorateCapabilityRows(source.capabilities, {
         resolveType: typeId => this.constructor.capabilityRegistry?.get(typeId) ?? null,
-        choices: trainingChoices
+        choices: trainingChoices,
+        capabilityTypeIds: this.constructor.capabilityRegistry?.all().map(type => type.id) ?? null
       })
     } : null;
     const selectedSceneIds = new Set(draft?.sceneIds ?? []);

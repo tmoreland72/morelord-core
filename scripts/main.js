@@ -15,6 +15,7 @@ import { CONFIGURE_SOURCES_CHANGED, filterAllowed, getAllowedPack, getAllowedPac
 import { resolveBookLabel, resolvePackLabel } from "./services/source-book-service.js";
 import { BUILTIN_CAPABILITY_TYPES, CapabilityRegistry } from "./location/capability-registry.js";
 import { buildSpecialtyOptions, listTrainingSpecialties } from "./location/training-specialties.js";
+import { artisanSpecialtyOptions, listArtisanToolsForCapability, listWorkshopSpecialties, toolCapabilityType } from "./location/artisan-tools.js";
 import { LocationService } from "./location/location-service.js";
 import { CAPABILITY_TIERS, SETTLEMENT_TYPES, evaluateRequirements, meetsTier } from "./location/location-domain.js";
 import { LocationManagerApp } from "./location/location-manager-app.js";
@@ -729,7 +730,22 @@ Hooks.once("ready", async () => {
       getCapability: id => capabilityRegistry.get(id),
       listCapabilities: () => capabilityRegistry.all(),
       listTrainingSpecialties: (options) => listTrainingSpecialties(options),
-      buildSpecialtyOptions: (typeId, options = {}) => buildSpecialtyOptions(capabilityRegistry.get(typeId), options),
+      buildSpecialtyOptions: (typeId, options = {}) => {
+        const registeredIds = options.capabilityTypeIds ?? capabilityRegistry.all().map(type => type.id);
+        const definition = capabilityRegistry.get(typeId);
+        if (definition?.specialtyCatalog === "training") return buildSpecialtyOptions(definition, options);
+        return artisanSpecialtyOptions(typeId, { ...options, capabilityTypeIds: registeredIds })
+          ?? buildSpecialtyOptions(definition, options);
+      },
+      toolCapabilityType: (tool, options = {}) => toolCapabilityType(tool, {
+        capabilityTypeIds: options.capabilityTypeIds ?? capabilityRegistry.all().map(type => type.id)
+      }),
+      listWorkshopSpecialties: (options = {}) => listWorkshopSpecialties({
+        capabilityTypeIds: options.capabilityTypeIds ?? capabilityRegistry.all().map(type => type.id)
+      }),
+      listArtisanToolsForCapability: (typeId, options = {}) => listArtisanToolsForCapability(typeId, {
+        capabilityTypeIds: options.capabilityTypeIds ?? capabilityRegistry.all().map(type => type.id)
+      }),
       list: () => locationService.list(),
       get: id => locationService.get(id),
       forScene: sceneId => locationService.forScene(sceneId),

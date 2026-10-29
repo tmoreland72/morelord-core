@@ -100,7 +100,7 @@ test("specialty options follow the capability type, default to Any, and keep unk
   assert.equal(flatOptions(instructor).some(option => option.value === "Stealth"), false);
   assert.equal(flatOptions(instructor).find(option => option.value === "ste").label, "Stealth");
 
-  for (const typeId of ["forge", "marketplace", "alchemist", "library", "temple", "contractor", "workshop"]) {
+  for (const typeId of ["forge", "marketplace", "alchemist", "library", "temple", "contractor"]) {
     assert.equal(optionsFor(typeId, { choices, current: "smiths-tools" }), null, typeId);
   }
   assert.equal(buildSpecialtyOptions({ id: "oracle", supportsSpecialty: true }, { choices, current: "ste" }), null);
@@ -136,14 +136,16 @@ test("hidden specialty types keep the stored specialty on the editor row", async
   assert.equal(rows[1].source, "kept");
 });
 
-test("builtin instructor advertises the training catalog and other types do not", () => {
+test("builtin instructor uses the training catalog and workshop uses artisan tools", () => {
   const types = registry();
   assert.equal(types.get("instructor").supportsSpecialty, true);
   assert.equal(types.get("instructor").specialtyCatalog, "training");
-  for (const typeId of ["forge", "marketplace", "alchemist", "library", "temple", "contractor", "workshop"]) {
+  for (const typeId of ["forge", "marketplace", "alchemist", "library", "temple", "contractor"]) {
     assert.equal(types.get(typeId).supportsSpecialty, false, typeId);
     assert.equal(types.get(typeId).specialtyCatalog, null, typeId);
   }
+  assert.equal(types.get("workshop").supportsSpecialty, true);
+  assert.equal(types.get("workshop").specialtyCatalog, "artisan-tools");
 });
 
 test("stored specialty and source strings stay compatible", () => {

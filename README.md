@@ -39,6 +39,15 @@ The Settlement Type dropdown includes suggested population ranges: Hamlet (1–1
 
 An Instructor capability shows **Specialty** as a dropdown. **Any** is the default and stores no specialty. The other choices are languages, skills, tools, weapons, armor, and weapon masteries from `listTrainingSpecialties()`, the same D&D 2024 set Downtime Training discovers. The saved specialty is that subject's id, which Downtime compares with the training proficiency id. A weapon that appears under both weapons and weapon masteries saves the same id. A stored specialty that is not in the list stays in the dropdown. Capability types with no specialty catalog hide **Specialty** and keep any specialty already saved. The capability field labeled **Notes** is still stored as `source`.
 
+A Workshop capability shows **Specialty** as the D&D 2024 artisan's tools that do not already belong to another registered capability. **Any** is the default and stores no specialty. Each other choice stores the dnd5e tool id, such as `cobbler` for Cobbler's Tools. Smith's Tools belong to Forge and Alchemist's Supplies belong to Alchemist, so those two are not Workshop choices and those types do not show a one-tool dropdown. Brewer's Supplies and Cook's Utensils stay on Workshop. If a module registers a Tavern capability, those two move to Tavern and Tavern shows them as its specialty list. Carpenter's Tools, Mason's Tools, Calligrapher's Supplies, and Cartographer's Tools stay on Workshop. A saved specialty that is not in the list stays in the dropdown.
+
+```js
+const locations = game.modules.get("morelord-core").api.locations;
+locations.toolCapabilityType("Smith's Tools"); // "forge"
+locations.toolCapabilityType("cobbler"); // "workshop"
+locations.listWorkshopSpecialties(); // [{ id, label, capabilityType }]
+```
+
 ```js
 const locations = game.modules.get("morelord-core").api.locations;
 const choices = await locations.listTrainingSpecialties();
