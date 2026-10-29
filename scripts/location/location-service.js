@@ -1,4 +1,5 @@
 import { normalizeLocation, evaluateRequirements } from "./location-domain.js";
+import { activeLocationContext, readDowntimeProjectState } from "./location-context.js";
 
 export class LocationService {
   constructor({ moduleId, settingKey }) {
@@ -20,6 +21,18 @@ export class LocationService {
   get(id) { return this.#records()[String(id)] ?? null; }
   forScene(sceneId) { return this.list().find(location => location.sceneIds.includes(String(sceneId))) ?? null; }
   current() { return this.forScene(globalThis.canvas?.scene?.id ?? game.scenes?.current?.id); }
+
+  activeContext(user = globalThis.game?.user ?? null) {
+    const localSceneId = globalThis.canvas?.scene?.id ?? globalThis.game?.scenes?.current?.id ?? null;
+    return activeLocationContext({
+      user,
+      localUserId: globalThis.game?.user?.id ?? null,
+      localSceneId,
+      forScene: sceneId => this.forScene(sceneId),
+      getLocation: id => this.get(id),
+      ...readDowntimeProjectState(globalThis.game)
+    });
+  }
 
   async save(raw) {
     if (!game.user?.isGM) throw new Error("Only a GM may change Morelord locations.");

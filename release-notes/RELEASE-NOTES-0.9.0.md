@@ -9,7 +9,9 @@
 ### Added
 
 - Locations can list that same D&D 2024 training set and map a capability type to its specialty options, so other modules can use the list the Instructor dropdown uses.
+- `api.locations.activeContext(user)` returns the current place: the active Downtime session's location, On the Road when that session has no location, or the location for the scene that user is viewing. When Downtime is not active, or it has no active session, the viewed scene is used.
+- Settings transfer includes Marketplace's Enable Locations setting.
 
 ## Verification
 
-Node tests cover the training catalog, the capability type to specialty options mapping, preserved free-text specialties, and unchanged specialty and source storage. Live Foundry verification is still outstanding.
+Node tests cover the training catalog, the capability type to specialty options mapping, preserved free-text specialties, unchanged specialty and source storage, the active location context, and Enable Locations in settings transfer. Live Foundry verification is still outstanding.

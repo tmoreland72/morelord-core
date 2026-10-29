@@ -47,11 +47,17 @@ const options = locations.buildSpecialtyOptions("instructor", { choices, current
 
 `listTrainingSpecialties()` reads the active `CONFIG.DND5E` skills, languages, tool proficiencies, weapon proficiencies, armor proficiencies, and the specific tool, weapon, armor, and shield items. Weapon masteries use those weapon ids. Each choice has `kind`, `id`, `label`, `category`, and `trainingValue` (`kind:id`). Compendium items from a pack excluded by Configure Sources are omitted, and an open Locations window refreshes when that setting changes. `buildSpecialtyOptions(typeId, { choices, current })` returns `null` when that registered type has no `specialtyCatalog`, and otherwise returns grouped dropdown options. `registerCapability({ id, name, icon, supportsSpecialty, specialtyCatalog })` accepts `specialtyCatalog: "training"` for this list. Downtime still awards proficiencies through its own adapter.
 
+`locations.activeContext(user)` resolves the place those workflows should use. Downtime keeps one active session for the world. When Downtime is active and that session has a location id, the result is that saved location (`source: "downtime"`). When the session has no location, the result is the virtual **On the Road** place (`source: "road"`, `metadata.virtual: true`, no capabilities). It is not a saved location. When Downtime is inactive, has no active session, or its project state cannot be read, the result is the location for the scene `user` is viewing (`source: "scene"`). Omit `user` to use the current user. A user with no viewed scene falls back to the local canvas scene only when that user is the current user; another user's missing scene does not use this client’s scene. No matching location returns `source: "none"` and `location: null`. `sessionId` is set only for an active session. A session location id that no longer exists returns `source: "downtime"` and `location: null`.
+
+```js
+const place = game.modules.get("morelord-core").api.locations.activeContext(user);
+```
+
 ## Export and import settings
 
 GMs can open **Morelord Core → Export / Import Settings** in Module Settings. Export downloads `morelord-settings.json` with configuration from every enabled Morelord module, including hidden defaults and current-browser preferences. Import replaces matching settings and leaves settings absent from the file unchanged. Missing or disabled modules and unknown keys are skipped; enable a module before importing its settings. Reload Foundry after importing to refresh module views.
 
-Account credentials and access caches, shops, shared locations, active journeys, downtime projects, and window positions are excluded. Actor/user references keep their IDs; they are not remapped between worlds. Modules with no configurable settings add no entries. Files are validated before writing; if a write fails, Core attempts to restore the previous values and reports any restoration failures.
+Account credentials and access caches, shops, shared locations, active journeys, downtime projects, and window positions are excluded. Marketplace's **Enable Locations** setting is included with its other configuration settings. Actor/user references keep their IDs; they are not remapped between worlds. Modules with no configurable settings add no entries. Files are validated before writing; if a write fails, Core attempts to restore the previous values and reports any restoration failures.
 
 ## Module API
 

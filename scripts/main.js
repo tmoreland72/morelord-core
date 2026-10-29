@@ -734,6 +734,7 @@ Hooks.once("ready", async () => {
       get: id => locationService.get(id),
       forScene: sceneId => locationService.forScene(sceneId),
       current: () => locationService.current(),
+      activeContext: user => locationService.activeContext(user),
       save: location => locationService.save(location),
       remove: id => locationService.remove(id),
       evaluate: (requirements, context) => locationService.evaluate(requirements, context),
