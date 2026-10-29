@@ -1,5 +1,11 @@
 # Morelord Core Changelog
 
+## 0.8.1
+
+### Changed
+
+- The 0.8.0 release notes now correctly state it was tested in Dev1. There are no functional changes.
+
 ## 0.8.0
 
 ### Added
