@@ -131,6 +131,11 @@
   color: var(--ml-color-accent);
   font-weight: var(--ml-font-weight-bold);
 }
+:is(.ml-window .window-content, .ml-app, .ml-chat-card) select optgroup option {
+  background: var(--ml-color-window);
+  color: var(--ml-color-text);
+  font-weight: var(--ml-font-weight-normal);
+}
 .ml-window .window-content select { color-scheme: dark; }
 .ml-window .window-content select[multiple] { height: auto; }
 .ml-window .window-content select[multiple] option:checked {

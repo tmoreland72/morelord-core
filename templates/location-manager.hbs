@@ -73,7 +73,7 @@
                 <div class="ml-multi-select__panel" id="ml-specialty-{{@index}}" hidden>
                   {{#each specialtyOptions.groups}}
                     <div class="ml-multi-select__group">
-                      {{#if label}}<p class="ml-multi-select__heading">{{label}}</p>{{/if}}
+                      {{#if label}}<div class="ml-multi-select__heading" role="heading" aria-level="3">{{label}}</div>{{/if}}
                       {{#each options}}
                         <label>
                           <input type="checkbox" name="capabilities.{{@../../index}}.specialty" value="{{value}}" {{#if selected}}checked{{/if}}>

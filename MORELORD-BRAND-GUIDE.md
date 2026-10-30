@@ -210,7 +210,7 @@ Standard paragraphs, list prose, and descriptions use Core's normal body weight 
 
 - Inputs, selects, and textareas use the shared height, background, border, radius, and focus treatment.
 - Select menus must remain readable in their expanded native popup; Morelord’s dark windows use a dark `color-scheme` and opaque option background. `optgroup` labels use that same option background, `--ml-color-accent`, and bold type. Options keep the text color and normal weight.
-- `.ml-multi-select` is the compact checkbox menu when one field needs several values. The closed summary lists the selection, or **Any** when nothing is checked. Group headings use the accent color on the window background. Location **Specialty** uses this control.
+- `.ml-multi-select` is the compact checkbox menu when one field needs several values. The closed summary lists the selection, or **Any** when nothing is checked. Group headings are a `div` with `role="heading"`, bold weight, the accent color, and the window background. They are not paragraphs, so the shared body weight does not apply. Location **Specialty** uses this control.
 - Field labels use the shared uppercase eyebrow treatment.
 - Checkbox and radio accents use the Core accent color.
 - Buttons containing only an icon require an accessible name.
