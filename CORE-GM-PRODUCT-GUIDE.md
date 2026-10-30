@@ -206,15 +206,43 @@ Characters assigned to or owned only by ignored users are also excluded from sha
 
 ## Shared Locations
 
-A shared location is a place you describe once in Morelord Core. Marketplace, Craftworks, and Downtime use that same record. How each module uses a location is in that module's documentation.
+A shared location is a place you describe once in Morelord Core. Downtime, Craftworks, Marketplace, and Journeys read that same record. Name the town, choose the settlement, and list the facilities it has. Tie the town's scenes to that record, and choose the same record when a Downtime session happens there. Every module then sees the same forge, market, and instructor.
 
-Open **Morelord Core → Manage Shared Locations**. The window title is **Morelord Locations**.
+Creating the location records what the place can support. It does not create a shop, an NPC, a recipe, or a project. Each module applies its own rules, described below.
+
+**In this section**
+
+- [Why one location is enough](#why-one-location-is-enough)
+- [Set up a location](#set-up-a-location)
+- [Capabilities and Specialty](#capabilities-and-specialty)
+- [Which place the modules use](#which-place-the-modules-use)
+- [What each capability does](#what-each-capability-does)
+- [Downtime](#downtime)
+- [Craftworks](#craftworks)
+- [Marketplace](#marketplace)
+- [Journeys](#journeys)
+- [Example: a town forge](#example-a-town-forge)
+
+### Why one location is enough
+
+Without a shared location, each module would need its own note that the town has a forge, a market, and someone who can teach. One location keeps those facts together.
+
+A capability is one service at that place. **Tier** says how rare a result that service can support. **Specialty** says which subjects that one service covers. Leave Specialty on **Any** and the service covers every subject of its kind.
+
+The same town then answers a different question in each module:
+
+- Downtime asks whether an NPC there can teach a subject, and which place a session or a project uses.
+- Craftworks asks whether the current place has the facility a recipe needs.
+- Marketplace, when **Enable Locations** is on, asks whether the current place has a market and how rare an item that market trades.
+- Journeys can store the town on a travel day. With no town stored, the day is On the Road.
 
 ### Set up a location
 
-When the list is empty, the left side reads "No shared locations yet." The main panel shows **Shared Morelord Locations**, the line "Create a location to define its settlement type, capabilities, and associated Scenes.", and **Create First Location**. The plus button (**Create Location**) in the **Locations** heading starts a location as well. The left list shows each saved **Name** and its settlement type. Select a name to edit that location.
+Open **Morelord Core → Manage Shared Locations**. The window title is **Morelord Locations**. The same window opens from **Manage Locations** on the Downtime dashboard, the Craftworks dashboard, and Marketplace.
 
-While you are editing, under **New Location** or **Edit Location**, the introduction reads "Locations are used by Marketplace, Craftworks, and Downtime."
+When the list is empty, the left side reads "No shared locations yet." The main panel shows **Shared Morelord Locations**, the line "Create a location to define its settlement type, capabilities, and associated Scenes.", and **Create First Location**. The plus button (**Create Location**) in the **Locations** heading starts another location. The left list shows each saved **Name** and its settlement type. Select a name to edit that location.
+
+While you are editing, the heading is **New Location** or **Edit Location**. The introduction reads "Locations are shared by Marketplace, Craftworks, Downtime, and Journeys."
 
 **Save Location** before you select another location or choose **Create Location**. Those actions load a different record and drop edits that are still unsaved.
 
@@ -222,78 +250,135 @@ While you are editing, under **New Location** or **Edit Location**, the introduc
 
 **Name** is required. The placeholder is Neverwinter. Saving a blank name reports `Could not save location: A location requires a name.`
 
-**Settlement Type** choices are Road, Hamlet (1–100 people), Village (101–1,000 people), Town (1,001–6,000 people), City (6,001–25,000 people), Metropolis (25,001+ people), and Other. A new location starts as Road. The hint under the menu reads "Population ranges are suggested guidelines." The ranges are suggestions. Choose the capability **Tier** on each row.
+**Settlement Type** choices are Road, Hamlet (1–100 people), Village (101–1,000 people), Town (1,001–6,000 people), City (6,001–25,000 people), Metropolis (25,001+ people), and Other. A new location starts as Road. The hint under the menu reads "Population ranges are suggested guidelines." The ranges are suggestions. They leave crafting, teaching, and trade on the capability **Tier** you set.
 
 **Notes** is optional text for the GM. The placeholder is "GM-facing location notes."
 
-### Capabilities
+### Capabilities and Specialty
 
 Choose **Add Capability** for each facility the place offers. A new row starts as **Forge**, **Common**, and Specialty **Any**. The section hint reads "Capability tier is independent from settlement size."
 
 The **Type** menu lists Forge, Marketplace, Alchemist, Library, Temple, Contractor, Instructor, and Workshop, in that order. Each row has **Type**, **Tier**, **Specialty** when that type has one, **Notes**, and **Remove Capability**.
 
-**Tier** is Common, Uncommon, Rare, Very Rare, or Legendary. Core treats a higher tier as meeting a lower tier of the same type. An Uncommon Forge meets a Common Forge. A Legendary Forge meets every lower Forge tier. Set **Tier** on the row. Changing **Settlement Type** leaves the tier as you set it.
+**Tier** is Common, Uncommon, Rare, Very Rare, or Legendary. A higher tier meets a lower tier of the same type. An Uncommon Forge meets a Common Forge. A Legendary Forge meets every lower Forge tier. Changing **Settlement Type** leaves the tier as you set it. A hamlet can have a Legendary forge, and a metropolis can have a Common market.
 
-**Specialty** and tier apply together. When a comparison names a specialty, Core uses the highest tier among rows of that type whose Specialty is **Any** or includes that specialty. When a comparison names only the type, Core uses the highest tier of that type on the location.
+When a check names a specialty, the tier that counts is the highest tier among rows of that type whose Specialty is **Any** or includes that specialty. When a check names only the type, the tier that counts is the highest tier of that type on the location. You can add more than one row of the same type. A specialty is available when any row of that type is **Any** or includes it. An **Any** row covers every subject of that type, including when another row of the same type lists only a few.
 
-You can add more than one row of the same type. A specialty is available when any row of that type is **Any** or includes it.
+**Specialty** is a checkbox menu on Instructor, Forge, and Workshop. Marketplace, Alchemist, Library, Temple, and Contractor hide it. If you change **Type** to one of those, any specialties already stored on the row stay stored.
 
-**Notes** on the row is optional text stored with that capability. The placeholder is Optional. It is separate from the location **Notes** above the capability list.
+The closed summary reads **Any** when nothing is checked. **Any** covers every specialty of that type. Open the menu, check each specialty that one row should cover, and close it. The summary lists the checked names. One row holds several specialties. Clear every box to return the summary to **Any**. A specialty saved earlier as a single choice stays that one checked choice. A saved specialty that is not in the list remains in the menu under the saved name. Changing **Type** rebuilds the menu.
 
-**Remove Capability** drops that row. Save afterward to keep the change.
+The choices are fixed D&D 2024 lists. They stay as listed here when Configure Sources changes, and they do not come from compendium items. The menu is the same list on every world.
 
-### Specialty
+A listed weapon and that weapon's mastery are one specialty. Longsword appears under Weapons and under Weapon Masteries. Saving with either Longsword box checked keeps Longsword once. After that save, both boxes are checked, and the summary lists Longsword once.
 
-**Specialty** is shown for Instructor, Forge, and Workshop. Marketplace, Alchemist, Library, Temple, and Contractor hide it. If you change **Type** to one of those, any specialties already stored on the row stay stored.
+**Notes** on the row is optional text stored with that capability. The placeholder is Optional. It is separate from the location **Notes** above the capability list. **Remove Capability** drops that row. Save afterward to keep the change.
 
-The control is a checkbox menu. The closed summary reads **Any** when nothing is checked. **Any** covers every specialty of that type. Open the menu, check each specialty that one row should cover, and close it. The summary lists the checked names. One row holds several specialties. Clear every box to return the summary to **Any**.
+**Forge.** Groups are Weapons, Armor, and Weapon Masteries. Weapons include Simple Weapons, Martial Weapons, and each weapon. Armor includes Light Armor, Medium Armor, Heavy Armor, Shields, and each armor, including Shield. Weapon Masteries lists each weapon. **Any** covers every weapon, armor, and mastery in those groups. Smith's Tools identify a Forge. The Specialty menu itself lists weapons, armor, and weapon masteries.
 
-The choices are fixed D&D 2024 lists. They stay as listed here when Configure Sources changes, and the menu is the same list on every world. A specialty saved earlier as a single choice stays that one checked choice. A saved specialty that is not in the list remains in the menu under the saved name. Changing **Type** rebuilds the menu.
+**Workshop.** One list, with no group heading. **Any** covers every tool on the list: Brewer's Supplies, Calligrapher's Supplies, Carpenter's Tools, Cartographer's Tools, Cobbler's Tools, Cook's Utensils, Glassblower's Tools, Jeweler's Tools, Leatherworker's Tools, Mason's Tools, Painter's Supplies, Potter's Tools, Tinker's Tools, Weaver's Tools, and Woodcarver's Tools. Smith's Tools stay on Forge. Alchemist's Supplies stay on Alchemist, so Alchemist has no Specialty menu. Carpenter's Tools and Mason's Tools stay on Workshop; a Contractor row does not take them. Calligrapher's Supplies and Cartographer's Tools stay on Workshop; a Library row does not take them. If a Tavern capability is available, Brewer's Supplies and Cook's Utensils move to Tavern and leave Workshop.
 
-A listed weapon and that weapon's mastery are one specialty. Longsword appears under Weapons and under Weapon Masteries. Saving with either Longsword box checked keeps Longsword once. After that save, both boxes are checked, and the summary lists Longsword once. Simple Weapons, Martial Weapons, and the armor choices appear in their own group.
+**Instructor.** Groups are Languages, Skills, Tools, Weapons, Armor, and Weapon Masteries: the D&D 2024 languages, skills, tool proficiencies, weapon proficiencies, armor proficiencies, and weapon masteries. Tools includes artisan's tools, other kits, gaming sets, musical instruments, and vehicles. **Any** covers every subject in those groups. A checked list covers those subjects. The Instructor tier does not choose which subjects can be taught. A Common Instructor set to **Any** can teach every subject on the list.
 
-### Capability types
-
-**Forge.** Groups are Weapons, Armor, and Weapon Masteries. Weapons include Simple Weapons, Martial Weapons, and each weapon. Armor includes Light Armor, Medium Armor, Heavy Armor, Shields, and each armor, including Shield. Weapon Masteries lists each weapon. **Any** covers every weapon, armor, and mastery in those groups. Smith's Tools identify a Forge. The Specialty menu lists weapons, armor, and weapon masteries.
-
-**Marketplace.** The row is **Type** and **Tier**. Specialty stays hidden.
-
-**Alchemist.** The row is **Type** and **Tier**. Specialty stays hidden. Alchemist's Supplies identify an Alchemist. Workshop lists the other artisan's tools.
-
-**Library.** The row is **Type** and **Tier**. Specialty stays hidden. Calligrapher's Supplies and Cartographer's Tools are Workshop choices.
-
-**Temple.** The row is **Type** and **Tier**. Specialty stays hidden.
-
-**Contractor.** The row is **Type** and **Tier**. Specialty stays hidden. Carpenter's Tools and Mason's Tools are Workshop choices.
-
-**Instructor.** Groups are Languages, Skills, Tools, Weapons, Armor, and Weapon Masteries: the D&D 2024 languages, skills, tool proficiencies, weapon proficiencies, armor proficiencies, and weapon masteries. Tools includes artisan's tools, other kits, gaming sets, musical instruments, and vehicles. **Any** covers every subject in those groups. A checked list covers those subjects. A weapon and its mastery follow the same single-specialty rule as Forge.
-
-**Workshop.** One list, with no group heading. **Any** covers every tool on the list. The choices are Brewer's Supplies, Calligrapher's Supplies, Carpenter's Tools, Cartographer's Tools, Cobbler's Tools, Cook's Utensils, Glassblower's Tools, Jeweler's Tools, Leatherworker's Tools, Mason's Tools, Painter's Supplies, Potter's Tools, Tinker's Tools, Weaver's Tools, and Woodcarver's Tools. Smith's Tools stay on Forge. Alchemist's Supplies stay on Alchemist.
+**Marketplace, Alchemist, Library, Temple, and Contractor.** The row is **Type** and **Tier**. Specialty stays hidden. Alchemist's Supplies identify an Alchemist.
 
 ### Associated Scenes
 
-**Associated Scenes** connects Foundry Scenes to this place. The text under the heading reads "When one of these Scenes is active, it resolves to this Morelord Location."
+**Associated Scenes** connects Foundry Scenes to this place. The text under the heading reads "When one of these Scenes is active, it resolves to this Morelord Location." The place the modules use is described under [Which place the modules use](#which-place-the-modules-use): the scene a user is viewing, unless an active Downtime session names a location or is On the Road.
 
-**Filter Scenes** keeps names that contain what you type. The placeholder is "Type any part of a Scene name." Click a Scene to select it, and click it again to clear it. The line under the list reads "{count} selected · Click a Scene to toggle its selection." Clearing the filter shows every Scene again. Several Scenes can belong to one location. A Scene belongs to one location. Saving a Scene that another location already has moves that Scene to the location you are saving. Selected Scenes stay highlighted when you reopen the location, and they are listed first.
+**Filter Scenes** keeps names that contain what you type. The placeholder is "Type any part of a Scene name." Click a Scene to select it, and click it again to clear it. The line under the list reads "{count} selected · Click a Scene to toggle its selection." Clearing the filter shows every Scene again. Several Scenes can belong to one location, which is how a town map and its interior maps stay the same place. A Scene belongs to one location. Saving a Scene that another location already has moves that Scene to the location you are saving. Selected Scenes stay highlighted when you reopen the location, and they are listed first.
 
 ### Save and delete
 
-**Save Location** keeps the editor open and in front. Other open Morelord windows may refresh and stay behind this window. The notice reads "{Name} saved."
+**Save Location** keeps the editor open and in front. Other open Morelord windows may refresh and stay behind this window. The notice reads "{Name} saved." These records stay in the world. **Export / Import Settings** does not copy them. Marketplace's **Enable Locations** setting is included with that transfer; the locations themselves are not.
 
 **Delete** appears after the location has been saved. The dialog title is **Delete Morelord Location**. The dialog reads "Delete {Name}? Projects and integrations that reference it may become unavailable." **No** keeps the location. **Yes** removes the location record. The notice reads "Location deleted." The Foundry Scenes remain. If other locations remain, the editor opens the one that comes first by name. If none remain, the window returns to **Create First Location**.
 
+### Which place the modules use
+
+Modules that need the party's current place use one shared answer.
+
+- While a Downtime session is active and that session has a **Location**, that saved location is the current place for the whole world.
+- While a Downtime session is active and its **Location** is **No Location**, the current place is **On the Road**. On the Road is not a saved location. It has no capabilities, so it has no forge, workshop, instructor, or market.
+- When Downtime is not active, or it has no active session, the current place is the location tied to the scene that user is viewing. A user who is looking at a different scene is in that scene's location.
+
+Downtime's crafting list also keeps the viewed scene in mind. A recipe the scene's location can support still appears during an On the Road session. Work already started stays on the list and shows as paused when neither place can support it.
+
+### What each capability does
+
+| Type | Specialty | What a GM uses it for |
+| --- | --- | --- |
+| **Forge** | Weapons, armor, and weapon masteries. **Any** covers all of them. | The place can do Smith's Tools work. Craftworks uses the Forge tier when a recipe's tool is assigned to Forge. The checked weapons and armor stay on the location. |
+| **Workshop** | The general workshop tools listed above. **Any** covers every one of them. | The place can support those crafts. Craftworks allows a workshop recipe when a Workshop of sufficient tier includes that tool, or is **Any**. |
+| **Alchemist** | Hidden. Alchemist's Supplies belong here. | The place can support alchemy. Craftworks uses the Alchemist tier when a recipe's tool is assigned to Alchemist. |
+| **Instructor** | Languages, skills, tools, weapons, armor, and weapon masteries. **Any** covers every subject. | The place has someone who can teach. Downtime uses this list for an NPC instructor. |
+| **Marketplace** | Hidden. | The place has a market. With **Enable Locations** on, this tier is the highest rarity the global market buys and sells here. A shop can also inherit a Marketplace row for generated stock. |
+| **Library** | Hidden. | Records that the place has a library. Training, crafting facilities, and trading use the other types. Calligrapher's Supplies and Cartographer's Tools remain Workshop choices. |
+| **Temple** | Hidden. | Records that the place has a temple. Training, crafting, and trading use the other types. |
+| **Contractor** | Hidden. | Records that the place has a contractor. A Downtime commission still asks for its own **Location**. Carpenter's Tools and Mason's Tools remain Workshop choices. |
+
+### Downtime
+
+Open **Manage Locations** from the Downtime dashboard when the activities need a place. Then create a session and choose its **Location**, or leave **No Location** for time spent on the road. **Available Activities** is a separate choice on the session. Checking Training, Crafting, or Source Item there permits that activity. The location's capabilities do not fill that list in.
+
+**Training.** Choose a student, a subject, and an instructor. The subject list is the same fixed D&D 2024 set the Instructor specialty uses: skills, languages, tools, weapons, armor, and weapon masteries. A character instructor must already know the subject and must spend the same hours as the student. That character can teach a subject the location's Instructor list leaves unchecked.
+
+An NPC instructor needs a name. **Project Location** is optional.
+
+- With a project location, the subject list shows only what that location's Instructor specialty allows. **Any**, or a specialty left empty, allows every subject. A single saved specialty allows that one subject. Several checked subjects allow those subjects. A location with no Instructor capability offers no NPC subjects. The NPC can advance the project in a session at that same location.
+- With **No fixed Location**, the full subject list stays available while you create the project. When hours are allocated, Downtime checks the session's location. That location needs an Instructor capability that allows the subject. A session with **No Location** has no Instructor specialty to apply.
+
+**Crafting.** Craftworks owns the recipe, the materials, the check, and the finished item. In Downtime, a marked recipe or a job already underway appears when the character can work it at the viewed scene's location or at the active session's place. An On the Road session keeps recipes the scene can still support. A job that neither place can support stays visible and shows as paused. While the session is active and **Available Activities** includes **Crafting**, hours spent crafting are added to that character's session time.
+
+**Commissions.** A commission needs a contractor name, a **Location**, the item, and the labor. Finished work waits for collection at that location. The commission advances by campaign days. Adding a Contractor capability is a separate record of that service. Commission is not an **Available Activities** choice.
+
+**Source Item.** A search needs a **Location**, a magic item from the character's Marketplace wishlist, and a **Sourcing Check** of Arcana or Investigation. The location is where the search happens. Marketplace's **Enable Locations** setting, described below, is what limits buying and selling.
+
+### Craftworks
+
+Craftworks reads the current place when it decides whether a recipe can be worked. **Manage Locations** on the Craftworks dashboard opens the same shared list.
+
+In Craftworks **Settings**, under **Crafting**, each artisan's tool has a facility, or **No facility required**. The default is **No facility required**, so the recipe can be worked in any place, including On the Road. The minimum tier is the crafted item's rarity. An Uncommon item can use an Uncommon, Rare, Very Rare, or Legendary facility. A Common facility leaves a Rare item paused. A facility choice saved before the tool was named Smith's Tools still applies to Smith's Tools.
+
+- Assign **Smith's Tools** to **Forge**, and the current place needs a Forge of sufficient tier. The weapons and armor checked on that Forge stay on the location. Crafting uses the tier. A Forge whose specialty is only Longsword can still craft a Smith's Tools recipe of a rarity that tier allows.
+- Assign **Alchemist's Supplies** to **Alchemist**, and the place needs an Alchemist of sufficient tier.
+- Assign a general workshop tool, such as Carpenter's Tools or Weaver's Tools, to **Workshop**, and the place needs a Workshop of sufficient tier whose Specialty includes that tool or is **Any**. Several tools may be checked on one Workshop row. A Workshop of a lower tier set to **Any** covers recipes of that lower tier. A Rare Workshop limited to Weaver's Tools covers weaver recipes of Rare or lower. Smith's Tools map to Forge and Alchemist's Supplies map to Alchemist. If either tool is assigned to **Workshop** instead, Craftworks asks for a Workshop of sufficient tier and skips the Workshop Specialty list for that tool.
+- **No facility required** skips the location check for that tool.
+
+A recipe that needs a facility stays paused in Craftworks while the current place lacks it, and it can continue when the place meets it. During an active Downtime session, Craftworks uses that session's location, or On the Road when the session has none. Downtime's own project list can still show a recipe the viewed scene allows, as described above.
+
+### Marketplace
+
+Marketplace uses a location in two ways. Both read the same saved record.
+
+**Enable Locations** is a world setting, off by default, in Marketplace's settings. While it is off, buying and selling ignore the current place.
+
+While it is on, buying and selling require the current place to have a Marketplace capability. The tier used is the highest Marketplace tier at that place. Common allows Common items. Uncommon allows Common and Uncommon. Rare allows through Rare, and so on through Legendary. An item with no rarity counts as Common. An artifact is above Legendary, so the global market leaves artifacts untraded at any of these tiers.
+
+- **Buy** omits items above that tier. The item count, the rarity counts, and the pages follow the shorter list.
+- **Sell** still lists owned items above the tier. Their sell buttons are disabled, and the button explanation names the limit.
+- A scene shop still needs a Marketplace at the current place. Its own stock and purchase rules then decide which items it trades, including items rarer than the location's tier. A shop that refuses an item still refuses it. On the Road has no Marketplace, so nothing can be bought or sold there while the setting is on, including at a scene shop.
+- The same check runs again when a cart, a shop purchase, or a GM approval is completed.
+
+This is separate from a shop's own fields. In the shop editor, **Morelord Location** optionally ties that shop to a saved location. Choosing it does not place the shop's token. **Maximum Normal Rarity** limits generated catalog items and random restocks. **Inherit from Location** uses the first Marketplace capability on that location. An explicit rarity on the shop replaces it. Items you add by hand may be rarer than that limit. With neither a shop rarity nor a location Marketplace, the shop's own rarity selections apply.
+
+### Journeys
+
+Journeys can store one of these locations as the place for the current travel day. With none stored, the day is On the Road, which has no capabilities. Completing a travel day advances Downtime projects that progress by days. It leaves the active Downtime session's location where you set it, and the road stays without a forge or a market.
+
+A travel day can also store extra capabilities for that day. They remain on the journey and leave the saved location unchanged. Marketplace, Craftworks, and Downtime sessions keep using the current place from the rules above. The Journeys window has no location picker, no temporary-capability field, and no **Manage Locations** button. Set the town and its facilities in **Manage Shared Locations**, and choose that town on the Downtime session when the party has stopped there.
+
 ### Example: a town forge
 
-Red Larch is a town whose forge covers martial weapons, plate, and shields, at Uncommon.
+Create a location named **Highmarket**. Set **Settlement Type** to Town (1,001–6,000 people). Associate the town scene and the smithy interior. Then add these capabilities and choose **Save Location**. The notice reads "Highmarket saved."
 
-1. Open **Manage Shared Locations** and choose **Create First Location**, or **Create Location** when locations already exist.
-2. Set **Name** to Red Larch and **Settlement Type** to Town (1,001–6,000 people).
-3. Choose **Add Capability**. Leave **Type** as Forge and set **Tier** to Uncommon.
-4. Open **Specialty**. Check Martial Weapons, Plate Armor, and Shield, then close the menu. The summary reads "Martial Weapons, Plate Armor, Shield".
-5. Under **Associated Scenes**, filter to the town Scene and click it.
-6. Choose **Save Location**. The notice reads "Red Larch saved."
+- **Forge**, tier **Rare**. Open **Specialty** and check Longsword, Plate Armor, and Shield. The summary lists those three. After you save, Longsword is stored once, so the Weapons box and the Weapon Masteries box for Longsword are both checked. In Craftworks **Crafting**, set Smith's Tools to **Forge**. Smith's Tools recipes of Rare, Uncommon, or Common can be worked in Highmarket. A Very Rare item needs the Forge tier raised to Very Rare or Legendary. The checked weapons and armor record what this forge covers. The Smith's Tools recipes follow the Rare tier. Leave **Specialty** on **Any** when this forge should cover every weapon, armor, and weapon mastery.
+- **Workshop**, tier **Common**. Check Cobbler's Tools and Leatherworker's Tools. A Common cobbler or leatherworker recipe can be worked here when those tools are assigned to **Workshop**. A carpenter recipe needs Carpenter's Tools checked, or **Specialty** left on **Any**, and a tier high enough for that item.
+- **Alchemist**, tier **Uncommon**. There is no Specialty to set. Alchemist's Supplies recipes of Uncommon or lower can be worked here when that tool is assigned to **Alchemist**.
+- **Instructor**, tier **Common**. Check Stealth and Thieves' Tools. An NPC instructor with **Project Location** set to Highmarket can teach those two subjects. Leave **Specialty** on **Any** when the same NPC should teach any subject. A player character who already knows Arcana can still train another character in Arcana here.
+- **Marketplace**, tier **Uncommon**. Turn on Marketplace's **Enable Locations**. In Highmarket, Buy lists Common and Uncommon items. Rarer owned items remain on Sell with their sell buttons disabled. A shop in town can still sell a Rare item from its own stock. Removing the Marketplace row blocks buying and selling here while the setting stays on.
 
-Leave **Specialty** on **Any** when that Forge should cover every weapon, armor, and weapon mastery. Check a shorter list when it should cover only those subjects. **Add Capability** again to record another facility at the same town, such as a Marketplace row with only **Type** and **Tier**, or an Instructor row using the Specialty menu above. Marketplace, Craftworks, and Downtime each explain what they do with the saved place.
+While the party is viewing the town scene and no Downtime session is active, crafting and shopping use Highmarket. Start a Downtime session, choose **Highmarket** as its **Location**, and they keep using Highmarket. Start that session with **No Location** and the current place becomes On the Road: facility recipes pause there, and **Enable Locations** blocks trade. Downtime can still list a recipe the town scene itself allows.
 
 ## Export and Import Settings
 

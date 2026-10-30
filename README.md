@@ -33,7 +33,7 @@ While it is checked, a creature in a started combat that uses a D&D 5e activity 
 
 ## Locations Manager
 
-Game Masters set places up in [Shared Locations](CORE-GM-PRODUCT-GUIDE.md#shared-locations). Marketplace, Craftworks, and Downtime document how they use a location.
+The [Shared Locations](CORE-GM-PRODUCT-GUIDE.md#shared-locations) section of the GM guide explains why a place is defined once, how to set it up, and how Downtime, Craftworks, Marketplace, and Journeys use each capability and Specialty.
 
 Saved Associated Scenes remain highlighted when the editor reopens, including when the Scene list is unfocused. Click a Scene to toggle its association, then save the location.
 
