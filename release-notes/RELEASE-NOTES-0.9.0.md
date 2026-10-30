@@ -8,6 +8,7 @@
 - A Forge capability's Specialty is the weapon proficiencies, armor proficiencies, and weapon masteries from that same fixed list. Any is the default.
 - Instructor, Forge, and Workshop Specialty is a checkbox menu. One entry can store several specialties. The closed summary lists them, or Any when none are checked. Empty or Any means no restriction. A specialty saved as a single value is read as that one choice.
 - Select group headings use the same background as the options, in the Morelord accent color and bold, so the heading is readable. Options stay in the normal text color and weight.
+- The GM guide's Shared Locations section explains defining a place once, each capability type, and the Specialty checkbox menu, including several choices on one row and **Any** when nothing is checked. Marketplace, Craftworks, and Downtime document how they use a location. The location window introduction names those three modules.
 
 ### Added
 

@@ -206,29 +206,94 @@ Characters assigned to or owned only by ignored users are also excluded from sha
 
 ## Shared Locations
 
-Shared Locations give Morelord Gaming modules a common description of a place. Downtime uses location information to expose available activities, while Craftworks can check crafting location requirements such as access to a forge. Marketplace and Journeys also use shared locations for their own workflows. Configure capabilities to describe the facilities those workflows need; creating a location record alone does not create the services or activities themselves. The individual module guides explain their uses in detail.
+A shared location is a place you describe once in Morelord Core. Marketplace, Craftworks, and Downtime use that same record. How each module uses a location is in that module's documentation.
 
-Open **Morelord Core → Manage Shared Locations**. Choose **Create First Location** when empty, or the plus button to add another. Select a saved location in the left list to edit it.
+Open **Morelord Core → Manage Shared Locations**. The window title is **Morelord Locations**.
+
+### Set up a location
+
+When the list is empty, the left side reads "No shared locations yet." The main panel shows **Shared Morelord Locations**, the line "Create a location to define its settlement type, capabilities, and associated Scenes.", and **Create First Location**. The plus button (**Create Location**) in the **Locations** heading starts a location as well. The left list shows each saved **Name** and its settlement type. Select a name to edit that location.
+
+While you are editing, under **New Location** or **Edit Location**, the introduction reads "Locations are used by Marketplace, Craftworks, and Downtime."
+
+**Save Location** before you select another location or choose **Create Location**. Those actions load a different record and drop edits that are still unsaved.
 
 ![New shared location named Phandalin, with settlement type Village and a Forge capability set to Common.](/images/foundry/core-locations.png)
 
-Enter a **Name**, **Settlement Type**, and optional GM-facing **Notes**. Settlement choices are Road, Hamlet (1–100 people), Village (101–1,000), Town (1,001–6,000), City (6,001–25,000), Metropolis (25,001+), and Other. Population ranges are suggestions, not enforced limits.
+**Name** is required. The placeholder is Neverwinter. Saving a blank name reports `Could not save location: A location requires a name.`
 
-Choose **Add Capability** for each service the location provides. Core registers Forge, Marketplace, Alchemist, Library, Temple, Contractor, Instructor, and Workshop; enabled integrations can register additional types. A capability describes facilities or services; it does not create a shop, NPC, recipe, or project.
+**Settlement Type** choices are Road, Hamlet (1–100 people), Village (101–1,000 people), Town (1,001–6,000 people), City (6,001–25,000 people), Metropolis (25,001+ people), and Other. A new location starts as Road. The hint under the menu reads "Population ranges are suggested guidelines." The ranges are suggestions. Choose the capability **Tier** on each row.
 
-Each row has a **Type**, **Tier**, optional **Specialty**, optional **Notes**, and a remove button. Tiers are Common, Uncommon, Rare, Very Rare, and Legendary. A higher tier satisfies a lower-tier requirement of the same type. Settlement size does not determine tier. **Specialty** is shown only for a capability type that has specialties. It is a compact checkbox menu. The closed summary reads **Any** when nothing is checked, which means no restriction. Open it and check every specialty that one entry should cover, then close it. The summary lists the checked names. The Instructor, Forge, and Workshop choices come from fixed D&D 2024 lists. They do not change when Configure Sources changes, and they do not come from compendium items. A saved specialty that is not in the list stays in the menu. A specialty saved earlier as one value is kept as that one choice.
+**Notes** is optional text for the GM. The placeholder is "GM-facing location notes."
 
-For an **Instructor**, the choices are languages, skills, tools, weapons, armor, and weapon masteries. Each checked value is that subject's identifier, such as `ste` for Stealth or `dagger` for Dagger. A weapon listed under both weapons and weapon masteries uses the same identifier, so either check stores it once.
+### Capabilities
 
-For a **Forge**, the choices are the weapon proficiencies, armor proficiencies, and weapon masteries from that list. One Forge row can cover several of them. Weapon proficiencies include Simple Weapons, Martial Weapons, and each weapon. Armor proficiencies include Light Armor, Medium Armor, Heavy Armor, Shields, and each armor. Weapon masteries list each weapon and save that weapon's identifier. Smith's Tools still mark a Forge when a module asks which capability an artisan's tool belongs to. That tool map is separate from this menu.
+Choose **Add Capability** for each facility the place offers. A new row starts as **Forge**, **Common**, and Specialty **Any**. The section hint reads "Capability tier is independent from settlement size."
 
-A **Workshop** uses the same menu. **Any** means every unmatched artisan's tool. The other choices are the D&D 2024 artisan's tools that do not already match another capability: Cobbler's Tools, Weaver's Tools, Leatherworker's Tools, Carpenter's Tools, Woodcarver's Tools, Mason's Tools, Glassblower's Tools, Jeweler's Tools, Potter's Tools, Painter's Supplies, Tinker's Tools, Calligrapher's Supplies, Cartographer's Tools, Brewer's Supplies, and Cook's Utensils. Alchemist's Supplies belong with Alchemist, so Alchemist does not ask for a specialty. If a Tavern capability is registered, Brewer's Supplies and Cook's Utensils move to that Tavern and leave Workshop. A specialty saved before this list, or one the list does not contain, remains in the menu and is kept as stored. Changing **Type** updates the menu. Other capability types hide **Specialty** and keep any specialty already saved. **Notes** is optional text on that capability. It records where the capability comes from and is separate from the location **Notes** box above. Remove a row with its trash button, then save.
+The **Type** menu lists Forge, Marketplace, Alchemist, Library, Temple, Contractor, Instructor, and Workshop, in that order. Each row has **Type**, **Tier**, **Specialty** when that type has one, **Notes**, and **Remove Capability**.
 
-Under **Associated Scenes**, use **Filter Scenes** to find names. Click a Scene to select it; click again to deselect it. Several Scenes can share a location. Clearing the filter reveals the full list. Saving an association already owned by another location moves that association to the newly saved location. For a user who is not in an active Downtime session, the shared location is the one associated with the scene that user is viewing. An active Downtime session replaces that scene: workflows use the session's location, or **On the Road** when the session has no location. On the Road is not a saved location and has no capabilities.
+**Tier** is Common, Uncommon, Rare, Very Rare, or Legendary. Core treats a higher tier as meeting a lower tier of the same type. An Uncommon Forge meets a Common Forge. A Legendary Forge meets every lower Forge tier. Set **Tier** on the row. Changing **Settlement Type** leaves the tier as you set it.
 
-Choose **Save Location** to persist changes; the editor stays open and in front. Other open Morelord windows may refresh from that save, and they stay behind this window. Reopen a saved entry to review it. Save edits before selecting another location. Journeys, Craftworks, Marketplace, and Downtime can consume these records.
+**Specialty** and tier apply together. When a comparison names a specialty, Core uses the highest tier among rows of that type whose Specialty is **Any** or includes that specialty. When a comparison names only the type, Core uses the highest tier of that type on the location.
 
-**Delete** asks for confirmation. Choose **No** to keep the record. Choosing **Yes** removes the location; projects and integrations referring to it may become unavailable. Deleting a location does not delete its Foundry Scenes.
+You can add more than one row of the same type. A specialty is available when any row of that type is **Any** or includes it.
+
+**Notes** on the row is optional text stored with that capability. The placeholder is Optional. It is separate from the location **Notes** above the capability list.
+
+**Remove Capability** drops that row. Save afterward to keep the change.
+
+### Specialty
+
+**Specialty** is shown for Instructor, Forge, and Workshop. Marketplace, Alchemist, Library, Temple, and Contractor hide it. If you change **Type** to one of those, any specialties already stored on the row stay stored.
+
+The control is a checkbox menu. The closed summary reads **Any** when nothing is checked. **Any** covers every specialty of that type. Open the menu, check each specialty that one row should cover, and close it. The summary lists the checked names. One row holds several specialties. Clear every box to return the summary to **Any**.
+
+The choices are fixed D&D 2024 lists. They stay as listed here when Configure Sources changes, and the menu is the same list on every world. A specialty saved earlier as a single choice stays that one checked choice. A saved specialty that is not in the list remains in the menu under the saved name. Changing **Type** rebuilds the menu.
+
+A listed weapon and that weapon's mastery are one specialty. Longsword appears under Weapons and under Weapon Masteries. Saving with either Longsword box checked keeps Longsword once. After that save, both boxes are checked, and the summary lists Longsword once. Simple Weapons, Martial Weapons, and the armor choices appear in their own group.
+
+### Capability types
+
+**Forge.** Groups are Weapons, Armor, and Weapon Masteries. Weapons include Simple Weapons, Martial Weapons, and each weapon. Armor includes Light Armor, Medium Armor, Heavy Armor, Shields, and each armor, including Shield. Weapon Masteries lists each weapon. **Any** covers every weapon, armor, and mastery in those groups. Smith's Tools identify a Forge. The Specialty menu lists weapons, armor, and weapon masteries.
+
+**Marketplace.** The row is **Type** and **Tier**. Specialty stays hidden.
+
+**Alchemist.** The row is **Type** and **Tier**. Specialty stays hidden. Alchemist's Supplies identify an Alchemist. Workshop lists the other artisan's tools.
+
+**Library.** The row is **Type** and **Tier**. Specialty stays hidden. Calligrapher's Supplies and Cartographer's Tools are Workshop choices.
+
+**Temple.** The row is **Type** and **Tier**. Specialty stays hidden.
+
+**Contractor.** The row is **Type** and **Tier**. Specialty stays hidden. Carpenter's Tools and Mason's Tools are Workshop choices.
+
+**Instructor.** Groups are Languages, Skills, Tools, Weapons, Armor, and Weapon Masteries: the D&D 2024 languages, skills, tool proficiencies, weapon proficiencies, armor proficiencies, and weapon masteries. Tools includes artisan's tools, other kits, gaming sets, musical instruments, and vehicles. **Any** covers every subject in those groups. A checked list covers those subjects. A weapon and its mastery follow the same single-specialty rule as Forge.
+
+**Workshop.** One list, with no group heading. **Any** covers every tool on the list. The choices are Brewer's Supplies, Calligrapher's Supplies, Carpenter's Tools, Cartographer's Tools, Cobbler's Tools, Cook's Utensils, Glassblower's Tools, Jeweler's Tools, Leatherworker's Tools, Mason's Tools, Painter's Supplies, Potter's Tools, Tinker's Tools, Weaver's Tools, and Woodcarver's Tools. Smith's Tools stay on Forge. Alchemist's Supplies stay on Alchemist.
+
+### Associated Scenes
+
+**Associated Scenes** connects Foundry Scenes to this place. The text under the heading reads "When one of these Scenes is active, it resolves to this Morelord Location."
+
+**Filter Scenes** keeps names that contain what you type. The placeholder is "Type any part of a Scene name." Click a Scene to select it, and click it again to clear it. The line under the list reads "{count} selected · Click a Scene to toggle its selection." Clearing the filter shows every Scene again. Several Scenes can belong to one location. A Scene belongs to one location. Saving a Scene that another location already has moves that Scene to the location you are saving. Selected Scenes stay highlighted when you reopen the location, and they are listed first.
+
+### Save and delete
+
+**Save Location** keeps the editor open and in front. Other open Morelord windows may refresh and stay behind this window. The notice reads "{Name} saved."
+
+**Delete** appears after the location has been saved. The dialog title is **Delete Morelord Location**. The dialog reads "Delete {Name}? Projects and integrations that reference it may become unavailable." **No** keeps the location. **Yes** removes the location record. The notice reads "Location deleted." The Foundry Scenes remain. If other locations remain, the editor opens the one that comes first by name. If none remain, the window returns to **Create First Location**.
+
+### Example: a town forge
+
+Red Larch is a town whose forge covers martial weapons, plate, and shields, at Uncommon.
+
+1. Open **Manage Shared Locations** and choose **Create First Location**, or **Create Location** when locations already exist.
+2. Set **Name** to Red Larch and **Settlement Type** to Town (1,001–6,000 people).
+3. Choose **Add Capability**. Leave **Type** as Forge and set **Tier** to Uncommon.
+4. Open **Specialty**. Check Martial Weapons, Plate Armor, and Shield, then close the menu. The summary reads "Martial Weapons, Plate Armor, Shield".
+5. Under **Associated Scenes**, filter to the town Scene and click it.
+6. Choose **Save Location**. The notice reads "Red Larch saved."
+
+Leave **Specialty** on **Any** when that Forge should cover every weapon, armor, and weapon mastery. Check a shorter list when it should cover only those subjects. **Add Capability** again to record another facility at the same town, such as a Marketplace row with only **Type** and **Tier**, or an Instructor row using the Specialty menu above. Marketplace, Craftworks, and Downtime each explain what they do with the saved place.
 
 ## Export and Import Settings
 
