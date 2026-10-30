@@ -1,4 +1,4 @@
-import { CAPABILITY_TIERS, SETTLEMENT_TYPES } from "./location-domain.js";
+import { CAPABILITY_TIERS, SETTLEMENT_TYPES, normalizeSpecialtyList } from "./location-domain.js";
 import { decorateCapabilityRows, listTrainingSpecialties } from "./training-specialties.js";
 import { renderPreservingScroll } from "../ui/scroll-preservation.js";
 
@@ -158,7 +158,7 @@ export class LocationManagerApp extends HandlebarsApplicationMixin(ApplicationV2
   static addCapability(event) {
     event.preventDefault();
     this.#captureDraft();
-    this.draft.capabilities.push({ type: "forge", tier: "common", specialty: null, source: null });
+    this.draft.capabilities.push({ type: "forge", tier: "common", specialty: [], source: null });
     this.render({ force: true });
   }
 
@@ -218,7 +218,7 @@ export class LocationManagerApp extends HandlebarsApplicationMixin(ApplicationV2
       capabilities.push({
         type,
         tier: String(data.get(`capabilities.${index}.tier`) ?? "common"),
-        specialty: String(data.get(`capabilities.${index}.specialty`) ?? "").trim() || null,
+        specialty: normalizeSpecialtyList(data.getAll(`capabilities.${index}.specialty`)),
         source: String(data.get(`capabilities.${index}.source`) ?? "").trim() || null
       });
     }

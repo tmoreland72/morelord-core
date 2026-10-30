@@ -1,3 +1,5 @@
+import { finishSpecialtyGroups } from "./specialty-selection.js";
+
 /**
  * D&D 2024 / SRD 5.2 artisan's tools.
  * `id` is the dnd5e tool key, the same kind of id Instructor stores for a training specialty.
@@ -88,20 +90,8 @@ export function artisanSpecialtyOptions(typeId, { current = null, ...options } =
   const tools = listArtisanToolsForCapability(typeId, options);
   const show = String(typeId) === "workshop" ? tools.length > 0 : tools.length > 1;
   if (!show) return null;
-  const currentValue = current == null ? "" : String(current).trim();
   const optionsList = tools
     .map(tool => ({ value: tool.id, label: tool.label, selected: false }))
     .sort((left, right) => left.label.localeCompare(right.label) || left.value.localeCompare(right.value));
-  const known = new Set(optionsList.map(option => option.value));
-  const head = [{ value: "", label: "Any", selected: false }];
-  if (currentValue && !known.has(currentValue)) {
-    head.push({ value: currentValue, label: currentValue, selected: false });
-  }
-  const flat = [...head, ...optionsList];
-  let matched = false;
-  for (const option of flat) {
-    option.selected = !matched && option.value === currentValue;
-    if (option.selected) matched = true;
-  }
-  return { groups: [{ label: "", options: flat }] };
+  return finishSpecialtyGroups([{ label: "", options: optionsList }], current);
 }

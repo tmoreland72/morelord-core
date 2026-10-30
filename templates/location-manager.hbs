@@ -64,22 +64,30 @@
             <label><span>Type</span><select name="capabilities.{{@index}}.type" data-capability-type>{{selectOptions ../capabilityTypes selected=type}}</select></label>
             <label><span>Tier</span><select name="capabilities.{{@index}}.tier">{{selectOptions ../capabilityTiers selected=tier}}</select></label>
             {{#if specialtyOptions}}
-              <label>
-                <span>Specialty</span>
-                <select name="capabilities.{{@index}}.specialty">
+              <div class="ml-multi-select">
+                <span class="ml-multi-select__label">Specialty</span>
+                <button type="button" class="ml-multi-select__summary" aria-expanded="false" aria-haspopup="true" aria-controls="ml-specialty-{{@index}}">
+                  <span data-ml-multi-select-label>{{specialtyOptions.summary}}</span>
+                  <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                </button>
+                <div class="ml-multi-select__panel" id="ml-specialty-{{@index}}" hidden>
                   {{#each specialtyOptions.groups}}
-                    {{#if label}}
-                      <optgroup label="{{label}}">
-                        {{#each options}}<option value="{{value}}" {{#if selected}}selected="selected"{{/if}}>{{label}}</option>{{/each}}
-                      </optgroup>
-                    {{else}}
-                      {{#each options}}<option value="{{value}}" {{#if selected}}selected="selected"{{/if}}>{{label}}</option>{{/each}}
-                    {{/if}}
+                    <div class="ml-multi-select__group">
+                      {{#if label}}<p class="ml-multi-select__heading">{{label}}</p>{{/if}}
+                      {{#each options}}
+                        <label>
+                          <input type="checkbox" name="capabilities.{{@../../index}}.specialty" value="{{value}}" {{#if selected}}checked{{/if}}>
+                          <span>{{label}}</span>
+                        </label>
+                      {{/each}}
+                    </div>
                   {{/each}}
-                </select>
-              </label>
+                </div>
+              </div>
             {{else}}
-              <span><input type="hidden" name="capabilities.{{@index}}.specialty" value="{{specialty}}"></span>
+              <span>
+                {{#each specialty}}<input type="hidden" name="capabilities.{{@../index}}.specialty" value="{{this}}">{{/each}}
+              </span>
             {{/if}}
             <label><span>Notes</span><input type="text" name="capabilities.{{@index}}.source" value="{{source}}" placeholder="Optional"></label>
             <button type="button" class="ml-icon-button" data-action="removeCapability" data-index="{{@index}}" title="Remove Capability" aria-label="Remove Capability"><i class="fa-solid fa-trash"></i></button>

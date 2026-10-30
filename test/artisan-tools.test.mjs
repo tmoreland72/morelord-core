@@ -63,10 +63,10 @@ test("artisan tools map to Forge, Alchemist, or Workshop, and Tavern takes brewi
   assert.equal(toolCapabilityType("brewer", { capabilityTypeIds: withTavern }), "tavern");
   assert.equal(toolCapabilityType("cook", { capabilityTypeIds: withTavern }), "tavern");
   assert.equal(listWorkshopSpecialties({ capabilityTypeIds: withTavern }).some(tool => tool.id === "brewer" || tool.id === "cook"), false);
-  const tavern = artisanSpecialtyOptions("tavern", { capabilityTypeIds: withTavern });
-  assert.deepEqual(flat(tavern).filter(option => option.value).map(option => option.value), ["brewer", "cook"]);
-  assert.equal(flat(tavern)[0].label, "Any");
-  assert.equal(flat(tavern)[0].selected, true);
+  const tavern = artisanSpecialtyOptions("tavern", { capabilityTypeIds: withTavern, current: ["cook", "brewer"] });
+  assert.deepEqual(flat(tavern).map(option => option.value), ["brewer", "cook"]);
+  assert.equal(tavern.summary, "Brewer's Supplies, Cook's Utensils");
+  assert.equal(flat(tavern).every(option => option.selected), true);
 });
 
 test("Workshop specialty stores the tool id, defaults to Any, and keeps an unknown value", () => {
@@ -81,24 +81,23 @@ test("Workshop specialty stores the tool id, defaults to Any, and keeps an unkno
     capabilityTypeIds: types.all().map(type => type.id)
   });
   const workshop = flat(rows[0].specialtyOptions);
-  assert.equal(workshop[0], workshop.find(option => option.label === "Any"));
-  assert.equal(workshop[0].selected, true);
+  assert.equal(rows[0].specialtyOptions.summary, "Any");
+  assert.equal(workshop.some(option => option.value === "" || option.selected), false);
   assert.equal(workshop.find(option => option.label === "Cobbler's Tools").value, "cobbler");
   assert.equal(workshop.some(option => option.value === "smith" || option.value === "alchemist"), false);
   assert.deepEqual(workshop.filter(option => option.value).map(option => option.label), WORKSHOP_LABELS.slice().sort((a, b) => a.localeCompare(b)));
 
   const saved = flat(rows[1].specialtyOptions);
-  assert.equal(saved.find(option => option.value === "").selected, false);
+  assert.equal(rows[1].specialtyOptions.summary, "old-loom");
   assert.deepEqual(saved.find(option => option.value === "old-loom"), {
     value: "old-loom",
     label: "old-loom",
     selected: true
   });
   assert.equal(rows[1].source, null);
-  assert.equal(rows[2].specialty, "smith");
+  assert.deepEqual(rows[2].specialty, ["smith"]);
   const forge = flat(rows[2].specialtyOptions);
-  assert.equal(forge[0].label, "Any");
-  assert.equal(forge[0].selected, false);
+  assert.equal(rows[2].specialtyOptions.summary, "smith");
   assert.deepEqual(forge.find(option => option.value === "smith"), {
     value: "smith",
     label: "smith",

@@ -207,6 +207,15 @@
 .ml-actor-select-field[data-ml-actor-select-layout="inline"] > select { grid-column: 2; grid-row: 1; padding-inline-start: calc(var(--ml-avatar-sm) + 2 * var(--ml-space-2)); }
 .ml-actor-select-field[data-ml-actor-select-layout="inline"] > [data-ml-actor-select-preview] { grid-column: 2; grid-row: 1; justify-self: start; margin-inline-start: var(--ml-space-2); pointer-events: none; }
 .ml-check,
+.ml-multi-select { display: grid; gap: var(--ml-space-1); min-width: 0; }
+.ml-multi-select__label { color: var(--ml-color-muted); font-size: var(--ml-font-size-xs); font-weight: var(--ml-font-weight-bold); letter-spacing: .04em; text-transform: uppercase; }
+.ml-window .window-content .ml-multi-select__summary { display: flex; align-items: center; justify-content: space-between; gap: var(--ml-space-2); width: 100%; height: auto; max-height: none; min-height: var(--ml-control-height); padding: 0 var(--ml-space-2); border: 1px solid var(--ml-color-border); border-radius: var(--ml-radius-md); background: var(--ml-color-surface-raised); color: var(--ml-color-text); font-weight: var(--ml-font-weight-normal); text-align: left; }
+.ml-multi-select__summary > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ml-multi-select__summary > i { flex: none; }
+.ml-multi-select__panel { display: grid; gap: var(--ml-space-1); max-height: 220px; margin-top: var(--ml-space-1); padding: var(--ml-space-2); overflow: auto; border: 1px solid var(--ml-color-border); border-radius: var(--ml-radius-md); background: var(--ml-color-window); }
+.ml-multi-select__panel[hidden] { display: none; }
+.ml-multi-select__heading { margin: var(--ml-space-2) 0 var(--ml-space-1); background: var(--ml-color-window); color: var(--ml-color-accent); font-size: var(--ml-font-size-sm); font-weight: var(--ml-font-weight-bold); }
+.ml-multi-select__group:first-child .ml-multi-select__heading { margin-top: 0; }
 .ml-window .window-content label:has(> input[type="checkbox"]):not(.ml-actor-choice, .ml-choice-card) { display: grid; grid-template-columns: max-content minmax(0, 1fr); align-items: start; gap: var(--ml-space-2); min-width: min-content; margin: 0; white-space: nowrap; }
 /* Trailing checkboxes keep their text in the flexible column. Choice cards already own their portrait columns. */
 .ml-window .window-content label:has(> input[type="checkbox"]):not(.ml-actor-choice, .ml-choice-card):has(> input:last-child):not(:has(> input:first-child)) { grid-template-columns: minmax(0, 1fr) max-content; }

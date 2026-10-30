@@ -59,8 +59,9 @@ test("locationAllowsSpecialty treats Any or empty as every specialty", () => {
     settlementType: "village",
     capabilities: [{ type: "forge", tier: "common", specialty: " Any " }]
   });
-  assert.equal(labeledAny.capabilities[0].specialty, "Any");
+  assert.deepEqual(labeledAny.capabilities[0].specialty, []);
   assert.equal(locationAllowsSpecialty(labeledAny, "forge", "whip"), true);
+  assert.equal(evaluateRequirements([{ kind: "capability", type: "forge", specialty: "whip", tier: "common" }], { location: labeledAny }).passed, true);
 
   const mixed = {
     capabilities: [
@@ -70,6 +71,32 @@ test("locationAllowsSpecialty treats Any or empty as every specialty", () => {
   };
   assert.equal(locationAllowsSpecialty(mixed, "forge", "maul"), true);
   assert.equal(locationAllowsSpecialty({ capabilities: [{ type: "alchemist", specialty: "longsword" }] }, "forge", "longsword"), false);
+});
+
+test("a specialty array and a legacy string both match the included keys", () => {
+  const location = normalizeLocation({
+    id: "armory",
+    name: "Armory",
+    settlementType: "town",
+    capabilities: [
+      { type: "forge", tier: "uncommon", specialty: ["longsword", "Any", "longsword", " plate "] },
+      { type: "instructor", tier: "common", specialty: "ste" },
+      { type: "workshop", tier: "rare", specialty: ["cobbler", "weaver"] }
+    ]
+  });
+  assert.deepEqual(location.capabilities[0].specialty, ["longsword", "plate"]);
+  assert.deepEqual(location.capabilities[1].specialty, ["ste"]);
+  assert.deepEqual(location.capabilities[2].specialty, ["cobbler", "weaver"]);
+  assert.equal(locationAllowsSpecialty(location, "forge", "longsword"), true);
+  assert.equal(locationAllowsSpecialty(location, "forge", "plate"), true);
+  assert.equal(locationAllowsSpecialty(location, "forge", "dagger"), false);
+  assert.equal(locationAllowsSpecialty(location, "instructor", "ste"), true);
+  assert.equal(locationAllowsSpecialty(location, "workshop", "weaver"), true);
+  assert.equal(locationAllowsSpecialty(location, "workshop", "smith"), false);
+  assert.equal(evaluateRequirements([{ kind: "capability", type: "forge", specialty: "plate", tier: "common" }], { location }).passed, true);
+  assert.equal(evaluateRequirements([{ kind: "capability", type: "forge", specialty: "dagger", tier: "common" }], { location }).passed, false);
+  assert.equal(evaluateRequirements([{ kind: "capability", type: "workshop", specialty: "cobbler", tier: "common" }], { location }).passed, true);
+  assert.equal(evaluateRequirements([{ kind: "capability", type: "instructor", specialty: "ste", tier: "common" }], { location }).passed, true);
 });
 
 test("Other supports special locations such as strongholds and garrisons", () => {

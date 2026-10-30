@@ -92,11 +92,10 @@ test("specialty options follow the capability type, default to Any, and keep unk
     instructor.groups.filter(group => group.label).map(group => group.label),
     ["Languages", "Skills", "Tools", "Weapons", "Armor", "Weapon Masteries"]
   );
-  const any = instructor.groups[0].options[0];
-  assert.deepEqual(any, { value: "", label: "Any", selected: true });
+  assert.equal(instructor.summary, "Any");
+  assert.equal(flatOptions(instructor).some(option => option.value === "" || option.selected), false);
   const emptyInstructor = optionsFor("instructor", { choices: [] });
-  assert.deepEqual(emptyInstructor.groups, [{ label: "", options: [{ value: "", label: "Any", selected: true }] }]);
-  assert.equal(flatOptions(instructor).filter(option => option.selected).length, 1);
+  assert.deepEqual(emptyInstructor, { groups: [], summary: "Any" });
   const dagger = flatOptions(instructor).filter(option => option.value === "dagger");
   assert.equal(dagger.length, 2);
   assert.deepEqual(dagger.map(option => option.label), ["Dagger", "Dagger"]);
@@ -109,7 +108,8 @@ test("specialty options follow the capability type, default to Any, and keep unk
     forge.groups.filter(group => group.label).map(group => group.label),
     ["Weapons", "Armor", "Weapon Masteries"]
   );
-  assert.deepEqual(forge.groups[0].options[0], { value: "", label: "Any", selected: true });
+  assert.equal(forge.summary, "Any");
+  assert.equal(flatOptions(forge).some(option => option.selected), false);
   assert.equal(flatOptions(forge).some(option => option.value === "ste" || option.value === "dwarvish" || option.value === "thief"), false);
   assert.equal(flatOptions(forge).some(option => option.value === "sim"), true);
   assert.equal(flatOptions(forge).some(option => option.value === "lgt"), true);
@@ -127,7 +127,7 @@ test("specialty options follow the capability type, default to Any, and keep unk
 
   const saved = optionsFor("instructor", { current: "smiths-tools" });
   const savedFlat = flatOptions(saved);
-  assert.equal(savedFlat.find(option => option.value === "").selected, false);
+  assert.equal(saved.summary, "smiths-tools");
   assert.deepEqual(savedFlat.find(option => option.value === "smiths-tools"), {
     value: "smiths-tools",
     label: "smiths-tools",
@@ -137,8 +137,16 @@ test("specialty options follow the capability type, default to Any, and keep unk
 
   const weapon = optionsFor("instructor", { current: "dagger" });
   const selectedDaggers = flatOptions(weapon).filter(option => option.value === "dagger" && option.selected);
-  assert.equal(selectedDaggers.length, 1);
+  assert.equal(selectedDaggers.length, 2);
+  assert.equal(weapon.summary, "Dagger");
   assert.equal(weapon.groups.find(group => group.label === "Weapons").options.some(option => option.selected), true);
+
+  const many = optionsFor("instructor", { current: ["ste", "dagger", "lgt", "ste"] });
+  assert.equal(many.summary, "Stealth, Dagger, Light Armor");
+  assert.deepEqual(
+    flatOptions(many).filter(option => option.selected).map(option => option.value),
+    ["ste", "dagger", "lgt", "dagger"]
+  );
 });
 
 test("hidden specialty types keep the stored specialty on the editor row", () => {
@@ -148,10 +156,10 @@ test("hidden specialty types keep the stored specialty on the editor row", () =>
     { type: "forge", tier: "rare", specialty: "old-forge-note", source: "kept" },
     { type: "marketplace", tier: "common", specialty: "kept-note", source: "stall" }
   ], { resolveType: id => types.get(id), choices });
-  assert.equal(rows[0].specialty, "dwarvish");
+  assert.deepEqual(rows[0].specialty, ["dwarvish"]);
   assert.equal(rows[0].source, "guild charter");
   assert.equal(flatOptions(rows[0].specialtyOptions).find(option => option.value === "dwarvish").selected, true);
-  assert.equal(rows[1].specialty, "old-forge-note");
+  assert.deepEqual(rows[1].specialty, ["old-forge-note"]);
   assert.equal(rows[1].source, "kept");
   assert.deepEqual(flatOptions(rows[1].specialtyOptions).find(option => option.value === "old-forge-note"), {
     value: "old-forge-note",
@@ -160,7 +168,7 @@ test("hidden specialty types keep the stored specialty on the editor row", () =>
   });
   assert.equal(flatOptions(rows[1].specialtyOptions).some(option => option.value === "ste"), false);
   assert.equal(rows[2].specialtyOptions, null);
-  assert.equal(rows[2].specialty, "kept-note");
+  assert.deepEqual(rows[2].specialty, ["kept-note"]);
   assert.equal(rows[2].source, "stall");
 });
 
@@ -211,17 +219,20 @@ test("stored specialty and source strings stay compatible", () => {
       { type: "forge", specialty: "", source: "", tier: "common" }
     ]
   });
-  assert.equal(location.capabilities[0].specialty, "smiths-tools");
+  assert.deepEqual(location.capabilities[0].specialty, ["smiths-tools"]);
   assert.equal(location.capabilities[0].source, "guild charter");
-  assert.equal(location.capabilities[1].specialty, null);
+  assert.deepEqual(location.capabilities[1].specialty, []);
   assert.equal(location.capabilities[1].source, null);
 });
 
 test("capability editor labels Notes and posts the existing source field", () => {
   const template = readFileSync(new URL("../templates/location-manager.hbs", import.meta.url), "utf8");
   assert.match(template, /<span>Notes<\/span>\s*<input type="text" name="capabilities\.\{\{@index\}\}\.source"/);
-  assert.match(template, /<select name="capabilities\.\{\{@index\}\}\.specialty">/);
-  assert.match(template, /<input type="hidden" name="capabilities\.\{\{@index\}\}\.specialty"/);
+  assert.match(template, /class="ml-multi-select"/);
+  assert.match(template, /data-ml-multi-select-label/);
+  assert.match(template, /name="capabilities\.\{\{@\.\.\/\.\.\/index\}\}\.specialty"/);
+  assert.match(template, /name="capabilities\.\{\{@\.\.\/index\}\}\.specialty"/);
+  assert.doesNotMatch(template, /<select name="capabilities\.\{\{@index\}\}\.specialty">/);
   assert.match(template, /data-capability-type/);
   assert.doesNotMatch(template, /<span>Source<\/span>/);
 });
