@@ -95,6 +95,15 @@ test("Workshop specialty stores the tool id, defaults to Any, and keeps an unkno
     selected: true
   });
   assert.equal(rows[1].source, null);
-  assert.equal(rows[2].specialtyOptions, null);
   assert.equal(rows[2].specialty, "smith");
+  const forge = flat(rows[2].specialtyOptions);
+  assert.equal(forge[0].label, "Any");
+  assert.equal(forge[0].selected, false);
+  assert.deepEqual(forge.find(option => option.value === "smith"), {
+    value: "smith",
+    label: "smith",
+    selected: true
+  });
+  assert.equal(forge.some(option => option.value === "longsword"), true);
+  assert.equal(forge.some(option => option.label === "Stealth" || option.value === "cobbler"), false);
 });

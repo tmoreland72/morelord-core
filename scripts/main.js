@@ -14,10 +14,10 @@ import { Dnd5eSourceFilterService } from "./services/dnd5e-source-filter-service
 import { CONFIGURE_SOURCES_CHANGED, filterAllowed, getAllowedPack, getAllowedPacks, installConfigureSourcesWatcher, isPackAllowed, isSourceAllowed, isUuidAllowed, onConfigureSourcesChanged } from "./services/allowed-packs.js";
 import { resolveBookLabel, resolvePackLabel } from "./services/source-book-service.js";
 import { BUILTIN_CAPABILITY_TYPES, CapabilityRegistry } from "./location/capability-registry.js";
-import { buildSpecialtyOptions, listTrainingSpecialties } from "./location/training-specialties.js";
+import { FORGE_SPECIALTY_CATALOG, TRAINING_SPECIALTY_CATALOG, buildSpecialtyOptions, listForgeSpecialties, listTrainingSpecialties } from "./location/training-specialties.js";
 import { artisanSpecialtyOptions, listArtisanToolsForCapability, listWorkshopSpecialties, toolCapabilityType } from "./location/artisan-tools.js";
 import { LocationService } from "./location/location-service.js";
-import { CAPABILITY_TIERS, SETTLEMENT_TYPES, evaluateRequirements, meetsTier } from "./location/location-domain.js";
+import { CAPABILITY_TIERS, SETTLEMENT_TYPES, evaluateRequirements, locationAllowsSpecialty, meetsTier } from "./location/location-domain.js";
 import { LocationManagerApp } from "./location/location-manager-app.js";
 import { renderPreservingScroll } from "./ui/scroll-preservation.js";
 import { guardApplicationRender, renderInBackground } from "./ui/background-render.js";
@@ -732,11 +732,15 @@ Hooks.once("ready", async () => {
       registerCapability: definition => capabilityRegistry.register(definition),
       getCapability: id => capabilityRegistry.get(id),
       listCapabilities: () => capabilityRegistry.all(),
-      listTrainingSpecialties: (options) => listTrainingSpecialties(options),
+      listTrainingSpecialties: () => listTrainingSpecialties(),
+      listForgeSpecialties: () => listForgeSpecialties(),
+      locationAllowsSpecialty: (location, type, specialtyKey) => locationAllowsSpecialty(location, type, specialtyKey),
       buildSpecialtyOptions: (typeId, options = {}) => {
         const registeredIds = options.capabilityTypeIds ?? capabilityRegistry.all().map(type => type.id);
         const definition = capabilityRegistry.get(typeId);
-        if (definition?.specialtyCatalog === "training") return buildSpecialtyOptions(definition, options);
+        if (definition?.specialtyCatalog === TRAINING_SPECIALTY_CATALOG || definition?.specialtyCatalog === FORGE_SPECIALTY_CATALOG) {
+          return buildSpecialtyOptions(definition, options);
+        }
         return artisanSpecialtyOptions(typeId, { ...options, capabilityTypeIds: registeredIds })
           ?? buildSpecialtyOptions(definition, options);
       },

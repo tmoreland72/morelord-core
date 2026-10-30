@@ -1,8 +1,6 @@
 import { CAPABILITY_TIERS, SETTLEMENT_TYPES } from "./location-domain.js";
 import { decorateCapabilityRows, listTrainingSpecialties } from "./training-specialties.js";
-import { onConfigureSourcesChanged } from "../services/allowed-packs.js";
 import { renderPreservingScroll } from "../ui/scroll-preservation.js";
-import { renderInBackground } from "../ui/background-render.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -48,8 +46,6 @@ export class LocationManagerApp extends HandlebarsApplicationMixin(ApplicationV2
 
   selectedId = null;
   draft = null;
-  #trainingChoiceCache = null;
-  #stopConfigureSourcesWatch = null;
 
   constructor(options = {}) {
     super(options);
@@ -57,18 +53,6 @@ export class LocationManagerApp extends HandlebarsApplicationMixin(ApplicationV2
     if (options.createNew) {
       this.draft = { id: null, name: "", settlementType: "road", sceneIds: [], capabilities: [], notes: "", metadata: {} };
     }
-    this.#stopConfigureSourcesWatch = onConfigureSourcesChanged(() => {
-      this.#trainingChoiceCache = null;
-      if (!this.rendered || !this.element) return;
-      this.#captureDraft();
-      void renderInBackground(this);
-    });
-  }
-
-  async close(options) {
-    this.#stopConfigureSourcesWatch?.();
-    this.#stopConfigureSourcesWatch = null;
-    return super.close(options);
   }
 
   render(options = {}) {
@@ -113,7 +97,7 @@ export class LocationManagerApp extends HandlebarsApplicationMixin(ApplicationV2
     if (!this.draft && this.selectedId) {
       this.draft = foundry.utils.deepClone(this.constructor.locationService.get(this.selectedId));
     }
-    const trainingChoices = await this.#trainingChoices();
+    const trainingChoices = listTrainingSpecialties();
     const source = this.draft;
     const draft = source ? {
       ...source,
@@ -220,17 +204,6 @@ export class LocationManagerApp extends HandlebarsApplicationMixin(ApplicationV2
       await this.render({ force: true });
     } finally {
       target.disabled = false;
-    }
-  }
-
-  async #trainingChoices() {
-    if (this.#trainingChoiceCache) return this.#trainingChoiceCache;
-    try {
-      const choices = await listTrainingSpecialties();
-      this.#trainingChoiceCache = choices;
-      return choices;
-    } catch {
-      return [];
     }
   }
 

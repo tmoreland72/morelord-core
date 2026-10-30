@@ -1,7 +1,7 @@
-import { TRAINING_SPECIALTY_CATALOG } from "./training-specialties.js";
+import { FORGE_SPECIALTY_CATALOG, TRAINING_SPECIALTY_CATALOG } from "./training-specialties.js";
 
 export const BUILTIN_CAPABILITY_TYPES = Object.freeze([
-  { id: "forge", name: "Forge" },
+  { id: "forge", name: "Forge", supportsSpecialty: true, specialtyCatalog: FORGE_SPECIALTY_CATALOG },
   { id: "marketplace", name: "Marketplace" },
   { id: "alchemist", name: "Alchemist" },
   { id: "library", name: "Library" },

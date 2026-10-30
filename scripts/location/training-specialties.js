@@ -1,13 +1,13 @@
-import { isUuidAllowed as coreUuidAllowed } from "../services/allowed-packs.js";
 import { artisanSpecialtyOptions } from "./artisan-tools.js";
+import { DND2024_SPECIALTIES, FORGE_SPECIALTY_CATEGORIES } from "./fixed-specialties.js";
 
 /**
- * D&D 2024 training subjects used by Downtime's Dnd5eProficiencyAdapter.listTrainingChoices:
- * skills, languages, tools, weapons, armor (including shields), and weapon masteries of those weapons.
- * A location stores `id`. Downtime matches that id to the training proficiency id, and treats an empty specialty as any subject.
- * Compendium documents whose pack Configure Sources excludes are omitted.
+ * D&D 2024 training subjects: skills, languages, tools, weapons, armor, and weapon masteries.
+ * A location stores `id`. Downtime matches that id to the training proficiency id.
+ * An empty specialty means any subject. The list is fixed and does not follow Configure Sources.
  */
 export const TRAINING_SPECIALTY_CATALOG = "training";
+export const FORGE_SPECIALTY_CATALOG = "forge";
 
 export const TRAINING_SPECIALTY_CATEGORIES = Object.freeze([
   "Language",
@@ -27,109 +27,22 @@ const GROUP_LABELS = Object.freeze({
   "Weapon Mastery": "Weapon Masteries"
 });
 
-const titleCase = value => String(value)
-  .replace(/([a-z])([A-Z])/g, "$1 $2")
-  .replace(/(^|\s)\S/g, letter => letter.toUpperCase());
+const CATALOGS = new Set([TRAINING_SPECIALTY_CATALOG, FORGE_SPECIALTY_CATALOG]);
 
-function defaultConfig() {
-  return globalThis.CONFIG?.DND5E ?? {};
+export function listTrainingSpecialties() {
+  return DND2024_SPECIALTIES.slice();
 }
 
-function defaultLocalize(key) {
-  try {
-    const localize = globalThis.game?.i18n?.localize;
-    if (typeof localize === "function") return localize(key);
-  } catch {
-    // A missing translation leaves the config key as the label.
+export function listForgeSpecialties() {
+  return DND2024_SPECIALTIES.filter(entry => FORGE_SPECIALTY_CATEGORIES.includes(entry.category));
+}
+
+function choicesFor(catalog, choices) {
+  const source = choices ?? (catalog === FORGE_SPECIALTY_CATALOG ? listForgeSpecialties() : listTrainingSpecialties());
+  if (catalog === FORGE_SPECIALTY_CATALOG) {
+    return source.filter(entry => FORGE_SPECIALTY_CATEGORIES.includes(entry?.category));
   }
-  return key;
-}
-
-function defaultResolveUuid(uuid) {
-  const resolve = globalThis.fromUuid;
-  if (typeof resolve !== "function") return null;
-  return Promise.resolve(resolve(uuid)).catch(() => null);
-}
-
-function defaultUuidAllowed(uuid) {
-  if (!globalThis.game?.system) return true;
-  return coreUuidAllowed(uuid);
-}
-
-function choice(kind, id, label, category) {
-  const proficiencyId = String(id ?? "").trim();
-  if (!proficiencyId) return null;
-  const text = String(label ?? proficiencyId).trim() || proficiencyId;
-  return {
-    kind,
-    id: proficiencyId,
-    label: text,
-    category,
-    trainingValue: `${kind}:${proficiencyId}`
-  };
-}
-
-function documentAllowed(uuid, isUuidAllowed) {
-  if (!uuid) return true;
-  try {
-    return isUuidAllowed(uuid) !== false;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * @returns {Promise<Array<{ kind: string, id: string, label: string, category: string, trainingValue: string }>>}
- */
-export async function listTrainingSpecialties({
-  config = defaultConfig,
-  resolveUuid = defaultResolveUuid,
-  localize = defaultLocalize,
-  isUuidAllowed = defaultUuidAllowed
-} = {}) {
-  const dnd = (typeof config === "function" ? config() : config) ?? {};
-  const entries = new Map();
-  const add = entry => {
-    if (entry) entries.set(`${entry.kind}:${entry.id}`, entry);
-  };
-  const addConfig = (values, kind, category) => {
-    for (const [id, data] of Object.entries(values ?? {})) {
-      const rawLabel = typeof data === "string" ? data : data?.label ?? id;
-      add(choice(kind, id, localize(rawLabel), category));
-    }
-  };
-  const addDocuments = async (values, kind, category) => {
-    for (const [id, data] of Object.entries(values ?? {})) {
-      const uuid = typeof data === "string" ? data : data?.id;
-      if (!documentAllowed(uuid, isUuidAllowed)) continue;
-      let document = null;
-      if (uuid) {
-        try {
-          document = await Promise.resolve(resolveUuid(uuid));
-        } catch {
-          document = null;
-        }
-      }
-      const fallback = typeof data === "object" && data?.label ? localize(data.label) : titleCase(id);
-      add(choice(kind, id, document?.name ?? fallback, category));
-    }
-  };
-
-  addConfig(dnd.skills, "skillProficiency", "Skill Proficiency");
-  addConfig(dnd.enrichmentLookup?.languages, "language", "Language");
-  addConfig(dnd.armorProficiencies, "armorProficiency", "Armor Proficiency");
-  await addDocuments({ ...(dnd.armorIds ?? {}), ...(dnd.shieldIds ?? {}) }, "armorProficiency", "Armor Proficiency");
-  addConfig(dnd.weaponProficiencies, "weaponProficiency", "Weapon Proficiency");
-  await addDocuments(dnd.weaponIds, "weaponProficiency", "Weapon Proficiency");
-  await addDocuments(dnd.weaponIds, "weaponMastery", "Weapon Mastery");
-  addConfig(dnd.toolProficiencies, "toolProficiency", "Tool Proficiency");
-  await addDocuments(dnd.tools, "toolProficiency", "Tool Proficiency");
-
-  return [...entries.values()].sort((left, right) =>
-    left.label.localeCompare(right.label)
-    || left.category.localeCompare(right.category)
-    || left.kind.localeCompare(right.kind)
-  );
+  return source;
 }
 
 /**
@@ -137,13 +50,12 @@ export async function listTrainingSpecialties({
  * Returns null when the type has no specialty catalog, so the editor can hide Specialty and keep the stored value.
  * @returns {null | { groups: Array<{ label: string, options: Array<{ value: string, label: string, selected: boolean }> }> }}
  */
-export function buildSpecialtyOptions(definition, { choices = [], current = null } = {}) {
+export function buildSpecialtyOptions(definition, { choices, current = null } = {}) {
   const catalog = String(definition?.specialtyCatalog ?? "").trim();
-  if (!catalog) return null;
+  if (!CATALOGS.has(catalog)) return null;
   const currentValue = current == null ? "" : String(current).trim();
-  const relevant = catalog === TRAINING_SPECIALTY_CATALOG ? choices : [];
   const buckets = new Map();
-  for (const entry of relevant) {
+  for (const entry of choicesFor(catalog, choices)) {
     const id = String(entry?.id ?? "").trim();
     if (!id) continue;
     const category = String(entry?.category ?? "Other").trim() || "Other";
@@ -177,17 +89,18 @@ export function buildSpecialtyOptions(definition, { choices = [], current = null
   return { groups };
 }
 
-export function decorateCapabilityRows(capabilities = [], { resolveType = () => null, choices = [], capabilityTypeIds = null } = {}) {
+export function decorateCapabilityRows(capabilities = [], { resolveType = () => null, choices, capabilityTypeIds = null } = {}) {
   return (capabilities ?? []).map(capability => {
     const definition = resolveType(capability?.type) ?? null;
     const current = capability?.specialty ?? null;
-    const artisanOptions = { current, ...(capabilityTypeIds ? { capabilityTypeIds } : {}) };
+    const catalog = definition?.specialtyCatalog ?? null;
     let specialtyOptions = null;
-    if (definition?.specialtyCatalog === TRAINING_SPECIALTY_CATALOG) {
+    if (catalog === TRAINING_SPECIALTY_CATALOG || catalog === FORGE_SPECIALTY_CATALOG) {
       specialtyOptions = buildSpecialtyOptions(definition, { choices, current });
     } else {
+      const artisanOptions = { current, ...(capabilityTypeIds ? { capabilityTypeIds } : {}) };
       specialtyOptions = artisanSpecialtyOptions(capability?.type, artisanOptions);
-      if (!specialtyOptions && definition?.specialtyCatalog) {
+      if (!specialtyOptions && catalog) {
         specialtyOptions = buildSpecialtyOptions(definition, { choices, current });
       }
     }

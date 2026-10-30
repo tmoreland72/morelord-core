@@ -3,7 +3,8 @@
  * `id` is the dnd5e tool key, the same kind of id Instructor stores for a training specialty.
  * `capabilityTypes` are checked in order against registered capability types.
  * Workshop is the fallback, so a tool leaves Workshop only when a more specific type is registered.
- * Forge is smithing. Alchemist is alchemist's supplies. Tavern, when a module registers it, is brewing and cooking.
+ * Forge is smithing for this tool map. The Forge specialty dropdown is the fixed weapon, armor, and mastery list, not Smith's Tools.
+ * Alchemist is alchemist's supplies. Tavern, when a module registers it, is brewing and cooking.
  * Carpenter's Tools and Mason's Tools stay on Workshop: Contractor is not those crafts.
  * Calligrapher's Supplies and Cartographer's Tools stay on Workshop: Library is not those crafts.
  */

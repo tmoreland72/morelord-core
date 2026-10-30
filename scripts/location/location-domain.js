@@ -59,6 +59,33 @@ export function normalizeLocation(raw = {}, { idFactory = () => crypto.randomUUI
   };
 }
 
+const UNRESTRICTED_SPECIALTY = new Set(["", "any"]);
+
+export function isUnrestrictedSpecialty(value) {
+  return UNRESTRICTED_SPECIALTY.has(String(value ?? "").trim().toLowerCase());
+}
+
+/**
+ * True when a location capability of `type` allows `specialtyKey`.
+ * Any, an empty string, or a missing specialty allows every key.
+ * An empty or Any specialtyKey is allowed by every capability of that type.
+ * A location with no capability of that type returns false.
+ * This is separate from findCapability, which still requires an exact specialty when a requirement names one.
+ */
+export function locationAllowsSpecialty(location, type, specialtyKey) {
+  const typeId = String(type ?? "").trim();
+  if (!typeId || !location || typeof location !== "object") return false;
+  const capabilities = Array.isArray(location.capabilities) ? location.capabilities : [];
+  const matches = capabilities.filter(capability => String(capability?.type ?? "").trim() === typeId);
+  if (!matches.length) return false;
+  if (isUnrestrictedSpecialty(specialtyKey)) return true;
+  const requested = String(specialtyKey).trim();
+  return matches.some(capability => {
+    const stored = String(capability?.specialty ?? "").trim();
+    return isUnrestrictedSpecialty(stored) || stored === requested;
+  });
+}
+
 export function findCapability(capabilities = [], requirement = {}) {
   const type = String(requirement.type ?? "").trim();
   const specialty = requirement.specialty ? String(requirement.specialty).trim() : null;
