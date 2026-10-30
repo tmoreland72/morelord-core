@@ -27,9 +27,8 @@ export function choiceSearchText(choice) {
   return `${choice?.label ?? ""} ${choice?.category ?? ""}`.toLocaleLowerCase();
 }
 
-/** Available rows hide a value that is already selected. Search and category match Select Training. */
-export function choiceVisible(choice, { query = "", category = "all", selected = [] } = {}) {
-  if ((selected ?? []).includes(choice?.value)) return false;
+/** Search and category match Select Training. A selected value stays in the list. */
+export function choiceVisible(choice, { query = "", category = "all" } = {}) {
   if (category !== "all" && choice?.category !== category) return false;
   const needle = String(query ?? "").trim().toLocaleLowerCase();
   if (needle && !choiceSearchText(choice).includes(needle)) return false;

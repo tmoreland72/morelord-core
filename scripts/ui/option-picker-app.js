@@ -66,8 +66,7 @@ export class OptionPickerApp extends HandlebarsApplicationMixin(ApplicationV2) {
     for (const option of this.element.querySelectorAll("[data-training-choice]")) {
       const matchesCategory = this.category === "all" || option.dataset.category === this.category;
       const matchesQuery = !query || option.dataset.search.includes(query);
-      const taken = this.selected.has(option.dataset.value);
-      option.hidden = taken || !(matchesCategory && matchesQuery);
+      option.hidden = !(matchesCategory && matchesQuery);
       if (!option.hidden) visible += 1;
     }
     const count = this.element.querySelector("[data-training-result-count]");
@@ -106,11 +105,18 @@ export class OptionPickerApp extends HandlebarsApplicationMixin(ApplicationV2) {
     search?.focus();
   }
 
-  static chooseOption(event, target) {
-    event.preventDefault();
-    const value = target.dataset.value;
-    if (!value || this.selected.has(value)) return;
-    this.selected.add(value);
+  markChoice(value, selected) {
+    const selector = CSS.escape ? CSS.escape(value) : value.replace(/"/g, '\\"');
+    for (const option of this.element.querySelectorAll(`[data-training-choice][data-value="${selector}"]`)) {
+      option.classList.toggle("is-selected", selected);
+      const icon = option.querySelector("i");
+      icon?.classList.toggle("fa-circle-check", selected);
+      icon?.classList.toggle("fa-chevron-right", !selected);
+    }
+  }
+
+  addSelectedRow(value) {
+    if (this.element.querySelector(`[data-selected-row][data-value="${CSS.escape ? CSS.escape(value) : value}"]`)) return;
     const choice = this.choices.find(item => item.value === value);
     const list = this.element.querySelector("[data-selected-list]");
     const row = document.createElement("div");
@@ -132,7 +138,21 @@ export class OptionPickerApp extends HandlebarsApplicationMixin(ApplicationV2) {
     remove.innerHTML = '<i class="fa-solid fa-xmark"></i>';
     row.append(text, remove);
     list?.append(row);
-    this.applyFilters();
+  }
+
+  static chooseOption(event, target) {
+    event.preventDefault();
+    const value = target.dataset.value;
+    if (!value) return;
+    if (this.selected.has(value)) {
+      this.selected.delete(value);
+      this.markChoice(value, false);
+      this.element.querySelector(`[data-selected-row][data-value="${CSS.escape ? CSS.escape(value) : value}"]`)?.remove();
+    } else {
+      this.selected.add(value);
+      this.markChoice(value, true);
+      this.addSelectedRow(value);
+    }
     this.syncSelectedEmpty();
   }
 
@@ -140,16 +160,16 @@ export class OptionPickerApp extends HandlebarsApplicationMixin(ApplicationV2) {
     event.preventDefault();
     const value = target.dataset.value;
     this.selected.delete(value);
+    this.markChoice(value, false);
     target.closest("[data-selected-row]")?.remove();
-    this.applyFilters();
     this.syncSelectedEmpty();
   }
 
   static clearSelected(event) {
     event.preventDefault();
+    for (const value of this.selected) this.markChoice(value, false);
     this.selected.clear();
     this.element.querySelector("[data-selected-list]")?.replaceChildren();
-    this.applyFilters();
     this.syncSelectedEmpty();
   }
 
