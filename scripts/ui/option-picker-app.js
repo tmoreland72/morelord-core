@@ -1,4 +1,4 @@
-import { choiceSearchText, pickerCategories } from "./option-picker.js";
+import { choiceSearchText, coveredValues, pickerCategories, toggleSpecialty } from "./option-picker.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -36,13 +36,15 @@ export class OptionPickerApp extends HandlebarsApplicationMixin(ApplicationV2) {
 
   async _prepareContext(options) {
     const selected = [...this.selected];
+    const covered = new Set(coveredValues(this.choices, selected));
     const labelFor = value => this.choices.find(choice => choice.value === value);
     return {
       ...await super._prepareContext(options),
       choices: this.choices.map(choice => ({
         ...choice,
         searchText: choiceSearchText(choice),
-        selected: this.selected.has(choice.value)
+        selected: choice.overallAny ? selected.length === 0 : this.selected.has(choice.value),
+        covered: covered.has(choice.value) && !this.selected.has(choice.value)
       })),
       categories: pickerCategories(this.choices),
       resultCount: this.choices.length,
@@ -105,14 +107,22 @@ export class OptionPickerApp extends HandlebarsApplicationMixin(ApplicationV2) {
     search?.focus();
   }
 
-  markChoice(value, selected) {
-    const selector = CSS.escape ? CSS.escape(value) : value.replace(/"/g, '\\"');
-    for (const option of this.element.querySelectorAll(`[data-training-choice][data-value="${selector}"]`)) {
-      option.classList.toggle("is-selected", selected);
+  refreshSelection() {
+    const selected = [...this.selected];
+    const covered = new Set(coveredValues(this.choices, selected));
+    for (const option of this.element.querySelectorAll("[data-training-choice]")) {
+      const value = option.dataset.value;
+      const on = value === "*" ? selected.length === 0 : this.selected.has(value);
+      option.classList.toggle("is-selected", on);
+      option.classList.toggle("is-covered", covered.has(value) && !this.selected.has(value));
       const icon = option.querySelector("i");
-      icon?.classList.toggle("fa-circle-check", selected);
-      icon?.classList.toggle("fa-chevron-right", !selected);
+      icon?.classList.toggle("fa-circle-check", on);
+      icon?.classList.toggle("fa-chevron-right", !on);
     }
+    const list = this.element.querySelector("[data-selected-list]");
+    list?.replaceChildren();
+    for (const value of selected) this.addSelectedRow(value);
+    this.syncSelectedEmpty();
   }
 
   addSelectedRow(value) {
@@ -142,40 +152,26 @@ export class OptionPickerApp extends HandlebarsApplicationMixin(ApplicationV2) {
 
   static chooseOption(event, target) {
     event.preventDefault();
-    const value = target.dataset.value;
-    if (!value) return;
-    if (this.selected.has(value)) {
-      this.selected.delete(value);
-      this.markChoice(value, false);
-      this.element.querySelector(`[data-selected-row][data-value="${CSS.escape ? CSS.escape(value) : value}"]`)?.remove();
-    } else {
-      this.selected.add(value);
-      this.markChoice(value, true);
-      this.addSelectedRow(value);
-    }
-    this.syncSelectedEmpty();
+    const value = target.dataset.value ?? "";
+    this.selected = new Set(toggleSpecialty(this.choices, [...this.selected], value));
+    this.refreshSelection();
   }
 
   static removeSelected(event, target) {
     event.preventDefault();
-    const value = target.dataset.value;
-    this.selected.delete(value);
-    this.markChoice(value, false);
-    target.closest("[data-selected-row]")?.remove();
-    this.syncSelectedEmpty();
+    this.selected.delete(target.dataset.value);
+    this.refreshSelection();
   }
 
   static clearSelected(event) {
     event.preventDefault();
-    for (const value of this.selected) this.markChoice(value, false);
     this.selected.clear();
-    this.element.querySelector("[data-selected-list]")?.replaceChildren();
-    this.syncSelectedEmpty();
+    this.refreshSelection();
   }
 
   static confirm(event) {
     event.preventDefault();
-    const keys = [...this.selected];
+    const keys = [...this.selected].filter(key => key && key !== "*");
     const confirm = this.onConfirm;
     return this.close().then(() => confirm?.(keys));
   }

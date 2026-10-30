@@ -12,12 +12,12 @@ const MEDIUM_ARMOR = Object.freeze(["hide", "chainshirt", "scalemail", "breastpl
 const HEAVY_ARMOR = Object.freeze(["ringmail", "chainmail", "splint", "plate"]);
 
 const NODES = Object.freeze([
-  { id: "armor", label: "Armor", parent: null, group: "Armor" },
+  { id: "armor", label: "Any Armor", parent: null, group: "Armor" },
   { id: "lgt", label: "Light Armor", parent: "armor", group: "Armor" },
   { id: "med", label: "Medium Armor", parent: "armor", group: "Armor" },
   { id: "hvy", label: "Heavy Armor", parent: "armor", group: "Armor" },
   { id: "shl", label: "Shields", parent: "armor", group: "Armor" },
-  { id: "weapon", label: "Weapons", parent: null, group: "Weapons" },
+  { id: "weapon", label: "Any Weapon", parent: null, group: "Weapons" },
   { id: "sim", label: "Simple Weapons", parent: "weapon", group: "Weapons" },
   { id: "simpleM", label: "Simple Melee Weapons", parent: "sim", group: "Weapons" },
   { id: "simpleR", label: "Simple Ranged Weapons", parent: "sim", group: "Weapons" },

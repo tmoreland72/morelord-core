@@ -93,5 +93,5 @@ export function artisanSpecialtyOptions(typeId, { current = null, ...options } =
   const optionsList = tools
     .map(tool => ({ value: tool.id, label: tool.label, selected: false }))
     .sort((left, right) => left.label.localeCompare(right.label) || left.value.localeCompare(right.value));
-  return finishSpecialtyGroups([{ label: "", options: optionsList }], current);
+  return finishSpecialtyGroups([{ label: "Tools", options: optionsList }], current);
 }

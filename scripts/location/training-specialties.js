@@ -1,6 +1,7 @@
 import { artisanSpecialtyOptions } from "./artisan-tools.js";
 import { DND2024_SPECIALTIES } from "./fixed-specialties.js";
-import { listForgeSpecialties, migrateForgeSpecialties } from "./forge-categories.js";
+import { forgeAncestors, listForgeSpecialties, migrateForgeSpecialties } from "./forge-categories.js";
+import { instructorGroupAny } from "./instructor-any.js";
 import { normalizeSpecialtyList } from "./location-domain.js";
 import { finishSpecialtyGroups } from "./specialty-selection.js";
 
@@ -72,7 +73,33 @@ export function buildSpecialtyOptions(definition, { choices, current = null } = 
     );
     if (options.length) groups.push({ label: GROUP_LABELS[category] ?? category, options });
   }
-  return finishSpecialtyGroups(groups, current);
+  return finishSpecialtyGroups(withAnyOptions(groups, catalog), current);
+}
+
+function withAnyOptions(groups, catalog) {
+  const next = groups.map(group => {
+    const options = group.options.map(option => ({ ...option }));
+    if (catalog === FORGE_SPECIALTY_CATALOG) {
+      for (const option of options) {
+        const descendants = forgeDescendantIds(option.value);
+        if (descendants.length) option.covers = descendants;
+      }
+    }
+    if (catalog === TRAINING_SPECIALTY_CATALOG) {
+      const any = instructorGroupAny(group.label);
+      if (any) {
+        options.unshift({ value: any.key, label: any.label, covers: options.map(option => option.value) });
+      }
+    }
+    return { ...group, options };
+  });
+  return [{ label: "Any", options: [{ value: "*", label: "Any", overallAny: true }] }, ...next];
+}
+
+function forgeDescendantIds(id) {
+  return listForgeSpecialties()
+    .filter(entry => entry.id !== id && forgeAncestors(entry.id).includes(id))
+    .map(entry => entry.id);
 }
 
 export function decorateCapabilityRows(capabilities = [], { resolveType = () => null, choices, capabilityTypeIds = null } = {}) {
@@ -94,6 +121,15 @@ export function decorateCapabilityRows(capabilities = [], { resolveType = () => 
         specialtyOptions = buildSpecialtyOptions(definition, { choices, current });
       }
     }
-    return { ...capability, specialty, specialtyOptions };
+    return { ...capability, specialty, specialtyOptions: includeOverallAny(specialtyOptions) };
   });
+}
+
+function includeOverallAny(model) {
+  if (!model?.groups) return model;
+  if (model.groups.some(group => (group.options ?? []).some(option => option.overallAny || option.value === "*"))) return model;
+  return {
+    ...model,
+    groups: [{ label: "Any", options: [{ value: "*", label: "Any", overallAny: true, selected: false }] }, ...model.groups]
+  };
 }

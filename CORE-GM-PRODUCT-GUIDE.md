@@ -270,7 +270,7 @@ The closed summary reads **Any** when nothing is selected. **Any** covers every 
 
 The choices are fixed D&D 2024 lists. They stay as listed here when Configure Sources changes, and they do not come from compendium items. The list is the same on every world.
 
-On an Instructor, a weapon and that weapon's mastery are one specialty. Longsword appears under Weapons and under Weapon Masteries. Adding either one keeps Longsword once.
+On an Instructor, each group also has **Any Language**, **Any Skill**, **Any Tool**, **Any Weapon**, **Any Armor**, or **Any Weapon Mastery**. Choosing one covers every subject in that group, and those subjects leave **Selected**. **Any** at the top of Instructor, Forge, and Workshop clears the list, which means no restriction. On a Forge, **Any Armor** and **Any Weapon** are the parents that cover the categories under them. On an Instructor, a weapon and that weapon's mastery are one specialty. Longsword appears under Weapons and under Weapon Masteries. Adding either one keeps Longsword once.
 
 **Notes** on the row is optional text stored with that capability. The placeholder is Optional. It is separate from the location **Notes** above the capability list. **Remove Capability** drops that row. Save afterward to keep the change.
 

@@ -29,8 +29,8 @@
     </header>
     <div class="ml-training-selection__list">
       {{#each choices}}
-        <button type="button" class="ml-list-button ml-training-selection__option {{#if selected}}is-selected{{/if}}" data-action="chooseOption" data-training-choice data-value="{{value}}" data-category="{{category}}" data-search="{{searchText}}">
-          <span><strong>{{label}}</strong><small>{{category}}</small></span>
+        <button type="button" class="ml-list-button ml-training-selection__option {{#if selected}}is-selected{{/if}} {{#if covered}}is-covered{{/if}}" data-action="chooseOption" data-training-choice data-value="{{value}}" data-category="{{category}}" data-search="{{searchText}}">
+          <span><strong>{{label}}</strong><small>{{category}}{{#if covered}} · Covered{{/if}}</small></span>
           <i class="fa-solid {{#if selected}}fa-circle-check{{else}}fa-chevron-right{{/if}}"></i>
         </button>
       {{/each}}

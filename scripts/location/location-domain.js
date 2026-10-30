@@ -1,4 +1,5 @@
 import { forgeAncestors, migrateForgeSpecialties } from "./forge-categories.js";
+import { instructorSpecialtyAllowed } from "./instructor-any.js";
 
 export const SETTLEMENT_TYPES = Object.freeze([
   "road",
@@ -26,7 +27,7 @@ export function meetsTier(actual, required) {
   return actualRank !== undefined && requiredRank !== undefined && actualRank >= requiredRank;
 }
 
-const UNRESTRICTED_SPECIALTY = new Set(["", "any"]);
+const UNRESTRICTED_SPECIALTY = new Set(["", "any", "*"]);
 
 export function isUnrestrictedSpecialty(value) {
   return UNRESTRICTED_SPECIALTY.has(String(value ?? "").trim().toLowerCase());
@@ -54,6 +55,7 @@ export function capabilityAllowsSpecialty(capability, specialtyKey) {
     : normalizeSpecialtyList(capability?.specialty);
   if (!stored.length) return true;
   const requested = String(specialtyKey).trim();
+  if (type === "instructor") return instructorSpecialtyAllowed(stored, requested);
   if (type !== "forge") return stored.includes(requested);
   const accepted = new Set(forgeAncestors(requested));
   if (!accepted.size) return stored.includes(requested);

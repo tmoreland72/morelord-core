@@ -85,7 +85,8 @@ test("Workshop specialty stores the tool id, defaults to Any, and keeps an unkno
   assert.equal(workshop.some(option => option.value === "" || option.selected), false);
   assert.equal(workshop.find(option => option.label === "Cobbler's Tools").value, "cobbler");
   assert.equal(workshop.some(option => option.value === "smith" || option.value === "alchemist"), false);
-  assert.deepEqual(workshop.filter(option => option.value).map(option => option.label), WORKSHOP_LABELS.slice().sort((a, b) => a.localeCompare(b)));
+  assert.equal(workshop.some(option => option.value === "*" && option.label === "Any"), true);
+  assert.deepEqual(workshop.filter(option => option.value && option.value !== "*").map(option => option.label), WORKSHOP_LABELS.slice().sort((a, b) => a.localeCompare(b)));
 
   const saved = flat(rows[1].specialtyOptions);
   assert.equal(rows[1].specialtyOptions.summary, "old-loom");
