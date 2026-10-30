@@ -48,6 +48,8 @@ test("instructor group Any allows every subject in that group", () => {
     capabilities: [{ type: "instructor", tier: "common", specialty: ["any-language", "ste"] }]
   });
   assert.equal(locationAllowsSpecialty(location, "instructor", "elvish"), true);
+  assert.equal(locationAllowsSpecialty(location, "instructor", "sign"), true);
+  assert.equal(locationAllowsSpecialty(location, "instructor", "commonSign"), true);
   assert.equal(locationAllowsSpecialty(location, "instructor", "common"), true);
   assert.equal(locationAllowsSpecialty(location, "instructor", "ste"), true);
   assert.equal(locationAllowsSpecialty(location, "instructor", "acr"), false);

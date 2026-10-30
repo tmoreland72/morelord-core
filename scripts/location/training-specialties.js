@@ -1,7 +1,7 @@
 import { artisanSpecialtyOptions } from "./artisan-tools.js";
 import { DND2024_SPECIALTIES } from "./fixed-specialties.js";
 import { forgeAncestors, listForgeSpecialties, migrateForgeSpecialties } from "./forge-categories.js";
-import { instructorGroupAny } from "./instructor-any.js";
+import { instructorCoverIds, instructorGroupAny, normalizeInstructorSpecialties } from "./instructor-any.js";
 import { normalizeSpecialtyList } from "./location-domain.js";
 import { finishSpecialtyGroups } from "./specialty-selection.js";
 
@@ -88,7 +88,7 @@ function withAnyOptions(groups, catalog) {
     if (catalog === TRAINING_SPECIALTY_CATALOG) {
       const any = instructorGroupAny(group.label);
       if (any) {
-        options.unshift({ value: any.key, label: any.label, covers: options.map(option => option.value) });
+        options.unshift({ value: any.key, label: any.label, covers: instructorCoverIds(options.map(option => option.value)) });
       }
     }
     return { ...group, options };
@@ -108,7 +108,9 @@ export function decorateCapabilityRows(capabilities = [], { resolveType = () => 
     const stored = normalizeSpecialtyList(capability?.specialty);
     const specialty = capability?.type === "forge" || definition?.specialtyCatalog === FORGE_SPECIALTY_CATALOG
       ? migrateForgeSpecialties(stored)
-      : stored;
+      : capability?.type === "instructor" || definition?.specialtyCatalog === TRAINING_SPECIALTY_CATALOG
+        ? normalizeInstructorSpecialties(stored)
+        : stored;
     const current = specialty;
     const catalog = definition?.specialtyCatalog ?? null;
     let specialtyOptions = null;

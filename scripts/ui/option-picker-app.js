@@ -25,9 +25,11 @@ export class OptionPickerApp extends HandlebarsApplicationMixin(ApplicationV2) {
   constructor({ choices = [], selected = [], onConfirm = null } = {}) {
     super();
     this.choices = choices.map(choice => ({
-      value: String(choice.value),
-      label: String(choice.label ?? choice.value),
-      category: String(choice.category ?? "Specialty")
+      value: String(choice.value ?? ""),
+      label: String(choice.label ?? choice.value ?? ""),
+      category: String(choice.category ?? "Specialty"),
+      covers: Array.isArray(choice.covers) ? choice.covers.map(id => String(id)) : [],
+      overallAny: choice.overallAny === true || choice.value === "*"
     }));
     this.selected = new Set((selected ?? []).map(value => String(value)));
     this.onConfirm = onConfirm;

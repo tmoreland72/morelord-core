@@ -1,5 +1,5 @@
 import { forgeAncestors, migrateForgeSpecialties } from "./forge-categories.js";
-import { instructorSpecialtyAllowed } from "./instructor-any.js";
+import { instructorSpecialtyAllowed, normalizeInstructorSpecialties } from "./instructor-any.js";
 
 export const SETTLEMENT_TYPES = Object.freeze([
   "road",
@@ -68,10 +68,15 @@ export function normalizeCapability(raw = {}) {
   if (!type) throw new Error("A capability requires a type.");
   if (!TIER_RANK.has(tier)) throw new Error(`Unknown capability tier: ${tier}.`);
   const specialty = normalizeSpecialtyList(raw.specialty);
+  const normalized = type === "forge"
+    ? migrateForgeSpecialties(specialty)
+    : type === "instructor"
+      ? normalizeInstructorSpecialties(specialty)
+      : specialty;
   return {
     type,
     tier,
-    specialty: type === "forge" ? migrateForgeSpecialties(specialty) : specialty,
+    specialty: normalized,
     source: raw.source ? String(raw.source).trim() : null
   };
 }
