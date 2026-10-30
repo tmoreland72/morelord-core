@@ -192,9 +192,3 @@ export const DND2024_SPECIALTIES = Object.freeze(
   [...SKILLS, ...LANGUAGES, ...TOOLS, ...WEAPON_PROFICIENCIES, ...ARMOR_PROFICIENCIES, ...WEAPON_MASTERIES]
     .sort(bySpecialty)
 );
-
-export const FORGE_SPECIALTY_CATEGORIES = Object.freeze([
-  WEAPON,
-  ARMOR,
-  MASTERY
-]);

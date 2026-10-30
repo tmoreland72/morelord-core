@@ -1,7 +1,10 @@
 import { artisanSpecialtyOptions } from "./artisan-tools.js";
-import { DND2024_SPECIALTIES, FORGE_SPECIALTY_CATEGORIES } from "./fixed-specialties.js";
+import { DND2024_SPECIALTIES } from "./fixed-specialties.js";
+import { listForgeSpecialties, migrateForgeSpecialties } from "./forge-categories.js";
 import { normalizeSpecialtyList } from "./location-domain.js";
 import { finishSpecialtyGroups } from "./specialty-selection.js";
+
+export { listForgeSpecialties };
 
 /**
  * D&D 2024 training subjects: skills, languages, tools, weapons, armor, and weapon masteries.
@@ -35,16 +38,9 @@ export function listTrainingSpecialties() {
   return DND2024_SPECIALTIES.slice();
 }
 
-export function listForgeSpecialties() {
-  return DND2024_SPECIALTIES.filter(entry => FORGE_SPECIALTY_CATEGORIES.includes(entry.category));
-}
-
 function choicesFor(catalog, choices) {
-  const source = choices ?? (catalog === FORGE_SPECIALTY_CATALOG ? listForgeSpecialties() : listTrainingSpecialties());
-  if (catalog === FORGE_SPECIALTY_CATALOG) {
-    return source.filter(entry => FORGE_SPECIALTY_CATEGORIES.includes(entry?.category));
-  }
-  return source;
+  if (catalog === FORGE_SPECIALTY_CATALOG) return listForgeSpecialties();
+  return choices ?? listTrainingSpecialties();
 }
 
 /**
@@ -82,7 +78,10 @@ export function buildSpecialtyOptions(definition, { choices, current = null } = 
 export function decorateCapabilityRows(capabilities = [], { resolveType = () => null, choices, capabilityTypeIds = null } = {}) {
   return (capabilities ?? []).map(capability => {
     const definition = resolveType(capability?.type) ?? null;
-    const specialty = normalizeSpecialtyList(capability?.specialty);
+    const stored = normalizeSpecialtyList(capability?.specialty);
+    const specialty = capability?.type === "forge" || definition?.specialtyCatalog === FORGE_SPECIALTY_CATALOG
+      ? migrateForgeSpecialties(stored)
+      : stored;
     const current = specialty;
     const catalog = definition?.specialtyCatalog ?? null;
     let specialtyOptions = null;

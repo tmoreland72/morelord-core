@@ -1,3 +1,5 @@
+import { forgeAncestors, migrateForgeSpecialties } from "./forge-categories.js";
+
 export const SETTLEMENT_TYPES = Object.freeze([
   "road",
   "hamlet",
@@ -46,9 +48,16 @@ export function normalizeSpecialtyList(value) {
 
 export function capabilityAllowsSpecialty(capability, specialtyKey) {
   if (isUnrestrictedSpecialty(specialtyKey)) return true;
-  const keys = normalizeSpecialtyList(capability?.specialty);
-  if (!keys.length) return true;
-  return keys.includes(String(specialtyKey).trim());
+  const type = String(capability?.type ?? "").trim();
+  const stored = type === "forge"
+    ? migrateForgeSpecialties(normalizeSpecialtyList(capability?.specialty))
+    : normalizeSpecialtyList(capability?.specialty);
+  if (!stored.length) return true;
+  const requested = String(specialtyKey).trim();
+  if (type !== "forge") return stored.includes(requested);
+  const accepted = new Set(forgeAncestors(requested));
+  if (!accepted.size) return stored.includes(requested);
+  return stored.some(key => accepted.has(key));
 }
 
 export function normalizeCapability(raw = {}) {
@@ -56,10 +65,11 @@ export function normalizeCapability(raw = {}) {
   const tier = String(raw.tier ?? "common").trim();
   if (!type) throw new Error("A capability requires a type.");
   if (!TIER_RANK.has(tier)) throw new Error(`Unknown capability tier: ${tier}.`);
+  const specialty = normalizeSpecialtyList(raw.specialty);
   return {
     type,
     tier,
-    specialty: normalizeSpecialtyList(raw.specialty),
+    specialty: type === "forge" ? migrateForgeSpecialties(specialty) : specialty,
     source: raw.source ? String(raw.source).trim() : null
   };
 }

@@ -47,7 +47,11 @@ test("locationAllowsSpecialty treats Any or empty as every specialty", () => {
     ]
   });
   assert.equal(locationAllowsSpecialty(named, "forge", "longsword"), true);
+  assert.equal(locationAllowsSpecialty(named, "forge", "martialM"), true);
+  assert.equal(locationAllowsSpecialty(named, "forge", "mar"), false);
+  assert.equal(locationAllowsSpecialty(named, "forge", "weapon"), false);
   assert.equal(locationAllowsSpecialty(named, "forge", "dagger"), false);
+  assert.equal(locationAllowsSpecialty(named, "forge", "simpleM"), false);
   assert.equal(locationAllowsSpecialty(named, "forge", "  longsword  "), true);
   assert.equal(locationAllowsSpecialty(named, "forge", ""), true);
   assert.equal(locationAllowsSpecialty(named, "instructor", "dwarvish"), true);
@@ -84,7 +88,7 @@ test("a specialty array and a legacy string both match the included keys", () =>
       { type: "workshop", tier: "rare", specialty: ["cobbler", "weaver"] }
     ]
   });
-  assert.deepEqual(location.capabilities[0].specialty, ["longsword", "plate"]);
+  assert.deepEqual(location.capabilities[0].specialty, ["martialM", "hvy"]);
   assert.deepEqual(location.capabilities[1].specialty, ["ste"]);
   assert.deepEqual(location.capabilities[2].specialty, ["cobbler", "weaver"]);
   assert.equal(locationAllowsSpecialty(location, "forge", "longsword"), true);

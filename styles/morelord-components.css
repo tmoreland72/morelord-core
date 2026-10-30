@@ -542,3 +542,42 @@
   border-radius: var(--ml-radius-pill);
   box-shadow: 0 0 0 1px var(--ml-color-accent-strong);
 }
+
+/* Select Specialty uses Downtime's Select Training layout. The Selected column is the multi-select addition. */
+.ml-training-selection { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: var(--ml-space-3); min-height: 0; padding: var(--ml-space-4); }
+.ml-training-selection:has(> .ml-training-selection__selected) { grid-template-columns: 270px minmax(0, 1fr) 280px; }
+.ml-training-selection__filters { display: flex; flex-direction: column; min-width: 220px; min-height: 0; padding-right: var(--ml-space-2); overflow-x: hidden; overflow-y: auto; border-right: 1px solid var(--ml-color-border); scrollbar-gutter: stable; }
+.ml-training-selection__filter-search { flex: 0 0 auto; margin-bottom: var(--ml-space-4); }
+.ml-training-selection__filter-search > label { display: block; margin-bottom: var(--ml-space-1); font-weight: var(--ml-font-weight-bold); }
+.ml-training-selection__search { position: relative; min-width: 0; }
+.ml-training-selection__search input { width: 100%; padding-right: var(--ml-space-5); }
+.ml-training-selection__clear-search { position: absolute; top: 50%; right: .45rem; display: flex; align-items: center; justify-content: center; width: 1.45rem; height: 1.45rem; min-height: unset; margin: 0; padding: 0; transform: translateY(-50%); border: none; background: transparent; box-shadow: none; opacity: 0; pointer-events: none; }
+.ml-training-selection__search:hover .ml-training-selection__clear-search,
+.ml-training-selection__search:focus-within .ml-training-selection__clear-search { opacity: .75; pointer-events: auto; }
+.ml-training-selection__search input:placeholder-shown + .ml-training-selection__clear-search { opacity: 0; pointer-events: none; }
+.ml-training-selection__clear-search:hover { opacity: 1; }
+.ml-training-selection__filter-group { flex: 0 0 auto; padding: var(--ml-space-3) 0; border-top: 1px solid var(--ml-color-border); }
+.ml-training-selection__filter-group h4 { margin: 0 0 var(--ml-space-2); font-size: var(--ml-font-size-sm); text-transform: uppercase; }
+.ml-training-selection__filter-options { display: flex; flex-direction: column; gap: var(--ml-space-1); }
+.ml-training-selection__category { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: center; gap: .4rem; width: 100%; min-width: 0; padding: .28rem .35rem; border: none; background: transparent; box-shadow: none; text-align: left; opacity: .9; }
+.ml-training-selection__category:hover { background: rgba(255, 255, 255, .07); }
+.ml-training-selection__category span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ml-training-selection__category small { margin-left: auto; opacity: .7; }
+.ml-training-selection__category.is-active { font-weight: 600; opacity: 1; }
+.ml-training-selection__results,
+.ml-training-selection__selected { min-width: 0; min-height: 0; padding: var(--ml-space-4); overflow-y: auto; }
+.ml-training-selection__selected { display: flex; flex-direction: column; border-left: 1px solid var(--ml-color-border); }
+.ml-training-selection__selected > .ml-training-selection__list { flex: 1 1 auto; }
+.ml-training-selection__heading { justify-content: space-between; }
+.ml-training-selection__heading :where(h2, p) { margin: 0; }
+.ml-training-selection__list { display: grid; gap: var(--ml-space-2); }
+.ml-training-selection__option { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--ml-space-3); width: 100%; height: auto !important; min-height: 68px !important; max-height: none !important; padding: var(--ml-space-3) var(--ml-space-4); text-align: left; }
+.ml-training-selection__option span { display: grid; gap: var(--ml-space-1); min-width: 0; }
+.ml-training-selection__option small { color: var(--ml-color-muted); }
+.ml-training-selection__option.is-selected { border-color: var(--ml-color-accent); box-shadow: inset 3px 0 var(--ml-color-accent); }
+@media (max-width: 760px) {
+  .ml-training-selection,
+  .ml-training-selection:has(> .ml-training-selection__selected) { grid-template-columns: 1fr; }
+  .ml-training-selection__filters { border-right: 0; border-bottom: 1px solid var(--ml-color-border); }
+  .ml-training-selection__selected { border-left: 0; border-top: 1px solid var(--ml-color-border); }
+}

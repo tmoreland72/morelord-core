@@ -78,12 +78,11 @@ test("the instructor and forge catalogs are a fixed D&D 2024 list", () => {
   for (const entry of catalog) {
     assert.equal(JSON.stringify(entry).includes("Compendium."), false, entry.id);
   }
-  assert.deepEqual(
-    new Set(forge.map(entry => entry.category)),
-    new Set(["Weapon Proficiency", "Armor Proficiency", "Weapon Mastery"])
-  );
-  assert.equal(forge.some(entry => entry.kind === "skillProficiency" || entry.kind === "language" || entry.kind === "toolProficiency"), false);
-  assert.equal(forge.length, 40 + 17 + 38);
+  assert.deepEqual(forge.map(entry => entry.id), [
+    "armor", "lgt", "med", "hvy", "shl",
+    "weapon", "sim", "simpleM", "simpleR", "mar", "martialM", "martialR", "ammo"
+  ]);
+  assert.equal(forge.some(entry => entry.category === "Weapon Mastery" || entry.id === "longsword"), false);
 });
 
 test("specialty options follow the capability type, default to Any, and keep unknown stored values", () => {
@@ -106,19 +105,19 @@ test("specialty options follow the capability type, default to Any, and keep unk
   const forge = optionsFor("forge");
   assert.deepEqual(
     forge.groups.filter(group => group.label).map(group => group.label),
-    ["Weapons", "Armor", "Weapon Masteries"]
+    ["Armor", "Weapons"]
   );
   assert.equal(forge.summary, "Any");
   assert.equal(flatOptions(forge).some(option => option.selected), false);
-  assert.equal(flatOptions(forge).some(option => option.value === "ste" || option.value === "dwarvish" || option.value === "thief"), false);
+  assert.equal(flatOptions(forge).some(option => option.value === "ste" || option.value === "dwarvish" || option.value === "thief" || option.value === "longsword"), false);
   assert.equal(flatOptions(forge).some(option => option.value === "sim"), true);
   assert.equal(flatOptions(forge).some(option => option.value === "lgt"), true);
-  assert.equal(flatOptions(forge).filter(option => option.value === "dagger").length, 2);
+  assert.equal(flatOptions(forge).some(option => option.value === "simpleM" && option.label === "Simple Melee Weapons"), true);
 
   const fixedForge = optionsFor("forge", { useDefault: true });
-  assert.equal(flatOptions(fixedForge).some(option => option.value === "longsword"), true);
-  assert.equal(flatOptions(fixedForge).some(option => option.value === "ste"), false);
-  assert.equal(flatOptions(fixedForge).find(option => option.value === "musket").label, "Musket");
+  assert.equal(flatOptions(fixedForge).some(option => option.value === "martialM"), true);
+  assert.equal(flatOptions(fixedForge).some(option => option.value === "ste" || option.value === "longsword"), false);
+  assert.equal(flatOptions(fixedForge).find(option => option.value === "ammo").label, "Ammunition");
 
   for (const typeId of ["marketplace", "alchemist", "library", "temple", "contractor"]) {
     assert.equal(optionsFor(typeId, { current: "smiths-tools" }), null, typeId);
@@ -153,20 +152,16 @@ test("hidden specialty types keep the stored specialty on the editor row", () =>
   const types = registry();
   const rows = decorateCapabilityRows([
     { type: "instructor", tier: "common", specialty: "dwarvish", source: "guild charter" },
-    { type: "forge", tier: "rare", specialty: "old-forge-note", source: "kept" },
+    { type: "forge", tier: "rare", specialty: ["hvy", "old-forge-note"], source: "kept" },
     { type: "marketplace", tier: "common", specialty: "kept-note", source: "stall" }
   ], { resolveType: id => types.get(id), choices });
   assert.deepEqual(rows[0].specialty, ["dwarvish"]);
   assert.equal(rows[0].source, "guild charter");
   assert.equal(flatOptions(rows[0].specialtyOptions).find(option => option.value === "dwarvish").selected, true);
-  assert.deepEqual(rows[1].specialty, ["old-forge-note"]);
+  assert.deepEqual(rows[1].specialty, ["hvy"]);
   assert.equal(rows[1].source, "kept");
-  assert.deepEqual(flatOptions(rows[1].specialtyOptions).find(option => option.value === "old-forge-note"), {
-    value: "old-forge-note",
-    label: "old-forge-note",
-    selected: true
-  });
-  assert.equal(flatOptions(rows[1].specialtyOptions).some(option => option.value === "ste"), false);
+  assert.equal(rows[1].specialtyOptions.summary, "Heavy Armor");
+  assert.equal(flatOptions(rows[1].specialtyOptions).some(option => option.value === "old-forge-note" || option.value === "ste"), false);
   assert.equal(rows[2].specialtyOptions, null);
   assert.deepEqual(rows[2].specialty, ["kept-note"]);
   assert.equal(rows[2].source, "stall");
@@ -190,7 +185,8 @@ test("instructor and forge lists do not consult Configure Sources or compendium 
   const sources = [
     "scripts/location/training-specialties.js",
     "scripts/location/fixed-specialties.js",
-    "scripts/location/location-manager-app.js"
+    "scripts/location/location-manager-app.js",
+    "scripts/location/forge-categories.js"
   ].map(path => readFileSync(new URL(`../${path}`, import.meta.url), "utf8"));
   for (const source of sources) {
     assert.equal(source.includes("isUuidAllowed"), false);
@@ -229,12 +225,12 @@ test("capability editor labels Notes and posts the existing source field", () =>
   const template = readFileSync(new URL("../templates/location-manager.hbs", import.meta.url), "utf8");
   assert.match(template, /<span>Notes<\/span>\s*<input type="text" name="capabilities\.\{\{@index\}\}\.source"/);
   assert.match(template, /class="ml-multi-select"/);
-  assert.match(template, /<div class="ml-multi-select__heading" role="heading" aria-level="3">/);
-  assert.match(template, /class="ml-multi-select__summary" title="\{\{specialtyOptions\.summary\}\}"/);
+  assert.match(template, /data-action="pickSpecialty"/);
+  assert.match(template, /class="ml-multi-select__summary" data-action="pickSpecialty"[^>]*title="\{\{specialtyOptions\.summary\}\}"/);
   assert.doesNotMatch(template, /<p class="ml-multi-select__heading">/);
   assert.match(template, /data-ml-multi-select-label/);
-  assert.match(template, /name="capabilities\.\{\{@\.\.\/\.\.\/index\}\}\.specialty"/);
   assert.match(template, /name="capabilities\.\{\{@\.\.\/index\}\}\.specialty"/);
+  assert.doesNotMatch(template, /type="checkbox" name="capabilities\./);
   assert.doesNotMatch(template, /<select name="capabilities\.\{\{@index\}\}\.specialty">/);
   assert.match(template, /data-capability-type/);
   assert.doesNotMatch(template, /<span>Source<\/span>/);

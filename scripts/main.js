@@ -15,6 +15,7 @@ import { CONFIGURE_SOURCES_CHANGED, filterAllowed, getAllowedPack, getAllowedPac
 import { resolveBookLabel, resolvePackLabel } from "./services/source-book-service.js";
 import { BUILTIN_CAPABILITY_TYPES, CapabilityRegistry } from "./location/capability-registry.js";
 import { FORGE_SPECIALTY_CATALOG, TRAINING_SPECIALTY_CATALOG, buildSpecialtyOptions, listForgeSpecialties, listTrainingSpecialties } from "./location/training-specialties.js";
+import { forgeCategoryKeys } from "./location/forge-categories.js";
 import { artisanSpecialtyOptions, listArtisanToolsForCapability, listWorkshopSpecialties, toolCapabilityType } from "./location/artisan-tools.js";
 import { LocationService } from "./location/location-service.js";
 import { CAPABILITY_TIERS, SETTLEMENT_TYPES, evaluateRequirements, locationAllowsSpecialty, meetsTier } from "./location/location-domain.js";
@@ -24,6 +25,7 @@ import { guardApplicationRender, renderInBackground } from "./ui/background-rend
 import { applyPageLayout } from "./ui/page-layout.js";
 import { activateTabs } from "./ui/tabs.js";
 import { activateMultiSelects } from "./ui/multi-select.js";
+import { openOptionPicker } from "./ui/option-picker-app.js";
 import { activateCardSelection } from "./ui/card-selection.js";
 import { sortable } from "./ui/sortable.js";
 import { activateCollapsibleSections, createCollapsibleSection } from "./ui/collapsible-section.js";
@@ -707,6 +709,7 @@ Hooks.once("ready", async () => {
       applyPageLayout,
       activateTabs,
       activateMultiSelects,
+      openOptionPicker,
       activateCardSelection,
       activateCollapsibleSections,
       createCollapsibleSection,
@@ -738,6 +741,7 @@ Hooks.once("ready", async () => {
       listCapabilities: () => capabilityRegistry.all(),
       listTrainingSpecialties: () => listTrainingSpecialties(),
       listForgeSpecialties: () => listForgeSpecialties(),
+      forgeCategoryKeys: item => forgeCategoryKeys(item),
       locationAllowsSpecialty: (location, type, specialtyKey) => locationAllowsSpecialty(location, type, specialtyKey),
       buildSpecialtyOptions: (typeId, options = {}) => {
         const registeredIds = options.capabilityTypeIds ?? capabilityRegistry.all().map(type => type.id);

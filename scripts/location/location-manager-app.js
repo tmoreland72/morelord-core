@@ -1,5 +1,7 @@
 import { CAPABILITY_TIERS, SETTLEMENT_TYPES, normalizeSpecialtyList } from "./location-domain.js";
 import { decorateCapabilityRows, listTrainingSpecialties } from "./training-specialties.js";
+import { choicesFromGroups } from "../ui/option-picker.js";
+import { openOptionPicker } from "../ui/option-picker-app.js";
 import { renderPreservingScroll } from "../ui/scroll-preservation.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
@@ -35,6 +37,7 @@ export class LocationManagerApp extends HandlebarsApplicationMixin(ApplicationV2
       edit: LocationManagerApp.edit,
       addCapability: LocationManagerApp.addCapability,
       removeCapability: LocationManagerApp.removeCapability,
+      pickSpecialty: LocationManagerApp.pickSpecialty,
       save: LocationManagerApp.save,
       delete: LocationManagerApp.delete
     }
@@ -160,6 +163,28 @@ export class LocationManagerApp extends HandlebarsApplicationMixin(ApplicationV2
     this.#captureDraft();
     this.draft.capabilities.push({ type: "forge", tier: "common", specialty: [], source: null });
     this.render({ force: true });
+  }
+
+  static pickSpecialty(event, target) {
+    event.preventDefault();
+    this.#captureDraft();
+    const index = Number(target.dataset.index);
+    const capability = this.draft?.capabilities?.[index];
+    if (!capability) return;
+    const [row] = decorateCapabilityRows([capability], {
+      resolveType: typeId => this.constructor.capabilityRegistry?.get(typeId) ?? null,
+      choices: listTrainingSpecialties(),
+      capabilityTypeIds: this.constructor.capabilityRegistry?.all().map(type => type.id) ?? null
+    });
+    const choices = choicesFromGroups(row?.specialtyOptions?.groups ?? []);
+    openOptionPicker({
+      choices,
+      selected: row?.specialty ?? capability.specialty ?? [],
+      onConfirm: keys => {
+        this.draft.capabilities[index].specialty = keys;
+        void this.render({ force: true, focus: true });
+      }
+    });
   }
 
   static removeCapability(event, target) {

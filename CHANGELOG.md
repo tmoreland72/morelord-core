@@ -24,6 +24,8 @@
 - Specialty group headings in the checkbox menu are bold. The heading is a div, so the shared paragraph weight no longer overrides it. Native select group labels stay bold in the accent color on the window background, and options inside a group keep the normal text weight.
 - A Specialty summary with several names stays in its column at the same height as the other menus. The text ends in an ellipsis, the chevron stays inside the button, and the full list is in the button tooltip.
 - A Downtime session with no location no longer replaces the viewed scene with On the Road. The scene's associated location is used. On the Road remains only when that scene has no location either.
+- Instructor, Forge, and Workshop **Specialty** opens **Select Specialty**, using the Select Training layout. Several choices can be added to **Selected**. **Confirm** stores the ids. An empty selection is **Any**.
+- Forge specialties are D&D 2024 equipment categories. Armor and Weapons cover their children. Weapon masteries are not a Forge specialty. A saved weapon, armor, or mastery becomes its category. An unknown Forge specialty becomes **Any**. `api.locations.forgeCategoryKeys(item)` returns that item's category keys, root first.
 
 ## 0.8.1
 

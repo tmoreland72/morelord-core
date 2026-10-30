@@ -1,0 +1,59 @@
+<section class="ml-app ml-training-selection">
+  <aside class="ml-training-selection__filters" aria-label="Specialty filters">
+    <div class="ml-training-selection__filter-search">
+      <label for="ml-option-picker-search">Search</label>
+      <div class="ml-training-selection__search">
+        <input id="ml-option-picker-search" type="search" data-training-search placeholder="Search training options..." autofocus>
+        <button type="button" class="ml-icon-button ml-training-selection__clear-search" data-size="compact" data-variant="ghost" title="Clear Search" aria-label="Clear Search" data-action="clearSearch">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </div>
+    <section class="ml-training-selection__filter-group">
+      <h4>Category</h4>
+      <div class="ml-training-selection__filter-options">
+        <button type="button" class="ml-list-button ml-training-selection__category is-active" data-action="filterCategory" data-category="all">
+          <i class="fa-solid fa-square-check"></i><span>All Categories</span><small>{{resultCount}}</small>
+        </button>
+        {{#each categories}}
+          <button type="button" class="ml-list-button ml-training-selection__category" data-action="filterCategory" data-category="{{category}}">
+            <i class="fa-regular fa-square"></i><span>{{category}}</span><small>{{count}}</small>
+          </button>
+        {{/each}}
+      </div>
+    </section>
+  </aside>
+  <main class="ml-training-selection__results ml-stack" data-gap="3">
+    <header class="ml-cluster ml-training-selection__heading">
+      <div><h2>Select Specialty</h2><p data-training-result-count>{{resultCount}} training options</p></div>
+    </header>
+    <div class="ml-training-selection__list">
+      {{#each choices}}
+        <button type="button" class="ml-list-button ml-training-selection__option" data-action="chooseOption" data-training-choice data-value="{{value}}" data-category="{{category}}" data-search="{{searchText}}" {{#if selected}}hidden{{/if}}>
+          <span><strong>{{label}}</strong><small>{{category}}</small></span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      {{/each}}
+    </div>
+    <div class="ml-empty-state" data-training-empty hidden><i class="fa-solid fa-filter-circle-xmark"></i><h3>No Matching Specialty</h3><p>Change the search text or category filter.</p></div>
+  </main>
+  <aside class="ml-training-selection__selected" aria-label="Selected">
+    <header class="ml-cluster ml-training-selection__heading">
+      <div><h2>Selected</h2><p data-selected-count>{{selectedCount}} selected</p></div>
+      <button type="button" data-action="clearSelected">Clear all</button>
+    </header>
+    <div class="ml-training-selection__list" data-selected-list>
+      {{#each selected}}
+        <div class="ml-list-button ml-training-selection__option" data-selected-row data-value="{{value}}">
+          <span><strong>{{label}}</strong><small>{{category}}</small></span>
+          <button type="button" class="ml-icon-button" data-action="removeSelected" data-value="{{value}}" aria-label="Remove {{label}}"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      {{/each}}
+    </div>
+    <div class="ml-empty-state" data-selected-empty {{#if selectedCount}}hidden{{/if}}><i class="fa-solid fa-list"></i><p>Any</p></div>
+    <footer class="ml-actions">
+      <button type="button" data-action="cancel">Cancel</button>
+      <button type="button" data-action="confirm">Confirm</button>
+    </footer>
+  </aside>
+</section>
