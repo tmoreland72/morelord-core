@@ -22,6 +22,7 @@
 
 - Saving a location, or another background refresh, no longer brings a different open Morelord window to the front. The window where the button was clicked stays frontmost. A re-render of a window that is already open does not call `bringToFront` unless that render passes `focus: true`. `api.ui.renderInBackground(application)` is the shared refresh for an open window.
 - Specialty group headings in the checkbox menu are bold. The heading is a div, so the shared paragraph weight no longer overrides it. Native select group labels stay bold in the accent color on the window background, and options inside a group keep the normal text weight.
+- A Specialty summary with several names stays in its column at the same height as the other menus. The text ends in an ellipsis, the chevron stays inside the button, and the full list is in the button tooltip.
 
 ## 0.8.1
 

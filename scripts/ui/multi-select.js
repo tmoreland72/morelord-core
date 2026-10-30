@@ -26,7 +26,9 @@ function refreshSummary(picker) {
     seen.add(name);
     names.push(name);
   }
-  label.textContent = names.length ? names.join(", ") : "Any";
+  const summaryText = names.length ? names.join(", ") : "Any";
+  label.textContent = summaryText;
+  picker.querySelector(".ml-multi-select__summary")?.setAttribute("title", summaryText);
 }
 
 /** Open and close compact checkbox menus and keep their summary in sync with the checks. */

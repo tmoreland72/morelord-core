@@ -230,6 +230,7 @@ test("capability editor labels Notes and posts the existing source field", () =>
   assert.match(template, /<span>Notes<\/span>\s*<input type="text" name="capabilities\.\{\{@index\}\}\.source"/);
   assert.match(template, /class="ml-multi-select"/);
   assert.match(template, /<div class="ml-multi-select__heading" role="heading" aria-level="3">/);
+  assert.match(template, /class="ml-multi-select__summary" title="\{\{specialtyOptions\.summary\}\}"/);
   assert.doesNotMatch(template, /<p class="ml-multi-select__heading">/);
   assert.match(template, /data-ml-multi-select-label/);
   assert.match(template, /name="capabilities\.\{\{@\.\.\/\.\.\/index\}\}\.specialty"/);

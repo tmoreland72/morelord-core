@@ -266,7 +266,7 @@ When a check names a specialty, the tier that counts is the highest tier among r
 
 **Specialty** is a checkbox menu on Instructor, Forge, and Workshop. Marketplace, Alchemist, Library, Temple, and Contractor hide it. If you change **Type** to one of those, any specialties already stored on the row stay stored.
 
-The closed summary reads **Any** when nothing is checked. **Any** covers every specialty of that type. Open the menu, check each specialty that one row should cover, and close it. The summary lists the checked names. One row holds several specialties. Clear every box to return the summary to **Any**. A specialty saved earlier as a single choice stays that one checked choice. A saved specialty that is not in the list remains in the menu under the saved name. Changing **Type** rebuilds the menu.
+The closed summary reads **Any** when nothing is checked. **Any** covers every specialty of that type. Open the menu, check each specialty that one row should cover, and close it. The summary lists the checked names in the same height as the **Type** and **Tier** menus. When the names are wider than that field, the line ends in an ellipsis and the full list is in the field's tooltip. One row holds several specialties. Clear every box to return the summary to **Any**. A specialty saved earlier as a single choice stays that one checked choice. A saved specialty that is not in the list remains in the menu under the saved name. Changing **Type** rebuilds the menu.
 
 The choices are fixed D&D 2024 lists. They stay as listed here when Configure Sources changes, and they do not come from compendium items. The menu is the same list on every world.
 

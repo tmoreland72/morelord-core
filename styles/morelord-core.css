@@ -48,8 +48,10 @@
 .ml-location-manager__section-heading { align-items: flex-start; justify-content: space-between; }
 .ml-location-manager__section-heading h3,
 .ml-location-manager__section-heading p { margin-block: 0; }
-.ml-location-manager__capability { display: grid; grid-template-columns: 1.2fr 1fr 1.4fr 1.2fr auto; gap: var(--ml-space-2); align-items: end; }
+.ml-location-manager__capability { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 1.2fr) auto; gap: var(--ml-space-2); align-items: end; }
+.ml-location-manager__capability > :is(label, .ml-multi-select) { min-width: 0; max-width: 100%; }
 .ml-location-manager__capability > label { display: grid; gap: var(--ml-space-1); }
+.ml-location-manager__capability select { width: 100%; min-width: 0; max-width: 100%; }
 .ml-location-manager__capability > label > span { font-size: var(--ml-font-size-sm); font-weight: var(--ml-font-weight-bold); }
 .ml-location-manager__scene-picker select { width: 100%; min-height: 260px; }
 .ml-location-manager__scene-picker option { padding: var(--ml-space-2); }
@@ -59,7 +61,7 @@
 @media (max-width: 760px) {
   .ml-location-manager__layout { grid-template-columns: 1fr; }
   .ml-location-manager__sidebar { border-right: 0; border-bottom: 1px solid var(--ml-color-border); }
-  .ml-location-manager__capability { grid-template-columns: 1fr 1fr; }
+  .ml-location-manager__capability { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .ml-location-manager__capability > button { justify-self: end; }
 }
 

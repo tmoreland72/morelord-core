@@ -78,6 +78,7 @@ test("a specialty menu toggles, summarizes the checks, and closes on Escape", ()
   dagger.checked = true;
   for (const callback of panel.listeners.change) callback();
   assert.equal(label.textContent, "Dagger, Longsword");
+  assert.equal(summary.attributes.title, "Dagger, Longsword");
   for (const callback of picker.listeners.keydown) callback({ key: "Escape" });
   assert.equal(panel.hidden, true);
   assert.equal(summary.focused, true);
