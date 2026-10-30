@@ -27,23 +27,56 @@ test("an active Downtime session location replaces the viewed scene", () => {
   assert.equal(result.location, keep);
 });
 
-test("a session without a location is On the Road, and a missing location stays empty", () => {
+test("a blank session location keeps the viewed scene, and On the Road is only both empty", () => {
+  const phandalin = {
+    id: "phandalin",
+    name: "Phandalin",
+    settlementType: "village",
+    sceneIds: ["scene-phandalin"],
+    capabilities: [{ type: "alchemist", tier: "common" }]
+  };
+  const scenes = [];
+  const viewed = activeLocationContext({
+    user: { id: "user-gm", viewedScene: "scene-phandalin" },
+    localUserId: "user-gm",
+    localSceneId: "scene-camp",
+    forScene: sceneId => {
+      scenes.push(sceneId);
+      return sceneId === "scene-phandalin" ? phandalin : null;
+    },
+    getLocation: () => { throw new Error("a blank session location must not replace the scene"); },
+    downtimeActive: true,
+    downtimeState: { sessions: { week: { id: "week", status: "active", locationId: "" } } }
+  });
+  assert.deepEqual(scenes, ["scene-phandalin"]);
+  assert.equal(viewed.source, "scene");
+  assert.equal(viewed.sessionId, "week");
+  assert.equal(viewed.location, phandalin);
+
+  for (const locationId of [null, undefined, "   "]) {
+    const blank = context({
+      user: { id: "user-player", viewedScene: "scene-keep" },
+      downtimeActive: true,
+      downtimeState: { sessions: { travel: { id: "travel", status: "active", locationId } } }
+    });
+    assert.equal(blank.source, "scene", `locationId ${JSON.stringify(locationId)}`);
+    assert.equal(blank.sessionId, "travel");
+    assert.equal(blank.location, keep);
+  }
+
   const road = context({
+    user: { id: "user-player", viewedScene: "scene-empty" },
     downtimeActive: true,
     downtimeState: { sessions: { travel: { id: "travel", status: "active", locationId: "" } } }
   });
   assert.equal(road.source, "road");
   assert.equal(road.sessionId, "travel");
-  assert.deepEqual(road.location, {
-    id: "road",
-    name: "On the Road",
-    settlementType: "road",
-    sceneIds: [],
-    capabilities: [],
-    notes: "",
-    metadata: { virtual: true }
-  });
+  assert.equal(road.location.name, "On the Road");
+  assert.equal(road.location.metadata.virtual, true);
+  assert.deepEqual(road.location.capabilities, []);
+
   const missing = context({
+    user: { id: "user-player", viewedScene: "scene-keep" },
     downtimeActive: true,
     downtimeState: { sessions: { gone: { status: "active", locationId: "missing-place" } } }
   });
@@ -103,11 +136,18 @@ test("location service uses the session while Downtime is active and the scene w
     assert.notEqual(scene.location, locations.keep);
 
     downtimeActive = true;
+    const duringSession = service.activeContext();
+    assert.equal(duringSession.source, "scene");
+    assert.equal(duringSession.sessionId, "week");
+    assert.equal(duringSession.location.id, "camp");
+
+    globalThis.canvas = { scene: { id: "scene-nowhere" } };
     const road = service.activeContext();
     assert.equal(road.source, "road");
     assert.equal(road.sessionId, "week");
     assert.equal(road.location.name, "On the Road");
     assert.equal(road.location.metadata.virtual, true);
+    globalThis.canvas = { scene: { id: "scene-camp" } };
 
     downtimeState.sessions.week.locationId = "keep";
     const sessionPlace = service.activeContext({ id: "user-player", viewedScene: "scene-camp" });

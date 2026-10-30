@@ -1,8 +1,10 @@
 /**
  * Current-place lookup shared by Craftworks and Marketplace.
- * An active Downtime session wins. A session with no location is the virtual On the Road place.
- * Otherwise the result is the location for the scene that user is viewing.
- * Downtime keeps one active session for the world; `user` chooses the viewed scene when no session is active.
+ * The viewed scene's location is resolved first.
+ * An active Downtime session with a location id wins (`source: "downtime"`).
+ * A session with a blank location id keeps that scene location (`source: "scene"`) and the session id.
+ * On the Road is used only when that session and the viewed scene are both empty.
+ * With no active session, the result is the viewed scene. `user` chooses that scene.
  */
 
 export function roadLocation() {
@@ -45,17 +47,20 @@ export function activeLocationContext({
   downtimeActive = false,
   downtimeState = null
 } = {}) {
+  const sceneId = sceneIdForUser(user, { localUserId, localSceneId });
+  const sceneLocation = sceneId ? (forScene(sceneId) ?? null) : null;
   if (downtimeActive) {
     const active = activeSession(downtimeState);
     if (active) {
       const locationId = String(active.session.locationId ?? "").trim();
-      if (!locationId) return { location: roadLocation(), source: "road", sessionId: active.sessionId };
-      return { location: getLocation(locationId) ?? null, source: "downtime", sessionId: active.sessionId };
+      if (locationId) {
+        return { location: getLocation(locationId) ?? null, source: "downtime", sessionId: active.sessionId };
+      }
+      if (sceneLocation) return { location: sceneLocation, source: "scene", sessionId: active.sessionId };
+      return { location: roadLocation(), source: "road", sessionId: active.sessionId };
     }
   }
-  const sceneId = sceneIdForUser(user, { localUserId, localSceneId });
-  const location = sceneId ? (forScene(sceneId) ?? null) : null;
-  return { location, source: location ? "scene" : "none", sessionId: null };
+  return { location: sceneLocation, source: sceneLocation ? "scene" : "none", sessionId: null };
 }
 
 export function readDowntimeProjectState(game = globalThis.game) {

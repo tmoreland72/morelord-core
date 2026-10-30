@@ -284,7 +284,7 @@ A listed weapon and that weapon's mastery are one specialty. Longsword appears u
 
 ### Associated Scenes
 
-**Associated Scenes** connects Foundry Scenes to this place. The text under the heading reads "When one of these Scenes is active, it resolves to this Morelord Location." The place the modules use is described under [Which place the modules use](#which-place-the-modules-use): the scene a user is viewing, unless an active Downtime session names a location or is On the Road.
+**Associated Scenes** connects Foundry Scenes to this place. The text under the heading reads "When one of these Scenes is active, it resolves to this Morelord Location." The place the modules use is described under [Which place the modules use](#which-place-the-modules-use): the scene a user is viewing, unless an active Downtime session names a location.
 
 **Filter Scenes** keeps names that contain what you type. The placeholder is "Type any part of a Scene name." Click a Scene to select it, and click it again to clear it. The line under the list reads "{count} selected Â· Click a Scene to toggle its selection." Clearing the filter shows every Scene again. Several Scenes can belong to one location, which is how a town map and its interior maps stay the same place. A Scene belongs to one location. Saving a Scene that another location already has moves that Scene to the location you are saving. Selected Scenes stay highlighted when you reopen the location, and they are listed first.
 
@@ -299,7 +299,7 @@ A listed weapon and that weapon's mastery are one specialty. Longsword appears u
 Modules that need the party's current place use one shared answer.
 
 - While a Downtime session is active and that session has a **Location**, that saved location is the current place for the whole world.
-- While a Downtime session is active and its **Location** is **No Location**, the current place is **On the Road**. On the Road is not a saved location. It has no capabilities, so it has no forge, workshop, instructor, or market.
+- While a Downtime session is active and its **Location** is **No Location**, the current place stays the location tied to the scene that user is viewing. **On the Road** is used only when that scene has no associated location. On the Road is not a saved location. It has no capabilities, so it has no forge, workshop, instructor, or market.
 - When Downtime is not active, or it has no active session, the current place is the location tied to the scene that user is viewing. A user who is looking at a different scene is in that scene's location.
 
 Downtime's crafting list also keeps the viewed scene in mind. A recipe the scene's location can support still appears during an On the Road session. Work already started stays on the list and shows as paused when neither place can support it.
@@ -345,7 +345,7 @@ In Craftworks **Settings**, under **Crafting**, each artisan's tool has a facili
 - Assign a general workshop tool, such as Carpenter's Tools or Weaver's Tools, to **Workshop**, and the place needs a Workshop of sufficient tier whose Specialty includes that tool or is **Any**. Several tools may be checked on one Workshop row. A Workshop of a lower tier set to **Any** covers recipes of that lower tier. A Rare Workshop limited to Weaver's Tools covers weaver recipes of Rare or lower. Smith's Tools map to Forge and Alchemist's Supplies map to Alchemist. If either tool is assigned to **Workshop** instead, Craftworks asks for a Workshop of sufficient tier and skips the Workshop Specialty list for that tool.
 - **No facility required** skips the location check for that tool.
 
-A recipe that needs a facility stays paused in Craftworks while the current place lacks it, and it can continue when the place meets it. During an active Downtime session, Craftworks uses that session's location, or On the Road when the session has none. Downtime's own project list can still show a recipe the viewed scene allows, as described above.
+A recipe that needs a facility stays paused in Craftworks while the current place lacks it, and it can continue when the place meets it. During an active Downtime session, Craftworks uses that session's location. When the session's **Location** is **No Location**, Craftworks uses the viewed scene's location, or On the Road when that scene has none. Downtime's own project list can still show a recipe the viewed scene allows, as described above.
 
 ### Marketplace
 
@@ -378,7 +378,7 @@ Create a location named **Highmarket**. Set **Settlement Type** to Town (1,001â€
 - **Instructor**, tier **Common**. Check Stealth and Thieves' Tools. An NPC instructor with **Project Location** set to Highmarket can teach those two subjects. Leave **Specialty** on **Any** when the same NPC should teach any subject. A player character who already knows Arcana can still train another character in Arcana here.
 - **Marketplace**, tier **Uncommon**. Turn on Marketplace's **Enable Locations**. In Highmarket, Buy lists Common and Uncommon items. Rarer owned items remain on Sell with their sell buttons disabled. A shop in town can still sell a Rare item from its own stock. Removing the Marketplace row blocks buying and selling here while the setting stays on.
 
-While the party is viewing the town scene and no Downtime session is active, crafting and shopping use Highmarket. Start a Downtime session, choose **Highmarket** as its **Location**, and they keep using Highmarket. Start that session with **No Location** and the current place becomes On the Road: facility recipes pause there, and **Enable Locations** blocks trade. Downtime can still list a recipe the town scene itself allows.
+While the party is viewing the town scene and no Downtime session is active, crafting and shopping use Highmarket. Start a Downtime session, choose **Highmarket** as its **Location**, and they keep using Highmarket. Start that session with **No Location** and they still use Highmarket, because the viewed scene is associated with it. On the Road applies when the session has **No Location** and the viewed scene is not associated with a location. Downtime can still list a recipe the town scene itself allows.
 
 ## Export and Import Settings
 
