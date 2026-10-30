@@ -89,12 +89,15 @@ test("specialty options follow the capability type, default to Any, and keep unk
   const instructor = optionsFor("instructor");
   assert.deepEqual(
     instructor.groups.filter(group => group.label).map(group => group.label),
-    ["Languages", "Skills", "Tools", "Weapons", "Armor", "Weapon Masteries"]
+    ["Any", "Languages", "Skills", "Tools", "Weapons", "Armor", "Weapon Masteries"]
   );
+  assert.equal(instructor.groups[0].options[0].label, "Any");
+  assert.equal(instructor.groups.find(group => group.label === "Languages").options[0].label, "Any Language");
   assert.equal(instructor.summary, "Any");
   assert.equal(flatOptions(instructor).some(option => option.value === "" || option.selected), false);
   const emptyInstructor = optionsFor("instructor", { choices: [] });
-  assert.deepEqual(emptyInstructor, { groups: [], summary: "Any" });
+  assert.equal(emptyInstructor.summary, "Any");
+  assert.deepEqual(emptyInstructor.groups.map(group => group.label), ["Any"]);
   const dagger = flatOptions(instructor).filter(option => option.value === "dagger");
   assert.equal(dagger.length, 2);
   assert.deepEqual(dagger.map(option => option.label), ["Dagger", "Dagger"]);
@@ -105,7 +108,7 @@ test("specialty options follow the capability type, default to Any, and keep unk
   const forge = optionsFor("forge");
   assert.deepEqual(
     forge.groups.filter(group => group.label).map(group => group.label),
-    ["Armor", "Weapons"]
+    ["Any", "Armor", "Weapons"]
   );
   assert.equal(forge.summary, "Any");
   assert.equal(flatOptions(forge).some(option => option.selected), false);
@@ -118,6 +121,8 @@ test("specialty options follow the capability type, default to Any, and keep unk
   assert.equal(flatOptions(fixedForge).some(option => option.value === "martialM"), true);
   assert.equal(flatOptions(fixedForge).some(option => option.value === "ste" || option.value === "longsword"), false);
   assert.equal(flatOptions(fixedForge).find(option => option.value === "ammo").label, "Ammunition");
+  assert.equal(flatOptions(fixedForge).find(option => option.value === "armor").label, "Any Armor");
+  assert.equal(flatOptions(fixedForge).find(option => option.value === "weapon").label, "Any Weapon");
 
   for (const typeId of ["marketplace", "alchemist", "library", "temple", "contractor"]) {
     assert.equal(optionsFor(typeId, { current: "smiths-tools" }), null, typeId);
