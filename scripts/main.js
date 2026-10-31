@@ -646,8 +646,8 @@ Hooks.once("init", () => {
   });
   game.settings.registerMenu(MODULE_ID, "locations", {
     name: "Morelord Locations",
-    label: "Manage Shared Locations",
-    hint: "Define settlement types, capabilities, and Scene associations shared by Morelord modules.",
+    label: "Manage Locations",
+    hint: "Define settlement types, capabilities, and Scene associations used by Morelord modules.",
     icon: "fa-solid fa-map-location-dot",
     type: LocationManagerApp,
     restricted: true

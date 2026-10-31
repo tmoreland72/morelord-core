@@ -84,7 +84,7 @@ Morelord Core owns:
 - Cards, surfaces, heroes, sections, fields, actions, icon buttons, badges, statuses, empty states, choice cards, and progress bars
 - Dialog footer layout and appearance
 - Accessibility and design-system release checks
-- Shared Location management, actor participation, documentation UI, and window geometry services
+- Location management, actor participation, documentation UI, and window geometry services
 
 Feature modules own:
 
@@ -250,7 +250,7 @@ Preserve module IDs, stored setting keys, flags, pack IDs, and public API identi
 
 ## Settings
 
-Feature-module configuration should use one Configure application, with implementation settings registered using `config: false` and existing keys preserved. Core currently exposes separate account, troubleshooting, and shared Location menus, plus its usage-statistics setting. These are existing shared-service entry points; do not remove them to force a single menu. Character Export is a sheet action and Compendium is a content package, so neither needs an empty Configure application.
+Feature-module configuration should use one Configure application, with implementation settings registered using `config: false` and existing keys preserved. Core currently exposes separate account, troubleshooting, and Location menus, plus its usage-statistics setting. These are existing shared-service entry points; do not remove them to force a single menu. Character Export is a sheet action and Compendium is a content package, so neither needs an empty Configure application.
 
 ## Accessibility
 
@@ -598,7 +598,7 @@ Shared accounts, UI, and Location services for Morelord modules.
 
 ### Foundry package description
 
-The shared foundation for connected Morelord Foundry VTT modules. Manage account access, shared Locations, consistent application controls, documentation, and support diagnostics from common services.
+The shared foundation for connected Morelord Foundry VTT modules. Manage account access, Locations, consistent application controls, documentation, and support diagnostics from common services.
 
 ### Website short
 
@@ -621,11 +621,11 @@ GMs can review membership, refresh access after an account change, open account 
 
 ```html
 <h3>Bring your Morelord campaign tools together.</h3>
-<p>Spend your attention on the campaign. Morelord Core provides the shared foundation behind connected Morelord modules, bringing account access, familiar controls, documentation, and shared Locations into one suite of services inside Foundry VTT.</p>
+<p>Spend your attention on the campaign. Morelord Core provides the shared foundation behind connected Morelord modules, bringing account access, familiar controls, documentation, and Locations into one suite of services inside Foundry VTT.</p>
 <ul>
   <li><strong>Connect the world once.</strong> Link a Morelord Gaming account and let supported modules use that shared connection for feature access.</li>
   <li><strong>Know where your access stands.</strong> Review recognized membership and refresh access after an account change.</li>
-  <li><strong>Build a consistent campaign context.</strong> Manage shared Locations, settlement capabilities, and Scene associations for modules that use them.</li>
+  <li><strong>Build a consistent campaign context.</strong> Manage Locations, settlement capabilities, and Scene associations for modules that use them.</li>
   <li><strong>Feel at home across the suite.</strong> Shared interface and documentation services give connected tools familiar patterns.</li>
   <li><strong>Get useful support information.</strong> Export sanitized diagnostics to help investigate an issue.</li>
 </ul>

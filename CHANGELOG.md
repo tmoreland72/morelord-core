@@ -4,8 +4,9 @@
 
 ### Changed
 
-- The GM guide's Shared Locations section explains why a place is defined once, how a GM sets it up, what each capability and Specialty gates, and how Downtime, Craftworks, Marketplace, and Journeys use that place. It includes a town forge example. The location window introduction names those four modules.
-- In Manage Shared Locations, an Instructor capability's Specialty is a dropdown. Any is the default. The choices are a fixed D&D 2024 list of languages, skills, tools, weapons, armor, and weapon masteries. The list does not follow Configure Sources or compendium items. A saved specialty that is not in that list stays in the dropdown. Other capability types hide Specialty and keep a specialty that was already saved. The capability Source label is now Notes. Saved location fields are unchanged.
+- The GM guide's Locations section explains why a place is defined once, how a GM sets it up, what each capability and Specialty gates, and how Downtime, Craftworks, Marketplace, and Journeys use that place. It includes a town forge example. The location window introduction names those four modules.
+- In Manage Locations, an Instructor capability's Specialty is a dropdown. Any is the default. The choices are a fixed D&D 2024 list of languages, skills, tools, weapons, armor, and weapon masteries. The list does not follow Configure Sources or compendium items. A saved specialty that is not in that list stays in the dropdown. Other capability types hide Specialty and keep a specialty that was already saved. The capability Source label is now Notes. Saved location fields are unchanged.
+- The Locations window **Documentation** button opens the Locations section of Core's guide at `https://morelordgaming.com/docs/morelord-core#locations` in a new browser tab. The Game Settings button is **Manage Locations**. The window title is **Morelord Locations**. Saved location ids and the `locations` setting key are unchanged.
 - A Forge capability's Specialty is the weapon proficiencies, armor proficiencies, and weapon masteries from that same fixed list. Any is the default.
 - Instructor, Forge, and Workshop Specialty is a checkbox menu. One entry can store several specialties. The closed summary lists them, or Any when none are checked. Empty or Any means no restriction. A specialty saved as a single value is read as that one choice.
 - Select group headings use the same background as the options, in the Morelord accent color and bold, so the heading is readable. Options stay in the normal text color and weight.
@@ -271,7 +272,7 @@
 
 - The Core settings Troubleshooting button downloads diagnostics directly. The Troubleshooting section is removed from Connect or Manage Account.
 
-- Shared Locations uses standard Delete and Remove Capability buttons, including Core’s shared icon button component.
+- Locations uses standard Delete and Remove Capability buttons, including Core’s shared icon button component.
 
 - Checkbox descriptions stay beside their controls at narrow widths, including existing settings labels; wrapped text remains in its own column.
 
@@ -290,7 +291,7 @@
 
 ### Improvements
 
-- Show suggested population ranges for Hamlet, Village, Town, City, and Metropolis in the shared Locations Manager's Settlement Type dropdown.
+- Show suggested population ranges for Hamlet, Village, Town, City, and Metropolis in the Locations Manager's Settlement Type dropdown.
 - Share nested and keyed-panel scroll preservation, phase resets, and deferred restoration across Morelord modules.
 - Support portrait decoration for actor-ID controls through a UUID resolver.
 - Include development modules and chat templates in the shared design check.
@@ -358,7 +359,7 @@ Morelord Core 0.3.0 expands the shared foundation used by the Morelord module fa
 
 ### Added
 
-- Added GM-managed shared locations with settlement types, Scene associations, notes, and tiered capabilities.
+- Added GM-managed Locations with settlement types, Scene associations, notes, and tiered capabilities.
 - Added capability registration and requirement evaluation APIs for feature modules such as Craftworks, Marketplace, Journeys, and Downtime.
 - Added shared character participation helpers and scroll-preserving application rendering.
 - Added a shared source-book label resolver for consistent compendium asset attribution across Morelord modules.

@@ -73,7 +73,7 @@ The tools are listed alphabetically by title, ignoring capitalization and a lead
 - Foundry Virtual Tabletop 13 or later, within the installed manifest's supported range. The reviewed manifest records 14.368 as verified; this guide does not establish additional version testing.
 - socketlib version 1.1.3 or later.
 - Permission to configure the world as a GM.
-- A Morelord Gaming account for account linking. Shared Locations, reporting preferences, and troubleshooting do not require an account connection.
+- A Morelord Gaming account for account linking. Locations, reporting preferences, and troubleshooting do not require an account connection.
 - Internet access for the initial connection and periodic access checks.
 
 ## Install and Enable Morelord Core
@@ -204,9 +204,9 @@ Open **Morelord Core → Select Ignored Users**. Check recording or observer acc
 
 Characters assigned to or owned only by ignored users are also excluded from shared character selections, including party-group members. Characters shared with a non-ignored player remain available, even if that player is offline. GM-managed party members without a player owner or assigned user remain available. Reopen a selection window after changing Ignored Users to refresh its options; existing stored participation records are preserved.
 
-## Shared Locations
+## Locations
 
-A shared location is a place you describe once in Morelord Core. Downtime, Craftworks, Marketplace, and Journeys read that same record. Name the town, choose the settlement, and list the facilities it has. Tie the town's scenes to that record, and choose the same record when a Downtime session happens there. Every module then sees the same forge, market, and instructor.
+A location is a place you describe once in Morelord Core. Downtime, Craftworks, Marketplace, and Journeys read that same record. Name the town, choose the settlement, and list the facilities it has. Tie the town's scenes to that record, and choose the same record when a Downtime session happens there. Every module then sees the same forge, market, and instructor.
 
 Creating the location records what the place can support. It does not create a shop, an NPC, a recipe, or a project. Each module applies its own rules, described below.
 
@@ -225,7 +225,7 @@ Creating the location records what the place can support. It does not create a s
 
 ### Why one location is enough
 
-Without a shared location, each module would need its own note that the town has a forge, a market, and someone who can teach. One location keeps those facts together.
+Without a location, each module would need its own note that the town has a forge, a market, and someone who can teach. One location keeps those facts together.
 
 A capability is one service at that place. **Tier** says how rare a result that service can support. **Specialty** says which subjects that one service covers. Leave Specialty on **Any** and the service covers every subject of its kind.
 
@@ -238,15 +238,15 @@ The same town then answers a different question in each module:
 
 ### Set up a location
 
-Open **Morelord Core → Manage Shared Locations**. The window title is **Morelord Locations**. The same window opens from **Manage Locations** on the Downtime dashboard, the Craftworks dashboard, and Marketplace.
+Open **Morelord Core → Manage Locations**. The window title is **Morelord Locations**. The same window opens from **Manage Locations** on the Downtime dashboard, the Craftworks dashboard, and Marketplace.
 
-When the list is empty, the left side reads "No shared locations yet." The main panel shows **Shared Morelord Locations**, the line "Create a location to define its settlement type, capabilities, and associated Scenes.", and **Create First Location**. The plus button (**Create Location**) in the **Locations** heading starts another location. The left list shows each saved **Name** and its settlement type. Select a name to edit that location.
+When the list is empty, the left side reads "No locations yet." The main panel shows **Morelord Locations**, the line "Create a location to define its settlement type, capabilities, and associated Scenes.", **Documentation**, and **Create First Location**. The plus button (**Create Location**) in the **Locations** heading starts another location. The left list shows each saved **Name** and its settlement type. Select a name to edit that location.
 
-While you are editing, the heading is **New Location** or **Edit Location**. The introduction reads "Locations are shared by Marketplace, Craftworks, Downtime, and Journeys."
+While you are editing, the heading is **New Location** or **Edit Location**. The introduction reads "Locations are shared by Marketplace, Craftworks, Downtime, and Journeys." **Documentation** sits to the right of that introduction, and it is also on the empty panel. It opens the Locations section of this guide on the Morelord Gaming website in a new browser tab: `https://morelordgaming.com/docs/morelord-core#locations`.
 
 **Save Location** before you select another location or choose **Create Location**. Those actions load a different record and drop edits that are still unsaved.
 
-![New shared location named Phandalin, with settlement type Village and a Forge capability set to Common.](/images/foundry/core-locations.png)
+![New location named Phandalin, with settlement type Village and a Forge capability set to Common.](/images/foundry/core-locations.png)
 
 **Name** is required. The placeholder is Neverwinter. Saving a blank name reports `Could not save location: A location requires a name.`
 
@@ -364,7 +364,7 @@ This is separate from a shop's own fields. In the shop editor, **Morelord Locati
 
 Journeys can store one of these locations as the place for the current travel day. With none stored, the day is On the Road, which has no capabilities. Completing a travel day advances Downtime projects that progress by days. It leaves the active Downtime session's location where you set it, and the road stays without a forge or a market.
 
-A travel day can also store extra capabilities for that day. They remain on the journey and leave the saved location unchanged. Marketplace, Craftworks, and Downtime sessions keep using the current place from the rules above. The Journeys window has no location picker, no temporary-capability field, and no **Manage Locations** button. Set the town and its facilities in **Manage Shared Locations**, and choose that town on the Downtime session when the party has stopped there.
+A travel day can also store extra capabilities for that day. They remain on the journey and leave the saved location unchanged. Marketplace, Craftworks, and Downtime sessions keep using the current place from the rules above. The Journeys window has no location picker, no temporary-capability field, and no **Manage Locations** button. Set the town and its facilities in **Manage Locations**, and choose that town on the Downtime session when the party has stopped there.
 
 ### Example: a town forge
 
@@ -386,11 +386,11 @@ Open **Morelord Core → Export / Import Settings**. The list shows enabled modu
 
 To import, enable the relevant modules, choose a JSON file under **Settings File**, then select **Import Settings**. Matching settings are replaced; settings absent from the file remain unchanged. Missing or disabled modules and unknown settings are skipped. Review the imported/skipped counts and reload Foundry to refresh module views. Export your current configuration before replacing it.
 
-This is configuration transfer, not a world backup. Credentials, access caches, reporting preferences/credentials, shops, shared Locations, active journeys, downtime projects, and window positions are excluded. Marketplace's **Enable Locations** setting is included with its other configuration settings. Actor/user references retain their IDs and are not remapped between worlds. Files are validated before writing. A failed write triggers an attempt to restore previous values; restoration failures are reported.
+This is configuration transfer, not a world backup. Credentials, access caches, reporting preferences/credentials, shops, Locations, active journeys, downtime projects, and window positions are excluded. Marketplace's **Enable Locations** setting is included with its other configuration settings. Actor/user references retain their IDs and are not remapped between worlds. Files are validated before writing. A failed write triggers an attempt to restore previous values; restoration failures are reported.
 
 ## Documentation and Community
 
-The account window's **Documentation** button opens Core's built-in reference, currently containing Morelord Account and Troubleshooting sections. This GM guide provides the fuller reference for configuration and shared Locations.
+The account window's **Documentation** button opens Core's built-in reference, currently containing Morelord Account and Troubleshooting sections. This GM guide provides the fuller reference for configuration and Locations.
 
 **Morelord Core → Join Discord** opens the Morelord Gaming Discord community for support, feature requests, and discussion. GMs and players can use it without an account connection.
 
@@ -445,7 +445,7 @@ If needed, disconnect and reconnect the world to create a fresh account connecti
 | Change reporting | Account window → Core Settings | Set the two reporting choices, then **Save Core Settings** |
 | Mark reactions | Account window → Core Settings | Check or uncheck **Reaction Used**, then **Save Core Settings** |
 | Exclude observers | Morelord Core module settings | **Select Ignored Users** |
-| Manage locations | Morelord Core module settings | **Manage Shared Locations** |
+| Manage locations | Morelord Core module settings | **Manage Locations** |
 | Transfer configuration | Morelord Core module settings | **Export / Import Settings** |
 | Get a support report | Morelord Core module settings | **Download Troubleshooting File** |
 | Open the community | Morelord Core module settings | **Join Discord** |

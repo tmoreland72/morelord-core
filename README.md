@@ -12,7 +12,7 @@ Shared account activation and entitlement services for Morelord Tools Foundry VT
 
 ## GM setup
 
-See the [Core GM Product Guide](CORE-GM-PRODUCT-GUIDE.md) for account controls, reporting preferences, Ignored Users, [Shared Locations](CORE-GM-PRODUCT-GUIDE.md#shared-locations), configuration transfer, and troubleshooting.
+See the [Core GM Product Guide](CORE-GM-PRODUCT-GUIDE.md) for account controls, reporting preferences, Ignored Users, [Locations](CORE-GM-PRODUCT-GUIDE.md#locations), configuration transfer, and troubleshooting.
 
 1. Install and enable Morelord Core.
 2. Open **Game Settings → Configure Settings → Module Settings → Morelord Core**.
@@ -33,9 +33,11 @@ While it is checked, a creature in a started combat that uses a D&D 5e activity 
 
 ## Locations Manager
 
-The [Shared Locations](CORE-GM-PRODUCT-GUIDE.md#shared-locations) section of the GM guide explains why a place is defined once, how to set it up, and how Downtime, Craftworks, Marketplace, and Journeys use each capability and Specialty.
+The [Locations](CORE-GM-PRODUCT-GUIDE.md#locations) section of the GM guide explains why a place is defined once, how to set it up, and how Downtime, Craftworks, Marketplace, and Journeys use each capability and Specialty.
 
-The built-in types are Forge, Marketplace, Alchemist, Library, Temple, Instructor, and Workshop. Library and Temple have no Specialty. Contractor is not a type. A saved Contractor row is omitted when the location is read or saved. The other rows on that location stay.
+The built-in types are Forge, Marketplace, Alchemist, Library, Temple, Instructor, and Workshop. Library and Temple have no Specialty. A saved Contractor row is omitted when the location is read or saved. The other rows on that location stay.
+
+**Documentation** on the Locations window opens `https://morelordgaming.com/docs/morelord-core#locations` in a new browser tab. The Game Settings button is **Manage Locations**. The window title is **Morelord Locations**. The stored setting key remains `locations`.
 
 Saved Associated Scenes remain highlighted when the editor reopens, including when the Scene list is unfocused. Click a Scene to toggle its association, then save the location.
 
@@ -79,7 +81,7 @@ const place = game.modules.get("morelord-core").api.locations.activeContext(user
 
 GMs can open **Morelord Core → Export / Import Settings** in Module Settings. Export downloads `morelord-settings.json` with configuration from every enabled Morelord module, including hidden defaults and current-browser preferences. Import replaces matching settings and leaves settings absent from the file unchanged. Missing or disabled modules and unknown keys are skipped; enable a module before importing its settings. Reload Foundry after importing to refresh module views.
 
-Account credentials and access caches, shops, shared locations, active journeys, downtime projects, and window positions are excluded. Marketplace's **Enable Locations** setting is included with its other configuration settings. Actor/user references keep their IDs; they are not remapped between worlds. Modules with no configurable settings add no entries. Files are validated before writing; if a write fails, Core attempts to restore the previous values and reports any restoration failures.
+Account credentials and access caches, shops, Locations, active journeys, downtime projects, and window positions are excluded. Marketplace's **Enable Locations** setting is included with its other configuration settings. Actor/user references keep their IDs; they are not remapped between worlds. Modules with no configurable settings add no entries. Files are validated before writing; if a write fails, Core attempts to restore the previous values and reports any restoration failures.
 
 ## Module API
 
@@ -365,7 +367,7 @@ Per-version release history lives in `release-notes/RELEASE-NOTES-<version>.md`,
 
 Core 0.4.2 exposes `ui.participation.canUseActorInventory(actor, user = game.user, { actors = game.actors } = {})`: GMs and owners qualify directly; a Group also qualifies when the user owns or is assigned one of its character members. Callers must still validate operation-specific permissions and route restricted writes through a connected GM. `ui.openItemPreview(item)` opens a read-only sheet; restricted sources are copied into an unsaved Observer document without changing the source or its ownership.
 
-The shared quantity-controls partial accepts optional `cartType`, `clearAction`, `classes`, and `quantityClass` values. `clearAction` adds an accessible remove button with `data-delta="0"`; existing plus/minus consumers keep their behavior. Documentation uses `ui.documentation.open(moduleId)` to open the supported module page on Morelord Gaming in a new browser tab, falling back to the documentation index for modules without a dedicated page. Ignored-only characters are excluded from shared character choices, including explicit saved selections; eligible offline owners remain supported.
+The shared quantity-controls partial accepts optional `cartType`, `clearAction`, `classes`, and `quantityClass` values. `clearAction` adds an accessible remove button with `data-delta="0"`; existing plus/minus consumers keep their behavior. Documentation uses `ui.documentation.open(moduleId, section)` to open the supported module page on Morelord Gaming in a new browser tab. `section` is an optional heading slug, such as `locations`, and is appended as a hash. Anything other than a slug is ignored. Modules without a dedicated page open the documentation index. Ignored-only characters are excluded from shared character choices, including explicit saved selections; eligible offline owners remain supported.
 ## Sidebar multiselect
 
 GM-only **Select multiple** controls support Scenes, Actors, Items, Journals, Rollable Tables, Cards, Macros, Playlists, and Compendium Packs, including pop-out directories. Checkboxes are the leftmost control on each row, including to the left of thumbnails and at the left of playlist headers, and use Foundry's flat checkbox. On a compendium pack card the checkbox sits over the upper left so the banner, title, and footer stay in place. Compact directory portraits stay beside the checkbox instead of underneath it. Clicks on checkboxes do not activate the underlying directory entry or open the pack. Shift-click selects the visible range from the previous checkbox. Select individual entries or **Select visible**, then use **Move selected (N)** to place them in a folder or **Root (no folder)**, or review the named list before confirming **Delete selected (N)**. On Compendium Packs, **Lock selected (N)** and **Unlock selected (N)** change the pack lock, and **Delete selected (N)** includes only world compendiums. **Clear selection** and **Done selecting** clear hidden selections too. Move changes only the selected entries' folder. Folders themselves remain; document and world-compendium deletion is permanent and uses Foundry's native API. No linked account or premium access is required. See `CORE-GM-PRODUCT-GUIDE.md` for every control and scope.

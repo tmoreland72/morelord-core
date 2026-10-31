@@ -12,7 +12,7 @@
 
 - The Core settings Troubleshooting button downloads diagnostics directly. The Troubleshooting section is removed from Connect or Manage Account.
 
-- Shared Locations uses standard Delete and Remove Capability buttons, including Core’s shared icon button component.
+- Locations uses standard Delete and Remove Capability buttons, including Core’s shared icon button component.
 
 - Checkbox descriptions stay beside their controls at narrow widths, including existing settings labels; wrapped text remains in its own column.
 

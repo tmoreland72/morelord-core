@@ -38,6 +38,7 @@ export class LocationManagerApp extends HandlebarsApplicationMixin(ApplicationV2
       addCapability: LocationManagerApp.addCapability,
       removeCapability: LocationManagerApp.removeCapability,
       pickSpecialty: LocationManagerApp.pickSpecialty,
+      openDocumentation: LocationManagerApp.openDocumentation,
       save: LocationManagerApp.save,
       delete: LocationManagerApp.delete
     }
@@ -149,6 +150,11 @@ export class LocationManagerApp extends HandlebarsApplicationMixin(ApplicationV2
       metadata: {}
     };
     this.render({ force: true });
+  }
+
+  static openDocumentation(event) {
+    event?.preventDefault();
+    globalThis.game?.modules?.get("morelord-core")?.api?.ui?.documentation?.open("morelord-core", "locations");
   }
 
   static edit(event, target) {

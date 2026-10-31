@@ -237,6 +237,7 @@ test("capability editor labels Notes and posts the existing source field", () =>
   assert.match(template, /name="capabilities\.\{\{@\.\.\/index\}\}\.specialty"/);
   assert.doesNotMatch(template, /type="checkbox" name="capabilities\./);
   assert.doesNotMatch(template, /<select name="capabilities\.\{\{@index\}\}\.specialty">/);
+  assert.match(template, /data-action="openDocumentation"/);
   assert.match(template, /data-capability-type/);
   assert.doesNotMatch(template, /<span>Source<\/span>/);
 });
