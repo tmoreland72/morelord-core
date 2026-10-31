@@ -7,7 +7,7 @@ import { finishSpecialtyGroups } from "./specialty-selection.js";
  * Workshop is the fallback, so a tool leaves Workshop only when a more specific type is registered.
  * Forge is smithing for this tool map. The Forge specialty dropdown is the fixed weapon, armor, and mastery list, not Smith's Tools.
  * Alchemist is alchemist's supplies. Tavern, when a module registers it, is brewing and cooking.
- * Carpenter's Tools and Mason's Tools stay on Workshop: Contractor is not those crafts.
+ * Carpenter's Tools and Mason's Tools stay on Workshop.
  * Calligrapher's Supplies and Cartographer's Tools stay on Workshop: Library is not those crafts.
  */
 export const ARTISAN_TOOLS = Object.freeze([
@@ -36,7 +36,6 @@ const DEFAULT_CAPABILITY_TYPE_IDS = Object.freeze([
   "alchemist",
   "library",
   "temple",
-  "contractor",
   "instructor",
   "workshop"
 ]);

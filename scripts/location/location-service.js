@@ -1,4 +1,4 @@
-import { normalizeLocation, evaluateRequirements } from "./location-domain.js";
+import { normalizeLocation, evaluateRequirements, withoutRemovedCapabilities } from "./location-domain.js";
 import { activeLocationContext, readDowntimeProjectState } from "./location-context.js";
 
 export class LocationService {
@@ -17,8 +17,15 @@ export class LocationService {
     return foundry.utils.deepClone(game.settings.get(this.moduleId, this.settingKey) ?? {});
   }
 
-  list() { return Object.values(this.#records()).sort((a, b) => a.name.localeCompare(b.name)); }
-  get(id) { return this.#records()[String(id)] ?? null; }
+  #present(location) {
+    if (!location) return null;
+    return { ...location, capabilities: withoutRemovedCapabilities(location.capabilities) };
+  }
+
+  list() {
+    return Object.values(this.#records()).map(location => this.#present(location)).sort((a, b) => a.name.localeCompare(b.name));
+  }
+  get(id) { return this.#present(this.#records()[String(id)] ?? null); }
   forScene(sceneId) { return this.list().find(location => location.sceneIds.includes(String(sceneId))) ?? null; }
   current() { return this.forScene(globalThis.canvas?.scene?.id ?? game.scenes?.current?.id); }
 

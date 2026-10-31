@@ -35,6 +35,8 @@ While it is checked, a creature in a started combat that uses a D&D 5e activity 
 
 The [Shared Locations](CORE-GM-PRODUCT-GUIDE.md#shared-locations) section of the GM guide explains why a place is defined once, how to set it up, and how Downtime, Craftworks, Marketplace, and Journeys use each capability and Specialty.
 
+The built-in types are Forge, Marketplace, Alchemist, Library, Temple, Instructor, and Workshop. Library and Temple have no Specialty. Contractor is not a type. A saved Contractor row is omitted when the location is read or saved. The other rows on that location stay.
+
 Saved Associated Scenes remain highlighted when the editor reopens, including when the Scene list is unfocused. Click a Scene to toggle its association, then save the location.
 
 The Settlement Type dropdown includes suggested population ranges: Hamlet (1–100), Village (101–1,000), Town (1,001–6,000), City (6,001–25,000), and Metropolis (25,001+). Road and Other have no population range. These labels provide guidance only; capability tiers remain independent of settlement size.

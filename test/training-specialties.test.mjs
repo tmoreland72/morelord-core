@@ -124,7 +124,7 @@ test("specialty options follow the capability type, default to Any, and keep unk
   assert.equal(flatOptions(fixedForge).find(option => option.value === "armor").label, "Any Armor");
   assert.equal(flatOptions(fixedForge).find(option => option.value === "weapon").label, "Any Weapon");
 
-  for (const typeId of ["marketplace", "alchemist", "library", "temple", "contractor"]) {
+  for (const typeId of ["marketplace", "alchemist", "library", "temple"]) {
     assert.equal(optionsFor(typeId, { current: "smiths-tools" }), null, typeId);
   }
   assert.equal(buildSpecialtyOptions({ id: "oracle", supportsSpecialty: true }, { choices, current: "ste" }), null);
@@ -178,7 +178,7 @@ test("builtin instructor uses the training catalog and forge uses weapon, armor,
   assert.equal(types.get("instructor").specialtyCatalog, "training");
   assert.equal(types.get("forge").supportsSpecialty, true);
   assert.equal(types.get("forge").specialtyCatalog, FORGE_SPECIALTY_CATALOG);
-  for (const typeId of ["marketplace", "alchemist", "library", "temple", "contractor"]) {
+  for (const typeId of ["marketplace", "alchemist", "library", "temple"]) {
     assert.equal(types.get(typeId).supportsSpecialty, false, typeId);
     assert.equal(types.get(typeId).specialtyCatalog, null, typeId);
   }

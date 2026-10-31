@@ -258,13 +258,13 @@ While you are editing, the heading is **New Location** or **Edit Location**. The
 
 Choose **Add Capability** for each facility the place offers. A new row starts as **Forge**, **Common**, and Specialty **Any**. The section hint reads "Capability tier is independent from settlement size."
 
-The **Type** menu lists Forge, Marketplace, Alchemist, Library, Temple, Contractor, Instructor, and Workshop, in that order. Each row has **Type**, **Tier**, **Specialty** when that type has one, **Notes**, and **Remove Capability**.
+The **Type** menu lists Forge, Marketplace, Alchemist, Library, Temple, Instructor, and Workshop, in that order. Each row has **Type**, **Tier**, **Specialty** when that type has one, **Notes**, and **Remove Capability**.
 
 **Tier** is Common, Uncommon, Rare, Very Rare, or Legendary. A higher tier meets a lower tier of the same type. An Uncommon Forge meets a Common Forge. A Legendary Forge meets every lower Forge tier. Changing **Settlement Type** leaves the tier as you set it. A hamlet can have a Legendary forge, and a metropolis can have a Common market.
 
 When a check names a specialty, the tier that counts is the highest tier among rows of that type whose Specialty is **Any** or includes that specialty. When a check names only the type, the tier that counts is the highest tier of that type on the location. You can add more than one row of the same type. A specialty is available when any row of that type is **Any** or includes it. An **Any** row covers every subject of that type, including when another row of the same type lists only a few.
 
-**Specialty** opens **Select Specialty** for Instructor, Forge, and Workshop. Marketplace, Alchemist, Library, Temple, and Contractor hide it. If you change **Type** to one of those, any specialties already stored on the row stay stored.
+**Specialty** opens **Select Specialty** for Instructor, Forge, and Workshop. Marketplace, Alchemist, Library, and Temple hide it. If you change **Type** to one of those, any specialties already stored on the row stay stored.
 
 The closed summary reads **Any** when nothing is selected. **Any** covers every specialty of that type. The summary stays the same height as the **Type** and **Tier** menus. When the names are wider than that field, the line ends in an ellipsis and the full list is in the field's tooltip. Choose the summary to open **Select Specialty**. The left side is **Search** and **Category**. The middle list is every choice. Choose a row to mark it, and choose it again to clear that mark. The right side is **Selected**, with every marked choice, **Remove** on each one, and **Clear all**. **Confirm** keeps that list. **Cancel** leaves the row unchanged. An empty **Selected** list means **Any**. One row holds several specialties. Changing **Type** rebuilds the choices.
 
@@ -276,11 +276,11 @@ On an Instructor, each group also has **Any Language**, **Any Skill**, **Any Too
 
 **Forge.** Categories are **Armor** and **Weapons**. Armor includes Armor, Light Armor, Medium Armor, Heavy Armor, and Shields. Weapons includes Weapons, Simple Weapons, Simple Melee Weapons, Simple Ranged Weapons, Martial Weapons, Martial Melee Weapons, Martial Ranged Weapons, and Ammunition. Choosing a parent covers everything under it: Armor covers Heavy Armor, and Simple Weapons covers Simple Melee Weapons and Simple Ranged Weapons. A child does not cover its parent. Weapon masteries are not a Forge specialty. **Any** covers every category. A specialty saved earlier as one weapon, armor, or mastery is kept as its category, such as Longsword as Martial Melee Weapons. A saved value that is not one of these categories becomes **Any**. Smith's Tools identify a Forge. The Specialty list itself is these categories.
 
-**Workshop.** One list, with no group heading. **Any** covers every tool on the list: Brewer's Supplies, Calligrapher's Supplies, Carpenter's Tools, Cartographer's Tools, Cobbler's Tools, Cook's Utensils, Glassblower's Tools, Jeweler's Tools, Leatherworker's Tools, Mason's Tools, Painter's Supplies, Potter's Tools, Tinker's Tools, Weaver's Tools, and Woodcarver's Tools. Smith's Tools stay on Forge. Alchemist's Supplies stay on Alchemist, so Alchemist has no Specialty menu. Carpenter's Tools and Mason's Tools stay on Workshop; a Contractor row does not take them. Calligrapher's Supplies and Cartographer's Tools stay on Workshop; a Library row does not take them. If a Tavern capability is available, Brewer's Supplies and Cook's Utensils move to Tavern and leave Workshop.
+**Workshop.** One list, with no group heading. **Any** covers every tool on the list: Brewer's Supplies, Calligrapher's Supplies, Carpenter's Tools, Cartographer's Tools, Cobbler's Tools, Cook's Utensils, Glassblower's Tools, Jeweler's Tools, Leatherworker's Tools, Mason's Tools, Painter's Supplies, Potter's Tools, Tinker's Tools, Weaver's Tools, and Woodcarver's Tools. Smith's Tools stay on Forge. Alchemist's Supplies stay on Alchemist, so Alchemist has no Specialty menu. Carpenter's Tools and Mason's Tools stay on Workshop. Calligrapher's Supplies and Cartographer's Tools stay on Workshop; a Library row does not take them. If a Tavern capability is available, Brewer's Supplies and Cook's Utensils move to Tavern and leave Workshop.
 
 **Instructor.** Groups are Languages, Skills, Tools, Weapons, Armor, and Weapon Masteries: the D&D 2024 languages, skills, tool proficiencies, weapon proficiencies, armor proficiencies, and weapon masteries. Tools includes artisan's tools, other kits, gaming sets, musical instruments, and vehicles. **Any** covers every subject in those groups. A checked list covers those subjects. The Instructor tier does not choose which subjects can be taught. A Common Instructor set to **Any** can teach every subject on the list.
 
-**Marketplace, Alchemist, Library, Temple, and Contractor.** The row is **Type** and **Tier**. Specialty stays hidden. Alchemist's Supplies identify an Alchemist.
+**Marketplace, Alchemist, Library, and Temple.** The row is **Type** and **Tier**. Specialty stays hidden. Library and Temple record the place for play. Alchemist's Supplies identify an Alchemist.
 
 ### Associated Scenes
 
@@ -315,8 +315,6 @@ Downtime's crafting list also keeps the viewed scene in mind. A recipe the scene
 | **Marketplace** | Hidden. | The place has a market. With **Enable Locations** on, this tier is the highest rarity the global market buys and sells here. A shop can also inherit a Marketplace row for generated stock. |
 | **Library** | Hidden. | Records that the place has a library. Training, crafting facilities, and trading use the other types. Calligrapher's Supplies and Cartographer's Tools remain Workshop choices. |
 | **Temple** | Hidden. | Records that the place has a temple. Training, crafting, and trading use the other types. |
-| **Contractor** | Hidden. | Records that the place has a contractor. A Downtime commission still asks for its own **Location**. Carpenter's Tools and Mason's Tools remain Workshop choices. |
-
 ### Downtime
 
 Open **Manage Locations** from the Downtime dashboard when the activities need a place. Then create a session and choose its **Location**, or leave **No Location** for time spent on the road. **Available Activities** is a separate choice on the session. Checking Training, Crafting, or Source Item there permits that activity. The location's capabilities do not fill that list in.
@@ -330,7 +328,7 @@ An NPC instructor needs a name. **Project Location** is optional.
 
 **Crafting.** Craftworks owns the recipe, the materials, the check, and the finished item. In Downtime, a marked recipe or a job already underway appears when the character can work it at the viewed scene's location or at the active session's place. An On the Road session keeps recipes the scene can still support. A job that neither place can support stays visible and shows as paused. While the session is active and **Available Activities** includes **Crafting**, hours spent crafting are added to that character's session time.
 
-**Commissions.** A commission needs a contractor name, a **Location**, the item, and the labor. Finished work waits for collection at that location. The commission advances by campaign days. Adding a Contractor capability is a separate record of that service. Commission is not an **Available Activities** choice.
+**Commissions.** A commission needs a contractor name, a **Location**, the item, and the labor. Finished work waits for collection at that location. The commission advances by campaign days. Commission is not an **Available Activities** choice.
 
 **Source Item.** A search needs a **Location**, a magic item from the character's Marketplace wishlist, and a **Sourcing Check** of Arcana or Investigation. The location is where the search happens. Marketplace's **Enable Locations** setting, described below, is what limits buying and selling.
 

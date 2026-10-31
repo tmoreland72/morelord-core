@@ -6,7 +6,6 @@ export const BUILTIN_CAPABILITY_TYPES = Object.freeze([
   { id: "alchemist", name: "Alchemist" },
   { id: "library", name: "Library" },
   { id: "temple", name: "Temple" },
-  { id: "contractor", name: "Contractor" },
   { id: "instructor", name: "Instructor", supportsSpecialty: true, specialtyCatalog: TRAINING_SPECIALTY_CATALOG },
   { id: "workshop", name: "Workshop", supportsSpecialty: true, specialtyCatalog: "artisan-tools" }
 ]);

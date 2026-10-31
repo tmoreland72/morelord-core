@@ -9,6 +9,7 @@
 - A Forge capability's Specialty is the weapon proficiencies, armor proficiencies, and weapon masteries from that same fixed list. Any is the default.
 - Instructor, Forge, and Workshop Specialty is a checkbox menu. One entry can store several specialties. The closed summary lists them, or Any when none are checked. Empty or Any means no restriction. A specialty saved as a single value is read as that one choice.
 - Select group headings use the same background as the options, in the Morelord accent color and bold, so the heading is readable. Options stay in the normal text color and weight.
+- Contractor is no longer a location capability. Library and Temple remain, with no Specialty. A saved Contractor row is omitted when the location is read or saved. The other rows stay.
 
 ### Added
 
@@ -29,4 +30,4 @@
 
 ## Verification
 
-Node tests cover the fixed D&D 2024 catalog, several specialties on one capability, legacy single-value specialty reads, `locationAllowsSpecialty`, `evaluateRequirements` matching a key in that array, shared select group heading styles, the artisan tool to capability map, preserved unknown specialties, unchanged source storage, the active location context, Enable Locations in settings transfer, and background re-renders that must not call bringToFront. Live Foundry verification is still outstanding.
+Node tests cover the fixed D&D 2024 catalog, several specialties on one capability, legacy single-value specialty reads, `locationAllowsSpecialty`, `evaluateRequirements` matching a key in that array, shared select group heading styles, the artisan tool to capability map, preserved unknown specialties, unchanged source storage, the active location context, Enable Locations in settings transfer, background re-renders that must not call bringToFront, and a saved Contractor row dropped on load. Live Foundry verification is still outstanding.

@@ -81,6 +81,15 @@ export function normalizeCapability(raw = {}) {
   };
 }
 
+const REMOVED_CAPABILITY_TYPES = new Set(["contractor"]);
+
+/** Drop capability types that are no longer offered. A contractor row is ignored. */
+export function withoutRemovedCapabilities(capabilities = []) {
+  return (Array.isArray(capabilities) ? capabilities : []).filter(capability => {
+    return !REMOVED_CAPABILITY_TYPES.has(String(capability?.type ?? "").trim());
+  });
+}
+
 export function normalizeLocation(raw = {}, { idFactory = () => crypto.randomUUID() } = {}) {
   const id = String(raw.id ?? idFactory()).trim();
   const name = String(raw.name ?? "").trim();
@@ -95,7 +104,7 @@ export function normalizeLocation(raw = {}, { idFactory = () => crypto.randomUUI
     name,
     settlementType,
     sceneIds: [...new Set((raw.sceneIds ?? []).map(String).filter(Boolean))],
-    capabilities: (raw.capabilities ?? []).map(normalizeCapability),
+    capabilities: withoutRemovedCapabilities(raw.capabilities).map(normalizeCapability),
     notes: String(raw.notes ?? ""),
     metadata: globalThis.structuredClone
       ? structuredClone(raw.metadata ?? {})
@@ -111,7 +120,7 @@ export function normalizeLocation(raw = {}, { idFactory = () => crypto.randomUUI
 export function locationAllowsSpecialty(location, type, specialtyKey) {
   const typeId = String(type ?? "").trim();
   if (!typeId || !location || typeof location !== "object") return false;
-  const capabilities = Array.isArray(location.capabilities) ? location.capabilities : [];
+  const capabilities = withoutRemovedCapabilities(location.capabilities);
   const matches = capabilities.filter(capability => String(capability?.type ?? "").trim() === typeId);
   if (!matches.length) return false;
   return matches.some(capability => capabilityAllowsSpecialty(capability, specialtyKey));
@@ -120,7 +129,7 @@ export function locationAllowsSpecialty(location, type, specialtyKey) {
 export function findCapability(capabilities = [], requirement = {}) {
   const type = String(requirement.type ?? "").trim();
   const specialty = requirement.specialty ? String(requirement.specialty).trim() : null;
-  return capabilities
+  return withoutRemovedCapabilities(capabilities)
     .map(normalizeCapability)
     .filter(capability => capability.type === type)
     .filter(capability => !specialty || capabilityAllowsSpecialty(capability, specialty))

@@ -103,6 +103,23 @@ test("a specialty array and a legacy string both match the included keys", () =>
   assert.equal(evaluateRequirements([{ kind: "capability", type: "instructor", specialty: "ste", tier: "common" }], { location }).passed, true);
 });
 
+test("a saved contractor capability is dropped and the rest of the location loads", () => {
+  const location = normalizeLocation({
+    id: "phandalin",
+    name: "Phandalin",
+    settlementType: "village",
+    capabilities: [
+      { type: "contractor", tier: "not-a-tier", specialty: "mason" },
+      { type: "temple", tier: "uncommon" },
+      { type: "library", tier: "rare", specialty: "kept" }
+    ]
+  });
+  assert.deepEqual(location.capabilities.map(capability => capability.type), ["temple", "library"]);
+  assert.equal(locationAllowsSpecialty(location, "contractor", "mason"), false);
+  assert.equal(location.capabilities.find(capability => capability.type === "library").specialty[0], "kept");
+  assert.equal(evaluateRequirements([{ kind: "capability", type: "temple", tier: "common" }], { location }).passed, true);
+});
+
 test("Other supports special locations such as strongholds and garrisons", () => {
   assert.equal(SETTLEMENT_TYPES.includes("other"), true);
   const stronghold = normalizeLocation({ id: "stronghold", name: "The Stronghold", settlementType: "other" });
