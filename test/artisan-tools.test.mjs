@@ -11,34 +11,36 @@ import {
 } from "../scripts/location/artisan-tools.js";
 
 const WORKSHOP_LABELS = [
-  "Brewer's Supplies",
-  "Calligrapher's Supplies",
-  "Carpenter's Tools",
-  "Cartographer's Tools",
-  "Cobbler's Tools",
-  "Cook's Utensils",
-  "Glassblower's Tools",
-  "Jeweler's Tools",
-  "Leatherworker's Tools",
-  "Mason's Tools",
-  "Painter's Supplies",
-  "Potter's Tools",
-  "Tinker's Tools",
-  "Weaver's Tools",
-  "Woodcarver's Tools"
+  "Alchemist",
+  "Brewer",
+  "Calligrapher",
+  "Carpenter",
+  "Cartographer",
+  "Cobbler",
+  "Cook",
+  "Glassblower",
+  "Jeweler",
+  "Leatherworker",
+  "Mason",
+  "Painter",
+  "Potter",
+  "Tinker",
+  "Weaver",
+  "Woodcarver"
 ];
 
 function flat(model) {
   return model.groups.flatMap(group => group.options);
 }
 
-test("artisan tools map to Forge, Alchemist, or Workshop, and Tavern takes brewing and cooking when registered", () => {
+test("artisan tools map to Forge or Workshop, and Tavern takes brewing and cooking when registered", () => {
   assert.equal(ARTISAN_TOOLS.length, 17);
   assert.equal(toolCapabilityType("Smith's Tools"), "forge");
   assert.equal(toolCapabilityType("smith"), "forge");
   assert.equal(toolCapabilityType("Blacksmith’s Tools"), "forge");
-  assert.equal(toolCapabilityType("Alchemist's Supplies"), "alchemist");
-  assert.equal(toolCapabilityType("alchemist"), "alchemist");
+  assert.equal(toolCapabilityType("Alchemist's Supplies"), "workshop");
+  assert.equal(toolCapabilityType("alchemist"), "workshop");
+  assert.equal(toolCapabilityType("Alchemist"), "workshop");
   assert.equal(toolCapabilityType("Cobbler's Tools"), "workshop");
   assert.equal(toolCapabilityType("carpenter"), "workshop");
   assert.equal(toolCapabilityType("mason"), "workshop");
@@ -51,11 +53,12 @@ test("artisan tools map to Forge, Alchemist, or Workshop, and Tavern takes brewi
 
   assert.deepEqual(listWorkshopSpecialties().map(tool => tool.label), WORKSHOP_LABELS);
   assert.deepEqual(listWorkshopSpecialties().map(tool => tool.id), [
-    "brewer", "calligrapher", "carpenter", "cartographer", "cobbler", "cook", "glassblower",
+    "alchemist", "brewer", "calligrapher", "carpenter", "cartographer", "cobbler", "cook", "glassblower",
     "jeweler", "leatherworker", "mason", "painter", "potter", "tinker", "weaver", "woodcarver"
   ]);
   assert.deepEqual(listArtisanToolsForCapability("forge").map(tool => tool.id), ["smith"]);
-  assert.deepEqual(listArtisanToolsForCapability("alchemist").map(tool => tool.id), ["alchemist"]);
+  assert.equal(listArtisanToolsForCapability("forge")[0].label, "Smith");
+  assert.deepEqual(listArtisanToolsForCapability("alchemist").map(tool => tool.id), []);
   assert.equal(artisanSpecialtyOptions("forge"), null);
   assert.equal(artisanSpecialtyOptions("alchemist"), null);
 
@@ -65,7 +68,7 @@ test("artisan tools map to Forge, Alchemist, or Workshop, and Tavern takes brewi
   assert.equal(listWorkshopSpecialties({ capabilityTypeIds: withTavern }).some(tool => tool.id === "brewer" || tool.id === "cook"), false);
   const tavern = artisanSpecialtyOptions("tavern", { capabilityTypeIds: withTavern, current: ["cook", "brewer"] });
   assert.deepEqual(flat(tavern).map(option => option.value), ["brewer", "cook"]);
-  assert.equal(tavern.summary, "Brewer's Supplies, Cook's Utensils");
+  assert.equal(tavern.summary, "Brewer, Cook");
   assert.equal(flat(tavern).every(option => option.selected), true);
 });
 
@@ -83,8 +86,9 @@ test("Workshop specialty stores the tool id, defaults to Any, and keeps an unkno
   const workshop = flat(rows[0].specialtyOptions);
   assert.equal(rows[0].specialtyOptions.summary, "Any");
   assert.equal(workshop.some(option => option.value === "" || option.selected), false);
-  assert.equal(workshop.find(option => option.label === "Cobbler's Tools").value, "cobbler");
-  assert.equal(workshop.some(option => option.value === "smith" || option.value === "alchemist"), false);
+  assert.equal(workshop.find(option => option.label === "Cobbler").value, "cobbler");
+  assert.equal(workshop.find(option => option.value === "alchemist").label, "Alchemist");
+  assert.equal(workshop.some(option => option.value === "smith"), false);
   assert.equal(workshop.some(option => option.value === "*" && option.label === "Any"), true);
   assert.deepEqual(workshop.filter(option => option.value && option.value !== "*").map(option => option.label), WORKSHOP_LABELS.slice().sort((a, b) => a.localeCompare(b)));
 

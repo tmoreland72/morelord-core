@@ -103,6 +103,70 @@ test("a specialty array and a legacy string both match the included keys", () =>
   assert.equal(evaluateRequirements([{ kind: "capability", type: "instructor", specialty: "ste", tier: "common" }], { location }).passed, true);
 });
 
+test("a saved alchemist capability becomes the Workshop specialty alchemist", () => {
+  const only = normalizeLocation({
+    id: "shop",
+    name: "Shop",
+    settlementType: "village",
+    capabilities: [
+      { type: "forge", tier: "common" },
+      { type: "alchemist", tier: "not-a-tier", specialty: "potion", source: "Elara" },
+      { type: "temple", tier: "common" }
+    ]
+  });
+  assert.deepEqual(only.capabilities.map(capability => capability.type), ["forge", "workshop", "temple"]);
+  const converted = only.capabilities[1];
+  assert.deepEqual(converted.specialty, ["alchemist"]);
+  assert.equal(converted.tier, "common");
+  assert.equal(converted.source, "Elara");
+
+  const merged = normalizeLocation({
+    id: "bench",
+    name: "Bench",
+    settlementType: "town",
+    capabilities: [
+      { type: "workshop", tier: "common", specialty: ["cobbler"], source: "bench" },
+      { type: "alchemist", tier: "rare", source: "Elara" },
+      { type: "alchemist", tier: "uncommon" }
+    ]
+  });
+  assert.equal(merged.capabilities.length, 1);
+  assert.deepEqual(merged.capabilities[0].specialty, ["cobbler", "alchemist"]);
+  assert.equal(merged.capabilities[0].tier, "rare");
+  assert.equal(merged.capabilities[0].source, "bench");
+
+  const open = normalizeLocation({
+    id: "open",
+    name: "Open",
+    settlementType: "town",
+    capabilities: [
+      { type: "workshop", tier: "common", specialty: "Any", source: "hall" },
+      { type: "workshop", tier: "uncommon", specialty: ["weaver"] },
+      { type: "alchemist", tier: "legendary" }
+    ]
+  });
+  assert.deepEqual(open.capabilities[0].specialty, []);
+  assert.equal(open.capabilities[0].tier, "legendary");
+  assert.equal(open.capabilities[0].source, "hall");
+  assert.deepEqual(open.capabilities[1].specialty, ["weaver"]);
+  assert.equal(open.capabilities[1].tier, "uncommon");
+
+  const raw = { capabilities: [{ type: "alchemist", tier: "rare", specialty: "potion" }] };
+  assert.equal(locationAllowsSpecialty(raw, "alchemist", "potion"), true);
+  assert.equal(locationAllowsSpecialty(raw, "workshop", "alchemist"), true);
+  assert.equal(locationAllowsSpecialty(raw, "workshop", "cobbler"), false);
+  assert.equal(locationAllowsSpecialty({ capabilities: [{ type: "workshop", tier: "rare", specialty: ["cobbler"] }] }, "alchemist"), false);
+  assert.equal(locationAllowsSpecialty({ capabilities: [{ type: "workshop", tier: "common", specialty: [] }] }, "alchemist", ""), true);
+  assert.equal(locationAllowsSpecialty({ capabilities: [{ type: "instructor", specialty: ["alchemist"] }] }, "instructor", "alchemist"), true);
+  assert.equal(evaluateRequirements([{ kind: "capability", type: "alchemist", tier: "rare" }], { location: raw }).passed, true);
+  assert.equal(evaluateRequirements([{ kind: "capability", type: "alchemist", tier: "rare" }], {
+    location: { capabilities: [{ type: "workshop", tier: "uncommon", specialty: ["alchemist"] }] }
+  }).passed, false);
+  assert.equal(evaluateRequirements([{ kind: "capability", type: "alchemist", tier: "uncommon" }], {
+    location: { capabilities: [{ type: "workshop", tier: "rare", specialty: "Any" }] }
+  }).passed, true);
+});
+
 test("a saved contractor capability is dropped and the rest of the location loads", () => {
   const location = normalizeLocation({
     id: "phandalin",

@@ -1,4 +1,4 @@
-import { normalizeLocation, evaluateRequirements, withoutRemovedCapabilities } from "./location-domain.js";
+import { normalizeLocation, evaluateRequirements, migrateAlchemistCapabilities, withoutRemovedCapabilities } from "./location-domain.js";
 import { activeLocationContext, readDowntimeProjectState } from "./location-context.js";
 
 export class LocationService {
@@ -19,7 +19,7 @@ export class LocationService {
 
   #present(location) {
     if (!location) return null;
-    return { ...location, capabilities: withoutRemovedCapabilities(location.capabilities) };
+    return { ...location, capabilities: migrateAlchemistCapabilities(withoutRemovedCapabilities(location.capabilities)) };
   }
 
   list() {
