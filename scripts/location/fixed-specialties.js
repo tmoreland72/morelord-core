@@ -70,9 +70,6 @@ const LANGUAGES = choices("language", LANGUAGE, [
 ]);
 
 const TOOLS = choices("toolProficiency", TOOL, [
-  ["art", "Artisan's Tools"],
-  ["game", "Gaming Set"],
-  ["music", "Musical Instrument"],
   ["vehicle", "Vehicles"],
   ["alchemist", "Alchemist's Supplies"],
   ["brewer", "Brewer's Supplies"],
@@ -100,6 +97,7 @@ const TOOLS = choices("toolProficiency", TOOL, [
   ["dice", "Dice Set"],
   ["chess", "Dragonchess Set"],
   ["card", "Playing Card Set"],
+  ["threedragon", "Three-Dragon Ante"],
   ["bagpipes", "Bagpipes"],
   ["drum", "Drum"],
   ["dulcimer", "Dulcimer"],
@@ -109,9 +107,7 @@ const TOOLS = choices("toolProficiency", TOOL, [
   ["lyre", "Lyre"],
   ["panflute", "Pan Flute"],
   ["shawm", "Shawm"],
-  ["viol", "Viol"],
-  ["land", "Vehicles (Land)"],
-  ["water", "Vehicles (Water)"]
+  ["viol", "Viol"]
 ]);
 
 const WEAPON_PROFICIENCIES = choices("weaponProficiency", WEAPON, [
@@ -164,7 +160,7 @@ const ARMOR_PROFICIENCIES = choices("armorProficiency", ARMOR, [
   ["shl", "Shields"],
   ["padded", "Padded Armor"],
   ["leather", "Leather Armor"],
-  ["studded", "Studded Leather"],
+  ["studded", "Studded Leather Armor"],
   ["hide", "Hide Armor"],
   ["chainshirt", "Chain Shirt"],
   ["scalemail", "Scale Mail"],
@@ -187,6 +183,15 @@ function bySpecialty(left, right) {
     || left.kind.localeCompare(right.kind)
     || left.id.localeCompare(right.id);
 }
+
+/** Labels for Instructor specialties removed from the 2024 list. A saved key keeps this name. */
+export const REMOVED_INSTRUCTOR_LABELS = Object.freeze({
+  art: "Artisan's Tools",
+  game: "Gaming Set",
+  music: "Musical Instrument",
+  land: "Vehicles (Land)",
+  water: "Vehicles (Water)"
+});
 
 export const DND2024_SPECIALTIES = Object.freeze(
   [...SKILLS, ...LANGUAGES, ...TOOLS, ...WEAPON_PROFICIENCIES, ...ARMOR_PROFICIENCIES, ...WEAPON_MASTERIES]

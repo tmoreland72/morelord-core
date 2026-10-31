@@ -56,7 +56,7 @@ test("the instructor and forge catalogs are a fixed D&D 2024 list", () => {
     "abyssal", "cant", "celestial", "common", "deep", "draconic", "druidic", "dwarvish", "elvish",
     "giant", "gnomish", "goblin", "halfling", "infernal", "orc", "primordial", "sign", "sylvan", "undercommon"
   ]);
-  assert.equal(ids(catalog, "toolProficiency").length, 42);
+  assert.equal(ids(catalog, "toolProficiency").length, 38);
   assert.equal(ids(catalog, "weaponProficiency").length, 40);
   assert.equal(ids(catalog, "armorProficiency").length, 17);
   assert.equal(ids(catalog, "weaponMastery").length, 38);
@@ -66,6 +66,11 @@ test("the instructor and forge catalogs are a fixed D&D 2024 list", () => {
   assert.equal(catalog.find(entry => entry.id === "sign").label, "Common Sign Language");
   assert.equal(catalog.find(entry => entry.id === "cant").label, "Thieves' Cant");
   assert.equal(catalog.find(entry => entry.id === "thief").label, "Thieves' Tools");
+  assert.equal(catalog.find(entry => entry.id === "threedragon").label, "Three-Dragon Ante");
+  assert.equal(catalog.find(entry => entry.id === "studded" && entry.kind === "armorProficiency").label, "Studded Leather Armor");
+  for (const absent of ["art", "game", "music", "land", "water"]) {
+    assert.equal(catalog.some(entry => entry.id === absent), false, absent);
+  }
   assert.equal(catalog.find(entry => entry.id === "plate" && entry.kind === "armorProficiency").label, "Plate Armor");
   assert.equal(catalog.find(entry => entry.id === "shl").label, "Shields");
   assert.equal(catalog.find(entry => entry.kind === "weaponMastery" && entry.id === "dagger").label, "Dagger");
@@ -151,6 +156,24 @@ test("specialty options follow the capability type, default to Any, and keep unk
     flatOptions(many).filter(option => option.selected).map(option => option.value),
     ["ste", "dagger", "lgt", "dagger"]
   );
+});
+
+test("a removed Instructor specialty stays stored and keeps its label", () => {
+  const kept = optionsFor("instructor", { useDefault: true, current: ["land", "art", "threedragon"] });
+  const flat = flatOptions(kept);
+  assert.equal(flat.find(option => option.value === "land").label, "Vehicles (Land)");
+  assert.equal(flat.find(option => option.value === "art").label, "Artisan's Tools");
+  assert.equal(flat.find(option => option.value === "threedragon").label, "Three-Dragon Ante");
+  assert.equal(flat.filter(option => option.value === "land" || option.value === "art").every(option => option.selected), true);
+  assert.equal(kept.summary, "Vehicles (Land), Artisan's Tools, Three-Dragon Ante");
+  assert.equal(flat.some(option => option.value === "water" || option.value === "game" || option.value === "music"), false);
+  const location = normalizeLocation({
+    id: "yard",
+    name: "Yard",
+    settlementType: "village",
+    capabilities: [{ type: "instructor", tier: "common", specialty: ["land", "water", "music"] }]
+  });
+  assert.deepEqual(location.capabilities[0].specialty, ["land", "water", "music"]);
 });
 
 test("hidden specialty types keep the stored specialty on the editor row", () => {

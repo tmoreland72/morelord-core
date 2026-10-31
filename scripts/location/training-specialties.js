@@ -1,5 +1,5 @@
 import { artisanSpecialtyOptions } from "./artisan-tools.js";
-import { DND2024_SPECIALTIES } from "./fixed-specialties.js";
+import { DND2024_SPECIALTIES, REMOVED_INSTRUCTOR_LABELS } from "./fixed-specialties.js";
 import { forgeAncestors, listForgeSpecialties, migrateForgeSpecialties } from "./forge-categories.js";
 import { instructorCoverIds, instructorGroupAny, normalizeInstructorSpecialties } from "./instructor-any.js";
 import { normalizeSpecialtyList } from "./location-domain.js";
@@ -73,7 +73,16 @@ export function buildSpecialtyOptions(definition, { choices, current = null } = 
     );
     if (options.length) groups.push({ label: GROUP_LABELS[category] ?? category, options });
   }
+  if (catalog === TRAINING_SPECIALTY_CATALOG) addRemovedInstructorChoices(groups, current);
   return finishSpecialtyGroups(withAnyOptions(groups, catalog), current);
+}
+
+function addRemovedInstructorChoices(groups, current) {
+  const known = new Set(groups.flatMap(group => (group.options ?? []).map(option => option.value)));
+  const options = normalizeSpecialtyList(current)
+    .filter(id => REMOVED_INSTRUCTOR_LABELS[id] && !known.has(id))
+    .map(id => ({ value: id, label: REMOVED_INSTRUCTOR_LABELS[id], selected: false }));
+  if (options.length) groups.unshift({ label: "", options });
 }
 
 function withAnyOptions(groups, catalog) {

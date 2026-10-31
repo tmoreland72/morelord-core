@@ -20,6 +20,8 @@
 - Settings transfer includes Marketplace's Enable Locations setting.
 - Workshop capabilities list the D&D 2024 artisan professions that do not already match another capability: Alchemist, Brewer, Calligrapher, Carpenter, Cartographer, Cobbler, Cook, Glassblower, Jeweler, Leatherworker, Mason, Painter, Potter, Tinker, Weaver, and Woodcarver. The stored key is still the tool id. Smith's Tools stay with Forge. Any remains the default, and a saved specialty that is not in the list stays available. `api.locations.toolCapabilityType(tool)` and `api.locations.listWorkshopSpecialties()` expose that map. A registered Tavern capability takes Brewer and Cook.
 - Alchemist is no longer its own location capability. A saved Alchemist row becomes the Workshop specialty `alchemist`, or merges into the existing Workshop row. A Workshop that is already Any stays Any. The tier is the higher of the two. A check for capability type `alchemist` uses that Workshop specialty.
+- The Instructor specialty list matches the D&D 2024 training subjects. The headings Artisan's Tools, Gaming Set, and Musical Instrument are gone, as are land and water vehicles. Three-Dragon Ante is included. Studded leather armor is labeled **Studded Leather Armor**. A saved specialty that left the list stays stored and keeps its name.
+- `api.ui.confirm({ title, content, yesLabel, noLabel, danger })` opens a compact yes/no dialog. It is 400 pixels wide and only as tall as its text. **Yes** and **No** fill the footer side by side at equal width. `danger: true` marks **Yes** with the danger color and makes **No** the default.
 
 ### Fixed
 
