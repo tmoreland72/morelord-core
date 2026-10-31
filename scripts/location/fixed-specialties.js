@@ -70,7 +70,6 @@ const LANGUAGES = choices("language", LANGUAGE, [
 ]);
 
 const TOOLS = choices("toolProficiency", TOOL, [
-  ["vehicle", "Vehicles"],
   ["alchemist", "Alchemist's Supplies"],
   ["brewer", "Brewer's Supplies"],
   ["calligrapher", "Calligrapher's Supplies"],
@@ -189,6 +188,7 @@ export const REMOVED_INSTRUCTOR_LABELS = Object.freeze({
   art: "Artisan's Tools",
   game: "Gaming Set",
   music: "Musical Instrument",
+  vehicle: "Vehicles",
   land: "Vehicles (Land)",
   water: "Vehicles (Water)"
 });
