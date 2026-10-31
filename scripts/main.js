@@ -13,13 +13,19 @@ import { WindowGeometryService } from "./services/window-geometry-service.js";
 import { Dnd5eSourceFilterService } from "./services/dnd5e-source-filter-service.js";
 import { CONFIGURE_SOURCES_CHANGED, filterAllowed, getAllowedPack, getAllowedPacks, installConfigureSourcesWatcher, isPackAllowed, isSourceAllowed, isUuidAllowed, onConfigureSourcesChanged } from "./services/allowed-packs.js";
 import { resolveBookLabel, resolvePackLabel } from "./services/source-book-service.js";
-import { CapabilityRegistry } from "./location/capability-registry.js";
+import { BUILTIN_CAPABILITY_TYPES, CapabilityRegistry } from "./location/capability-registry.js";
+import { FORGE_SPECIALTY_CATALOG, TRAINING_SPECIALTY_CATALOG, buildSpecialtyOptions, listForgeSpecialties, listTrainingSpecialties } from "./location/training-specialties.js";
+import { forgeCategoryKeys } from "./location/forge-categories.js";
+import { artisanSpecialtyOptions, listArtisanToolsForCapability, listWorkshopSpecialties, toolCapabilityType } from "./location/artisan-tools.js";
 import { LocationService } from "./location/location-service.js";
-import { CAPABILITY_TIERS, SETTLEMENT_TYPES, evaluateRequirements, meetsTier } from "./location/location-domain.js";
+import { CAPABILITY_TIERS, SETTLEMENT_TYPES, evaluateRequirements, locationAllowsSpecialty, meetsTier } from "./location/location-domain.js";
 import { LocationManagerApp } from "./location/location-manager-app.js";
 import { renderPreservingScroll } from "./ui/scroll-preservation.js";
+import { guardApplicationRender, renderInBackground } from "./ui/background-render.js";
 import { applyPageLayout } from "./ui/page-layout.js";
 import { activateTabs } from "./ui/tabs.js";
+import { activateMultiSelects } from "./ui/multi-select.js";
+import { openOptionPicker } from "./ui/option-picker-app.js";
 import { activateCardSelection } from "./ui/card-selection.js";
 import { sortable } from "./ui/sortable.js";
 import { activateCollapsibleSections, createCollapsibleSection } from "./ui/collapsible-section.js";
@@ -35,6 +41,7 @@ import { createToolsRegistry, mergeCoreApi } from "./ui/tools-registry.js";
 import { bindMorelordModulesButton } from "./ui/morelord-modules.js";
 
 const MODULE_ID = "morelord-core";
+guardApplicationRender(globalThis.foundry?.applications?.api?.ApplicationV2);
 const sourceFilter = new Dnd5eSourceFilterService();
 
 function publishedSources() {
@@ -56,8 +63,10 @@ registerDirectorySelection();
 const telemetry = new TelemetryService();
 Hooks.on("renderApplicationV2", applyPageLayout);
 Hooks.on("renderApplicationV2", activateTabs);
+Hooks.on("renderApplicationV2", activateMultiSelects);
 Hooks.on("renderApplication", applyPageLayout);
 Hooks.on("renderApplication", activateTabs);
+Hooks.on("renderApplication", activateMultiSelects);
 Hooks.on("renderApplicationV2", activateCardSelection);
 Hooks.on("renderApplication", activateCardSelection);
 Hooks.on("renderApplicationV2", activateCollapsibleSections);
@@ -593,16 +602,7 @@ Hooks.once("init", () => {
     scope: "world", config: false, type: Array, default: [], restricted: true
   });
   locationService.registerSetting();
-  for (const definition of [
-    { id: "forge", name: "Forge" },
-    { id: "marketplace", name: "Marketplace" },
-    { id: "alchemist", name: "Alchemist" },
-    { id: "library", name: "Library" },
-    { id: "temple", name: "Temple" },
-    { id: "contractor", name: "Contractor" },
-    { id: "instructor", name: "Instructor", supportsSpecialty: true },
-    { id: "workshop", name: "Workshop" }
-  ]) capabilityRegistry.register(definition);
+  for (const definition of BUILTIN_CAPABILITY_TYPES) capabilityRegistry.register(definition);
   windowGeometry.start();
   game.settings.register(MODULE_ID, SETTINGS.SERVER_URL, {
     name: "Morelord Gaming Website",
@@ -646,8 +646,8 @@ Hooks.once("init", () => {
   });
   game.settings.registerMenu(MODULE_ID, "locations", {
     name: "Morelord Locations",
-    label: "Manage Shared Locations",
-    hint: "Define settlement types, capabilities, and Scene associations shared by Morelord modules.",
+    label: "Manage Locations",
+    hint: "Define settlement types, capabilities, and Scene associations used by Morelord modules.",
     icon: "fa-solid fa-map-location-dot",
     type: LocationManagerApp,
     restricted: true
@@ -708,11 +708,14 @@ Hooks.once("ready", async () => {
       openItemPreview,
       applyPageLayout,
       activateTabs,
+      activateMultiSelects,
+      openOptionPicker,
       activateCardSelection,
       activateCollapsibleSections,
       createCollapsibleSection,
       createChoiceGroup,
       renderPreservingScroll,
+      renderInBackground,
       participation: Object.freeze({ canUseActorInventory, listCharacterActors, listCharacterChoices, participantRecords, primaryPartyGroup, selectedCharacterUuids }),
       documentation: Object.freeze({
         register: definition => documentationService.register(definition),
@@ -736,10 +739,33 @@ Hooks.once("ready", async () => {
       registerCapability: definition => capabilityRegistry.register(definition),
       getCapability: id => capabilityRegistry.get(id),
       listCapabilities: () => capabilityRegistry.all(),
+      listTrainingSpecialties: () => listTrainingSpecialties(),
+      listForgeSpecialties: () => listForgeSpecialties(),
+      forgeCategoryKeys: item => forgeCategoryKeys(item),
+      locationAllowsSpecialty: (location, type, specialtyKey) => locationAllowsSpecialty(location, type, specialtyKey),
+      buildSpecialtyOptions: (typeId, options = {}) => {
+        const registeredIds = options.capabilityTypeIds ?? capabilityRegistry.all().map(type => type.id);
+        const definition = capabilityRegistry.get(typeId);
+        if (definition?.specialtyCatalog === TRAINING_SPECIALTY_CATALOG || definition?.specialtyCatalog === FORGE_SPECIALTY_CATALOG) {
+          return buildSpecialtyOptions(definition, options);
+        }
+        return artisanSpecialtyOptions(typeId, { ...options, capabilityTypeIds: registeredIds })
+          ?? buildSpecialtyOptions(definition, options);
+      },
+      toolCapabilityType: (tool, options = {}) => toolCapabilityType(tool, {
+        capabilityTypeIds: options.capabilityTypeIds ?? capabilityRegistry.all().map(type => type.id)
+      }),
+      listWorkshopSpecialties: (options = {}) => listWorkshopSpecialties({
+        capabilityTypeIds: options.capabilityTypeIds ?? capabilityRegistry.all().map(type => type.id)
+      }),
+      listArtisanToolsForCapability: (typeId, options = {}) => listArtisanToolsForCapability(typeId, {
+        capabilityTypeIds: options.capabilityTypeIds ?? capabilityRegistry.all().map(type => type.id)
+      }),
       list: () => locationService.list(),
       get: id => locationService.get(id),
       forScene: sceneId => locationService.forScene(sceneId),
       current: () => locationService.current(),
+      activeContext: user => locationService.activeContext(user),
       save: location => locationService.save(location),
       remove: id => locationService.remove(id),
       evaluate: (requirements, context) => locationService.evaluate(requirements, context),

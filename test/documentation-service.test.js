@@ -18,6 +18,10 @@ test('Documentation entry points open the corresponding website in a new tab', (
     assert.equal(calls.at(-1)[0], 'https://morelordgaming.com/docs');
     service.open('../../untrusted');
     assert.equal(calls.at(-1)[0], 'https://morelordgaming.com/docs');
+    service.open('morelord-core', 'locations');
+    assert.deepEqual(calls.at(-1), ['https://morelordgaming.com/docs/morelord-core#locations', '_blank', 'noopener,noreferrer']);
+    service.open('morelord-core', '../locations');
+    assert.equal(calls.at(-1)[0], 'https://morelordgaming.com/docs/morelord-core');
   } finally { globalThis.window = previous; }
 });
 

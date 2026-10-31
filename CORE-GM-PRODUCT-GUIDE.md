@@ -73,7 +73,7 @@ The tools are listed alphabetically by title, ignoring capitalization and a lead
 - Foundry Virtual Tabletop 13 or later, within the installed manifest's supported range. The reviewed manifest records 14.368 as verified; this guide does not establish additional version testing.
 - socketlib version 1.1.3 or later.
 - Permission to configure the world as a GM.
-- A Morelord Gaming account for account linking. Shared Locations, reporting preferences, and troubleshooting do not require an account connection.
+- A Morelord Gaming account for account linking. Locations, reporting preferences, and troubleshooting do not require an account connection.
 - Internet access for the initial connection and periodic access checks.
 
 ## Install and Enable Morelord Core
@@ -204,25 +204,178 @@ Open **Morelord Core → Select Ignored Users**. Check recording or observer acc
 
 Characters assigned to or owned only by ignored users are also excluded from shared character selections, including party-group members. Characters shared with a non-ignored player remain available, even if that player is offline. GM-managed party members without a player owner or assigned user remain available. Reopen a selection window after changing Ignored Users to refresh its options; existing stored participation records are preserved.
 
-## Shared Locations
+## Locations
 
-Shared Locations give Morelord Gaming modules a common description of a place. Downtime uses location information to expose available activities, while Craftworks can check crafting location requirements such as access to a forge. Marketplace and Journeys also use shared locations for their own workflows. Configure capabilities to describe the facilities those workflows need; creating a location record alone does not create the services or activities themselves. The individual module guides explain their uses in detail.
+A location is a place you describe once in Morelord Core. Downtime, Craftworks, Marketplace, and Journeys read that same record. Name the town, choose the settlement, and list the facilities it has. Tie the town's scenes to that record, and choose the same record when a Downtime session happens there. Every module then sees the same forge, market, and instructor.
 
-Open **Morelord Core → Manage Shared Locations**. Choose **Create First Location** when empty, or the plus button to add another. Select a saved location in the left list to edit it.
+Creating the location records what the place can support. It does not create a shop, an NPC, a recipe, or a project. Each module applies its own rules, described below.
 
-![New shared location named Phandalin, with settlement type Village and a Forge capability set to Common.](/images/foundry/core-locations.png)
+**In this section**
 
-Enter a **Name**, **Settlement Type**, and optional GM-facing **Notes**. Settlement choices are Road, Hamlet (1–100 people), Village (101–1,000), Town (1,001–6,000), City (6,001–25,000), Metropolis (25,001+), and Other. Population ranges are suggestions, not enforced limits.
+- [Why one location is enough](#why-one-location-is-enough)
+- [Set up a location](#set-up-a-location)
+- [Capabilities and Specialty](#capabilities-and-specialty)
+- [Which place the modules use](#which-place-the-modules-use)
+- [What each capability does](#what-each-capability-does)
+- [Downtime](#downtime)
+- [Craftworks](#craftworks)
+- [Marketplace](#marketplace)
+- [Journeys](#journeys)
+- [Example: a town forge](#example-a-town-forge)
 
-Choose **Add Capability** for each service the location provides. Core registers Forge, Marketplace, Alchemist, Library, Temple, Contractor, Instructor, and Workshop; enabled integrations can register additional types. A capability describes facilities or services; it does not create a shop, NPC, recipe, or project.
+### Why one location is enough
 
-Each row has a **Type**, **Tier**, optional **Specialty**, optional **Source**, and a remove button. Tiers are Common, Uncommon, Rare, Very Rare, and Legendary. A higher tier satisfies a lower-tier requirement of the same type. Settlement size does not determine tier. Specialty can match a specific requirement; use the value expected by the consuming workflow. Source records where the capability comes from. Remove a row with its trash button, then save.
+Without a location, each module would need its own note that the town has a forge, a market, and someone who can teach. One location keeps those facts together.
 
-Under **Associated Scenes**, use **Filter Scenes** to find names. Click a Scene to select it; click again to deselect it. Several Scenes can share a location. Clearing the filter reveals the full list. Saving an association already owned by another location moves that association to the newly saved location. The current Scene determines the shared location used by applicable workflows.
+A capability is one service at that place. **Tier** says how rare a result that service can support. **Specialty** says which subjects that one service covers. Leave Specialty on **Any** and the service covers every subject of its kind.
 
-Choose **Save Location** to persist changes; the editor stays open. Reopen a saved entry to review it. Save edits before selecting another location. Journeys, Craftworks, Marketplace, and Downtime can consume these records.
+The same town then answers a different question in each module:
 
-**Delete** asks for confirmation. Choose **No** to keep the record. Choosing **Yes** removes the location; projects and integrations referring to it may become unavailable. Deleting a location does not delete its Foundry Scenes.
+- Downtime asks whether an NPC there can teach a subject, and which place a session or a project uses.
+- Craftworks asks whether the current place has the facility a recipe needs.
+- Marketplace, when **Enable Locations** is on, asks whether the current place has a market and how rare an item that market trades.
+- Journeys can store the town on a travel day. With no town stored, the day is On the Road.
+
+### Set up a location
+
+Open **Morelord Core → Manage Locations**. The window title is **Morelord Locations**. The same window opens from **Manage Locations** on the Downtime dashboard, the Craftworks dashboard, and Marketplace.
+
+When the list is empty, the left side reads "No locations yet." The main panel shows **Morelord Locations**, the line "Create a location to define its settlement type, capabilities, and associated Scenes.", **Documentation**, and **Create First Location**. The plus button (**Create Location**) in the **Locations** heading starts another location. The left list shows each saved **Name** and its settlement type. Select a name to edit that location.
+
+While you are editing, the heading is **New Location** or **Edit Location**. The introduction reads "Locations are shared by Marketplace, Craftworks, Downtime, and Journeys." **Documentation** sits to the right of that introduction, and it is also on the empty panel. It opens the Locations section of this guide on the Morelord Gaming website in a new browser tab: `https://morelordgaming.com/docs/morelord-core#locations`.
+
+**Save Location** before you select another location or choose **Create Location**. Those actions load a different record and drop edits that are still unsaved.
+
+![New location named Phandalin, with settlement type Village and a Forge capability set to Common.](/images/foundry/core-locations.png)
+
+**Name** is required. The placeholder is Neverwinter. Saving a blank name reports `Could not save location: A location requires a name.`
+
+**Settlement Type** choices are Road, Hamlet (1–100 people), Village (101–1,000 people), Town (1,001–6,000 people), City (6,001–25,000 people), Metropolis (25,001+ people), and Other. A new location starts as Road. The hint under the menu reads "Population ranges are suggested guidelines." The ranges are suggestions. They leave crafting, teaching, and trade on the capability **Tier** you set.
+
+**Notes** is optional text for the GM. The placeholder is "GM-facing location notes."
+
+### Capabilities and Specialty
+
+Choose **Add Capability** for each facility the place offers. A new row starts as **Forge**, **Common**, and Specialty **Any**. The section hint reads "Capability tier is independent from settlement size."
+
+The **Type** menu lists Forge, Marketplace, Library, Temple, Instructor, and Workshop, in that order. Each row has **Type**, **Tier**, **Specialty** when that type has one, **Notes**, and **Remove Capability**.
+
+**Tier** is Common, Uncommon, Rare, Very Rare, or Legendary. A higher tier meets a lower tier of the same type. An Uncommon Forge meets a Common Forge. A Legendary Forge meets every lower Forge tier. Changing **Settlement Type** leaves the tier as you set it. A hamlet can have a Legendary forge, and a metropolis can have a Common market.
+
+When a check names a specialty, the tier that counts is the highest tier among rows of that type whose Specialty is **Any** or includes that specialty. When a check names only the type, the tier that counts is the highest tier of that type on the location. You can add more than one row of the same type. A specialty is available when any row of that type is **Any** or includes it. An **Any** row covers every subject of that type, including when another row of the same type lists only a few.
+
+**Specialty** opens **Select Specialty** for Instructor, Forge, and Workshop. Marketplace, Library, and Temple hide it. If you change **Type** to one of those, any specialties already stored on the row stay stored.
+
+The closed summary reads **Any** when nothing is selected. **Any** covers every specialty of that type. The summary stays the same height as the **Type** and **Tier** menus. When the names are wider than that field, the line ends in an ellipsis and the full list is in the field's tooltip. Choose the summary to open **Select Specialty**. The left side is **Search** and **Category**. The middle list is every choice. Choose a row to mark it, and choose it again to clear that mark. The right side is **Selected**, with every marked choice, **Remove** on each one, and **Clear all**. **Confirm** keeps that list. **Cancel** leaves the row unchanged. An empty **Selected** list means **Any**. One row holds several specialties. Changing **Type** rebuilds the choices.
+
+The choices are fixed D&D 2024 lists. They stay as listed here when Configure Sources changes, and they do not come from compendium items. The list is the same on every world.
+
+On an Instructor, each group also has **Any Language**, **Any Skill**, **Any Tool**, **Any Weapon**, **Any Armor**, or **Any Weapon Mastery**. Choosing one covers every subject in that group, and those subjects leave **Selected**. **Any** at the top of Instructor, Forge, and Workshop clears the list, which means no restriction. On a Forge, **Any Armor** and **Any Weapon** are the parents that cover the categories under them. On an Instructor, a weapon and that weapon's mastery are one specialty. Longsword appears under Weapons and under Weapon Masteries. Adding either one keeps Longsword once.
+
+**Notes** on the row is optional text stored with that capability. The placeholder is Optional. It is separate from the location **Notes** above the capability list. **Remove Capability** drops that row. Save afterward to keep the change.
+
+**Forge.** Categories are **Armor** and **Weapons**. Armor includes Armor, Light Armor, Medium Armor, Heavy Armor, and Shields. Weapons includes Weapons, Simple Weapons, Simple Melee Weapons, Simple Ranged Weapons, Martial Weapons, Martial Melee Weapons, Martial Ranged Weapons, and Ammunition. Choosing a parent covers everything under it: Armor covers Heavy Armor, and Simple Weapons covers Simple Melee Weapons and Simple Ranged Weapons. A child does not cover its parent. Weapon masteries are not a Forge specialty. **Any** covers every category. A specialty saved earlier as one weapon, armor, or mastery is kept as its category, such as Longsword as Martial Melee Weapons. A saved value that is not one of these categories becomes **Any**. Smith's Tools identify a Forge. The Specialty list itself is these categories.
+
+**Workshop.** One list, with no group heading. Each choice is a profession. **Any** covers every profession on the list: Alchemist, Brewer, Calligrapher, Carpenter, Cartographer, Cobbler, Cook, Glassblower, Jeweler, Leatherworker, Mason, Painter, Potter, Tinker, Weaver, and Woodcarver. The stored key is still the tool id, such as `alchemist` for Alchemist and `cobbler` for Cobbler. Alchemist is Alchemist's Supplies. Smith stays on Forge. If a Workshop list includes Smith, that choice is labeled **Smith** and still stores `smith`. Carpenter and Mason stay on Workshop. Calligrapher and Cartographer stay on Workshop; a Library row does not take them. If a Tavern capability is available, Brewer and Cook move to Tavern and leave Workshop. A saved Alchemist capability becomes this Workshop specialty. If the Workshop is already **Any**, it stays **Any**. The tier is the higher of the two.
+
+**Instructor.** Groups are Languages, Skills, Tools, Weapons, Armor, and Weapon Masteries: the D&D 2024 languages, skills, tool proficiencies, weapon proficiencies, armor proficiencies, and weapon masteries. Tools includes artisan's tools, other kits, gaming sets, musical instruments, and vehicles. **Any** covers every subject in those groups. A checked list covers those subjects. The Instructor tier does not choose which subjects can be taught. A Common Instructor set to **Any** can teach every subject on the list.
+
+**Marketplace, Library, and Temple.** The row is **Type** and **Tier**. Specialty stays hidden. Library and Temple record the place for play.
+
+### Associated Scenes
+
+**Associated Scenes** connects Foundry Scenes to this place. The text under the heading reads "When one of these Scenes is active, it resolves to this Morelord Location." The place the modules use is described under [Which place the modules use](#which-place-the-modules-use): the scene a user is viewing, unless an active Downtime session names a location.
+
+**Filter Scenes** keeps names that contain what you type. The placeholder is "Type any part of a Scene name." Click a Scene to select it, and click it again to clear it. The line under the list reads "{count} selected · Click a Scene to toggle its selection." Clearing the filter shows every Scene again. Several Scenes can belong to one location, which is how a town map and its interior maps stay the same place. A Scene belongs to one location. Saving a Scene that another location already has moves that Scene to the location you are saving. Selected Scenes stay highlighted when you reopen the location, and they are listed first.
+
+### Save and delete
+
+**Save Location** keeps the editor open and in front. Other open Morelord windows may refresh and stay behind this window. The notice reads "{Name} saved." These records stay in the world. **Export / Import Settings** does not copy them. Marketplace's **Enable Locations** setting is included with that transfer; the locations themselves are not.
+
+**Delete** appears after the location has been saved. The dialog title is **Delete Morelord Location**. The dialog reads "Delete {Name}? Projects and integrations that reference it may become unavailable." **No** keeps the location. **Yes** removes the location record. The notice reads "Location deleted." The Foundry Scenes remain. If other locations remain, the editor opens the one that comes first by name. If none remain, the window returns to **Create First Location**.
+
+### Which place the modules use
+
+Modules that need the party's current place use one shared answer.
+
+- While a Downtime session is active and that session has a **Location**, that saved location is the current place for the whole world.
+- While a Downtime session is active and its **Location** is **No Location**, the current place stays the location tied to the scene that user is viewing. **On the Road** is used only when that scene has no associated location. On the Road is not a saved location. It has no capabilities, so it has no forge, workshop, instructor, or market.
+- When Downtime is not active, or it has no active session, the current place is the location tied to the scene that user is viewing. A user who is looking at a different scene is in that scene's location.
+
+Downtime's crafting list also keeps the viewed scene in mind. A recipe the scene's location can support still appears during an On the Road session. Work already started stays on the list and shows as paused when neither place can support it.
+
+### What each capability does
+
+| Type | Specialty | What a GM uses it for |
+| --- | --- | --- |
+| **Forge** | Armor and Weapons categories. A parent covers its children. **Any** covers all of them. | The place can do Smith's Tools work. Craftworks uses the Forge tier when a recipe's tool is assigned to Forge, and these categories when it checks a weapon or armor. |
+| **Workshop** | The professions listed above, including Alchemist. **Any** covers every one of them. | The place can support those crafts. Craftworks allows a workshop recipe when a Workshop of sufficient tier includes that profession, or is **Any**. Alchemist's Supplies use the Alchemist choice. |
+| **Instructor** | Languages, skills, tools, weapons, armor, and weapon masteries. **Any** covers every subject. | The place has someone who can teach. Downtime uses this list for an NPC instructor. |
+| **Marketplace** | Hidden. | The place has a market. With **Enable Locations** on, this tier is the highest rarity the global market buys and sells here. A shop can also inherit a Marketplace row for generated stock. |
+| **Library** | Hidden. | Records that the place has a library. Training, crafting facilities, and trading use the other types. Calligrapher's Supplies and Cartographer's Tools remain Workshop choices. |
+| **Temple** | Hidden. | Records that the place has a temple. Training, crafting, and trading use the other types. |
+### Downtime
+
+Open **Manage Locations** from the Downtime dashboard when the activities need a place. Then create a session and choose its **Location**, or leave **No Location** for time spent on the road. **Available Activities** is a separate choice on the session. Checking Training, Crafting, or Source Item there permits that activity. The location's capabilities do not fill that list in.
+
+**Training.** Choose a student, a subject, and an instructor. The subject list is the same fixed D&D 2024 set the Instructor specialty uses: skills, languages, tools, weapons, armor, and weapon masteries. A character instructor must already know the subject and must spend the same hours as the student. That character can teach a subject the location's Instructor list leaves unchecked.
+
+An NPC instructor needs a name. **Project Location** is optional.
+
+- With a project location, the subject list shows only what that location's Instructor specialty allows. **Any**, or a specialty left empty, allows every subject. A single saved specialty allows that one subject. Several checked subjects allow those subjects. A location with no Instructor capability offers no NPC subjects. The NPC can advance the project in a session at that same location.
+- With **No fixed Location**, the full subject list stays available while you create the project. When hours are allocated, Downtime checks the session's location. That location needs an Instructor capability that allows the subject. A session with **No Location** has no Instructor specialty to apply.
+
+**Crafting.** Craftworks owns the recipe, the materials, the check, and the finished item. In Downtime, a marked recipe or a job already underway appears when the character can work it at the viewed scene's location or at the active session's place. An On the Road session keeps recipes the scene can still support. A job that neither place can support stays visible and shows as paused. While the session is active and **Available Activities** includes **Crafting**, hours spent crafting are added to that character's session time.
+
+**Commissions.** A commission needs a contractor name, a **Location**, the item, and the labor. Finished work waits for collection at that location. The commission advances by campaign days. Commission is not an **Available Activities** choice.
+
+**Source Item.** A search needs a **Location**, a magic item from the character's Marketplace wishlist, and a **Sourcing Check** of Arcana or Investigation. The location is where the search happens. Marketplace's **Enable Locations** setting, described below, is what limits buying and selling.
+
+### Craftworks
+
+Craftworks reads the current place when it decides whether a recipe can be worked. **Manage Locations** on the Craftworks dashboard opens the same shared list.
+
+In Craftworks **Settings**, under **Crafting**, each artisan's tool has a facility, or **No facility required**. The default is **No facility required**, so the recipe can be worked in any place, including On the Road. The minimum tier is the crafted item's rarity. An Uncommon item can use an Uncommon, Rare, Very Rare, or Legendary facility. A Common facility leaves a Rare item paused. A facility choice saved before the tool was named Smith's Tools still applies to Smith's Tools.
+
+- Assign **Smith's Tools** to **Forge**, and the current place needs a Forge of sufficient tier. The weapons and armor checked on that Forge stay on the location. Crafting uses the tier. A Forge whose specialty is only Longsword can still craft a Smith's Tools recipe of a rarity that tier allows.
+- Assign **Alchemist's Supplies** to **Workshop**, and the place needs a Workshop of sufficient tier whose Specialty includes **Alchemist** or is **Any**. A check that still asks for an Alchemist capability uses that same Workshop specialty and tier.
+- Assign a general workshop tool, such as Carpenter's Tools or Weaver's Tools, to **Workshop**, and the place needs a Workshop of sufficient tier whose Specialty includes that profession or is **Any**. Several professions may be checked on one Workshop row. A Workshop of a lower tier set to **Any** covers recipes of that lower tier. A Rare Workshop limited to Weaver covers weaver recipes of Rare or lower. Smith's Tools map to Forge. If Smith's Tools are assigned to **Workshop** instead, Craftworks asks for a Workshop of sufficient tier and skips the Workshop Specialty list for that tool.
+- **No facility required** skips the location check for that tool.
+
+A recipe that needs a facility stays paused in Craftworks while the current place lacks it, and it can continue when the place meets it. During an active Downtime session, Craftworks uses that session's location. When the session's **Location** is **No Location**, Craftworks uses the viewed scene's location, or On the Road when that scene has none. Downtime's own project list can still show a recipe the viewed scene allows, as described above.
+
+### Marketplace
+
+Marketplace uses a location in two ways. Both read the same saved record.
+
+**Enable Locations** is a world setting, off by default, in Marketplace's settings. While it is off, buying and selling ignore the current place.
+
+While it is on, buying and selling require the current place to have a Marketplace capability. The tier used is the highest Marketplace tier at that place. Common allows Common items. Uncommon allows Common and Uncommon. Rare allows through Rare, and so on through Legendary. An item with no rarity counts as Common. An artifact is above Legendary, so the global market leaves artifacts untraded at any of these tiers.
+
+- **Buy** omits items above that tier. The item count, the rarity counts, and the pages follow the shorter list.
+- **Sell** still lists owned items above the tier. Their sell buttons are disabled, and the button explanation names the limit.
+- A scene shop still needs a Marketplace at the current place. Its own stock and purchase rules then decide which items it trades, including items rarer than the location's tier. A shop that refuses an item still refuses it. On the Road has no Marketplace, so nothing can be bought or sold there while the setting is on, including at a scene shop.
+- The same check runs again when a cart, a shop purchase, or a GM approval is completed.
+
+This is separate from a shop's own fields. In the shop editor, **Morelord Location** optionally ties that shop to a saved location. Choosing it does not place the shop's token. **Maximum Normal Rarity** limits generated catalog items and random restocks. **Inherit from Location** uses the first Marketplace capability on that location. An explicit rarity on the shop replaces it. Items you add by hand may be rarer than that limit. With neither a shop rarity nor a location Marketplace, the shop's own rarity selections apply.
+
+### Journeys
+
+Journeys can store one of these locations as the place for the current travel day. With none stored, the day is On the Road, which has no capabilities. Completing a travel day advances Downtime projects that progress by days. It leaves the active Downtime session's location where you set it, and the road stays without a forge or a market.
+
+A travel day can also store extra capabilities for that day. They remain on the journey and leave the saved location unchanged. Marketplace, Craftworks, and Downtime sessions keep using the current place from the rules above. The Journeys window has no location picker, no temporary-capability field, and no **Manage Locations** button. Set the town and its facilities in **Manage Locations**, and choose that town on the Downtime session when the party has stopped there.
+
+### Example: a town forge
+
+Create a location named **Highmarket**. Set **Settlement Type** to Town (1,001–6,000 people). Associate the town scene and the smithy interior. Then add these capabilities and choose **Save Location**. The notice reads "Highmarket saved."
+
+- **Forge**, tier **Rare**. Open **Specialty**, add Martial Weapons and Heavy Armor, and choose **Confirm**. The summary lists those two. Martial Weapons covers Martial Melee Weapons and Martial Ranged Weapons. In Craftworks **Crafting**, set Smith's Tools to **Forge**. Smith's Tools recipes of Rare, Uncommon, or Common can be worked in Highmarket. A Very Rare item needs the Forge tier raised to Very Rare or Legendary. Leave **Specialty** on **Any** when this forge should cover every armor and weapon category.
+- **Workshop**, tier **Common**. Check Cobbler and Leatherworker. A Common cobbler or leatherworker recipe can be worked here when those tools are assigned to **Workshop**. A carpenter recipe needs Carpenter checked, or **Specialty** left on **Any**, and a tier high enough for that item.
+- **Workshop**, tier **Uncommon**. Check Alchemist. Alchemist's Supplies recipes of Uncommon or lower can be worked here when that tool is assigned to **Workshop**. A saved Alchemist capability is kept as this choice.
+- **Instructor**, tier **Common**. Check Stealth and Thieves' Tools. An NPC instructor with **Project Location** set to Highmarket can teach those two subjects. Leave **Specialty** on **Any** when the same NPC should teach any subject. A player character who already knows Arcana can still train another character in Arcana here.
+- **Marketplace**, tier **Uncommon**. Turn on Marketplace's **Enable Locations**. In Highmarket, Buy lists Common and Uncommon items. Rarer owned items remain on Sell with their sell buttons disabled. A shop in town can still sell a Rare item from its own stock. Removing the Marketplace row blocks buying and selling here while the setting stays on.
+
+While the party is viewing the town scene and no Downtime session is active, crafting and shopping use Highmarket. Start a Downtime session, choose **Highmarket** as its **Location**, and they keep using Highmarket. Start that session with **No Location** and they still use Highmarket, because the viewed scene is associated with it. On the Road applies when the session has **No Location** and the viewed scene is not associated with a location. Downtime can still list a recipe the town scene itself allows.
 
 ## Export and Import Settings
 
@@ -232,11 +385,11 @@ Open **Morelord Core → Export / Import Settings**. The list shows enabled modu
 
 To import, enable the relevant modules, choose a JSON file under **Settings File**, then select **Import Settings**. Matching settings are replaced; settings absent from the file remain unchanged. Missing or disabled modules and unknown settings are skipped. Review the imported/skipped counts and reload Foundry to refresh module views. Export your current configuration before replacing it.
 
-This is configuration transfer, not a world backup. Credentials, access caches, reporting preferences/credentials, shops, shared Locations, active journeys, downtime projects, and window positions are excluded. Actor/user references retain their IDs and are not remapped between worlds. Files are validated before writing. A failed write triggers an attempt to restore previous values; restoration failures are reported.
+This is configuration transfer, not a world backup. Credentials, access caches, reporting preferences/credentials, shops, Locations, active journeys, downtime projects, and window positions are excluded. Marketplace's **Enable Locations** setting is included with its other configuration settings. Actor/user references retain their IDs and are not remapped between worlds. Files are validated before writing. A failed write triggers an attempt to restore previous values; restoration failures are reported.
 
 ## Documentation and Community
 
-The account window's **Documentation** button opens Core's built-in reference, currently containing Morelord Account and Troubleshooting sections. This GM guide provides the fuller reference for configuration and shared Locations.
+The account window's **Documentation** button opens Core's built-in reference, currently containing Morelord Account and Troubleshooting sections. This GM guide provides the fuller reference for configuration and Locations.
 
 **Morelord Core → Join Discord** opens the Morelord Gaming Discord community for support, feature requests, and discussion. GMs and players can use it without an account connection.
 
@@ -291,7 +444,7 @@ If needed, disconnect and reconnect the world to create a fresh account connecti
 | Change reporting | Account window → Core Settings | Set the two reporting choices, then **Save Core Settings** |
 | Mark reactions | Account window → Core Settings | Check or uncheck **Reaction Used**, then **Save Core Settings** |
 | Exclude observers | Morelord Core module settings | **Select Ignored Users** |
-| Manage locations | Morelord Core module settings | **Manage Shared Locations** |
+| Manage locations | Morelord Core module settings | **Manage Locations** |
 | Transfer configuration | Morelord Core module settings | **Export / Import Settings** |
 | Get a support report | Morelord Core module settings | **Download Troubleshooting File** |
 | Open the community | Morelord Core module settings | **Join Discord** |

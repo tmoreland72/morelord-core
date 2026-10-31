@@ -1,4 +1,7 @@
-import { CAPABILITY_TIERS, SETTLEMENT_TYPES } from "./location-domain.js";
+import { CAPABILITY_TIERS, SETTLEMENT_TYPES, normalizeSpecialtyList } from "./location-domain.js";
+import { decorateCapabilityRows, listTrainingSpecialties } from "./training-specialties.js";
+import { choicesFromGroups } from "../ui/option-picker.js";
+import { openOptionPicker } from "../ui/option-picker-app.js";
 import { renderPreservingScroll } from "../ui/scroll-preservation.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
@@ -34,6 +37,8 @@ export class LocationManagerApp extends HandlebarsApplicationMixin(ApplicationV2
       edit: LocationManagerApp.edit,
       addCapability: LocationManagerApp.addCapability,
       removeCapability: LocationManagerApp.removeCapability,
+      pickSpecialty: LocationManagerApp.pickSpecialty,
+      openDocumentation: LocationManagerApp.openDocumentation,
       save: LocationManagerApp.save,
       delete: LocationManagerApp.delete
     }
@@ -72,6 +77,12 @@ export class LocationManagerApp extends HandlebarsApplicationMixin(ApplicationV2
     };
     filter?.addEventListener("input", refresh);
     select?.addEventListener("change", refresh);
+    for (const typeSelect of this.element.querySelectorAll("[data-capability-type]")) {
+      typeSelect.addEventListener("change", () => {
+        this.#captureDraft();
+        void this.render({ force: true });
+      });
+    }
     select?.addEventListener("mousedown", event => {
       if (!(event.target instanceof HTMLOptionElement)) return;
       event.preventDefault();
@@ -90,7 +101,16 @@ export class LocationManagerApp extends HandlebarsApplicationMixin(ApplicationV2
     if (!this.draft && this.selectedId) {
       this.draft = foundry.utils.deepClone(this.constructor.locationService.get(this.selectedId));
     }
-    const draft = this.draft;
+    const trainingChoices = listTrainingSpecialties();
+    const source = this.draft;
+    const draft = source ? {
+      ...source,
+      capabilities: decorateCapabilityRows(source.capabilities, {
+        resolveType: typeId => this.constructor.capabilityRegistry?.get(typeId) ?? null,
+        choices: trainingChoices,
+        capabilityTypeIds: this.constructor.capabilityRegistry?.all().map(type => type.id) ?? null
+      })
+    } : null;
     const selectedSceneIds = new Set(draft?.sceneIds ?? []);
     return {
       locations: locations.map(location => ({ ...location, selected: location.id === draft?.id })),
@@ -132,6 +152,11 @@ export class LocationManagerApp extends HandlebarsApplicationMixin(ApplicationV2
     this.render({ force: true });
   }
 
+  static openDocumentation(event) {
+    event?.preventDefault();
+    globalThis.game?.modules?.get("morelord-core")?.api?.ui?.documentation?.open("morelord-core", "locations");
+  }
+
   static edit(event, target) {
     event.preventDefault();
     this.selectedId = target.dataset.locationId;
@@ -142,8 +167,30 @@ export class LocationManagerApp extends HandlebarsApplicationMixin(ApplicationV2
   static addCapability(event) {
     event.preventDefault();
     this.#captureDraft();
-    this.draft.capabilities.push({ type: "forge", tier: "common", specialty: null, source: null });
+    this.draft.capabilities.push({ type: "forge", tier: "common", specialty: [], source: null });
     this.render({ force: true });
+  }
+
+  static pickSpecialty(event, target) {
+    event.preventDefault();
+    this.#captureDraft();
+    const index = Number(target.dataset.index);
+    const capability = this.draft?.capabilities?.[index];
+    if (!capability) return;
+    const [row] = decorateCapabilityRows([capability], {
+      resolveType: typeId => this.constructor.capabilityRegistry?.get(typeId) ?? null,
+      choices: listTrainingSpecialties(),
+      capabilityTypeIds: this.constructor.capabilityRegistry?.all().map(type => type.id) ?? null
+    });
+    const choices = choicesFromGroups(row?.specialtyOptions?.groups ?? []);
+    openOptionPicker({
+      choices,
+      selected: row?.specialty ?? capability.specialty ?? [],
+      onConfirm: keys => {
+        this.draft.capabilities[index].specialty = keys;
+        void this.render({ force: true, focus: true });
+      }
+    });
   }
 
   static removeCapability(event, target) {
@@ -202,7 +249,7 @@ export class LocationManagerApp extends HandlebarsApplicationMixin(ApplicationV2
       capabilities.push({
         type,
         tier: String(data.get(`capabilities.${index}.tier`) ?? "common"),
-        specialty: String(data.get(`capabilities.${index}.specialty`) ?? "").trim() || null,
+        specialty: normalizeSpecialtyList(data.getAll(`capabilities.${index}.specialty`)),
         source: String(data.get(`capabilities.${index}.source`) ?? "").trim() || null
       });
     }

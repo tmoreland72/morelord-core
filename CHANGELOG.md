@@ -1,5 +1,35 @@
 # Morelord Core Changelog
 
+## 0.9.0
+
+### Changed
+
+- The GM guide's Locations section explains why a place is defined once, how a GM sets it up, what each capability and Specialty gates, and how Downtime, Craftworks, Marketplace, and Journeys use that place. It includes a town forge example. The location window introduction names those four modules.
+- In Manage Locations, an Instructor capability's Specialty is a dropdown. Any is the default. The choices are a fixed D&D 2024 list of languages, skills, tools, weapons, armor, and weapon masteries. The list does not follow Configure Sources or compendium items. A saved specialty that is not in that list stays in the dropdown. Other capability types hide Specialty and keep a specialty that was already saved. The capability Source label is now Notes. Saved location fields are unchanged.
+- The Locations window **Documentation** button opens the Locations section of Core's guide at `https://morelordgaming.com/docs/morelord-core#locations` in a new browser tab. The Game Settings button is **Manage Locations**. The window title is **Morelord Locations**. Saved location ids and the `locations` setting key are unchanged.
+- A Forge capability's Specialty is the weapon proficiencies, armor proficiencies, and weapon masteries from that same fixed list. Any is the default.
+- Instructor, Forge, and Workshop Specialty is a checkbox menu. One entry can store several specialties. The closed summary lists them, or Any when none are checked. Empty or Any means no restriction. A specialty saved as a single value is read as that one choice.
+- Select group headings use the same background as the options, in the Morelord accent color and bold, so the heading is readable. Options stay in the normal text color and weight.
+- Contractor is no longer a location capability. Library and Temple remain, with no Specialty. A saved Contractor row is omitted when the location is read or saved. The other rows stay.
+
+### Added
+
+- Locations can list that fixed D&D 2024 training set and map a capability type to its specialty options, so other modules can use the list the Instructor and Forge dropdowns use.
+- `api.locations.locationAllowsSpecialty(location, type, specialtyKey)` reports whether a location capability allows a subject. It stays the same function. It returns true when any capability of that type has no restriction or includes the key. `evaluateRequirements` uses that same match for a named specialty.
+- `api.locations.activeContext(user)` resolves the viewed scene first. An active Downtime session with a location id wins (`source: "downtime"`). A blank session location id returns that scene location (`source: "scene"`) and keeps the session id. On the Road is returned only when the session location and the viewed scene are both empty. With no active session, the viewed scene is used.
+- Settings transfer includes Marketplace's Enable Locations setting.
+- Workshop capabilities list the D&D 2024 artisan professions that do not already match another capability: Alchemist, Brewer, Calligrapher, Carpenter, Cartographer, Cobbler, Cook, Glassblower, Jeweler, Leatherworker, Mason, Painter, Potter, Tinker, Weaver, and Woodcarver. The stored key is still the tool id. Smith's Tools stay with Forge. Any remains the default, and a saved specialty that is not in the list stays available. `api.locations.toolCapabilityType(tool)` and `api.locations.listWorkshopSpecialties()` expose that map. A registered Tavern capability takes Brewer and Cook.
+- Alchemist is no longer its own location capability. A saved Alchemist row becomes the Workshop specialty `alchemist`, or merges into the existing Workshop row. A Workshop that is already Any stays Any. The tier is the higher of the two. A check for capability type `alchemist` uses that Workshop specialty.
+
+### Fixed
+
+- Saving a location, or another background refresh, no longer brings a different open Morelord window to the front. The window where the button was clicked stays frontmost. A re-render of a window that is already open does not call `bringToFront` unless that render passes `focus: true`. `api.ui.renderInBackground(application)` is the shared refresh for an open window.
+- Specialty group headings in the checkbox menu are bold. The heading is a div, so the shared paragraph weight no longer overrides it. Native select group labels stay bold in the accent color on the window background, and options inside a group keep the normal text weight.
+- A Specialty summary with several names stays in its column at the same height as the other menus. The text ends in an ellipsis, the chevron stays inside the button, and the full list is in the button tooltip.
+- A Downtime session with no location no longer replaces the viewed scene with On the Road. The scene's associated location is used. On the Road remains only when that scene has no location either.
+- Instructor, Forge, and Workshop **Specialty** opens **Select Specialty**. The left panel is Select Training's search and categories. The middle list toggles choices and marks the ones that are selected. The right panel lists those choices from the top, each removable, with **Clear all**. **Confirm** stores the ids. **Any** means no restriction. An Instructor can also choose **Any Language**, **Any Skill**, **Any Tool**, **Any Weapon**, **Any Armor**, or **Any Weapon Mastery**, and that covers every subject in the group, including a stored Common Sign Language id. Forge **Any Armor** and **Any Weapon** are those parents.
+- Forge specialties are D&D 2024 equipment categories. Armor and Weapons cover their children. Weapon masteries are not a Forge specialty. A saved weapon, armor, or mastery becomes its category. An unknown Forge specialty becomes **Any**. `api.locations.forgeCategoryKeys(item)` returns that item's category keys, root first.
+
 ## 0.8.1
 
 ### Changed
@@ -243,7 +273,7 @@
 
 - The Core settings Troubleshooting button downloads diagnostics directly. The Troubleshooting section is removed from Connect or Manage Account.
 
-- Shared Locations uses standard Delete and Remove Capability buttons, including Core’s shared icon button component.
+- Locations uses standard Delete and Remove Capability buttons, including Core’s shared icon button component.
 
 - Checkbox descriptions stay beside their controls at narrow widths, including existing settings labels; wrapped text remains in its own column.
 
@@ -262,7 +292,7 @@
 
 ### Improvements
 
-- Show suggested population ranges for Hamlet, Village, Town, City, and Metropolis in the shared Locations Manager's Settlement Type dropdown.
+- Show suggested population ranges for Hamlet, Village, Town, City, and Metropolis in the Locations Manager's Settlement Type dropdown.
 - Share nested and keyed-panel scroll preservation, phase resets, and deferred restoration across Morelord modules.
 - Support portrait decoration for actor-ID controls through a UUID resolver.
 - Include development modules and chat templates in the shared design check.
@@ -330,7 +360,7 @@ Morelord Core 0.3.0 expands the shared foundation used by the Morelord module fa
 
 ### Added
 
-- Added GM-managed shared locations with settlement types, Scene associations, notes, and tiered capabilities.
+- Added GM-managed Locations with settlement types, Scene associations, notes, and tiered capabilities.
 - Added capability registration and requirement evaluation APIs for feature modules such as Craftworks, Marketplace, Journeys, and Downtime.
 - Added shared character participation helpers and scroll-preserving application rendering.
 - Added a shared source-book label resolver for consistent compendium asset attribution across Morelord modules.

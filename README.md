@@ -12,7 +12,7 @@ Shared account activation and entitlement services for Morelord Tools Foundry VT
 
 ## GM setup
 
-See the [Core GM Product Guide](CORE-GM-PRODUCT-GUIDE.md) for account controls, reporting preferences, Ignored Users, shared Locations, configuration transfer, and troubleshooting.
+See the [Core GM Product Guide](CORE-GM-PRODUCT-GUIDE.md) for account controls, reporting preferences, Ignored Users, [Locations](CORE-GM-PRODUCT-GUIDE.md#locations), configuration transfer, and troubleshooting.
 
 1. Install and enable Morelord Core.
 2. Open **Game Settings → Configure Settings → Module Settings → Morelord Core**.
@@ -33,15 +33,56 @@ While it is checked, a creature in a started combat that uses a D&D 5e activity 
 
 ## Locations Manager
 
+The [Locations](CORE-GM-PRODUCT-GUIDE.md#locations) section of the GM guide explains why a place is defined once, how to set it up, and how Downtime, Craftworks, Marketplace, and Journeys use each capability and Specialty.
+
+The built-in types are Forge, Marketplace, Library, Temple, Instructor, and Workshop. Library and Temple have no Specialty. A saved Contractor row is omitted when the location is read or saved. A saved Alchemist capability becomes the Workshop specialty `alchemist`. If that Workshop is already Any, it stays Any, and the tier is the higher of the two. The other rows on that location stay.
+
+**Documentation** on the Locations window opens `https://morelordgaming.com/docs/morelord-core#locations` in a new browser tab. The Game Settings button is **Manage Locations**. The window title is **Morelord Locations**. The stored setting key remains `locations`.
+
 Saved Associated Scenes remain highlighted when the editor reopens, including when the Scene list is unfocused. Click a Scene to toggle its association, then save the location.
 
 The Settlement Type dropdown includes suggested population ranges: Hamlet (1–100), Village (101–1,000), Town (1,001–6,000), City (6,001–25,000), and Metropolis (25,001+). Road and Other have no population range. These labels provide guidance only; capability tiers remain independent of settlement size.
+
+Instructor, Forge, and Workshop open **Select Specialty**. The window is the Select Training layout: **Search**, a **Category** list, and one button per choice. Choosing a row toggles it. A selected row stays in the option list and is marked. It is also listed under **Selected**. **Remove** and **Clear all** edit that list. **Confirm** stores it. **Cancel** discards the edit. The row summary says **Any** when nothing is selected, truncates with an ellipsis, and puts the full list in the button `title`. The saved specialty is an array of ids. A legacy single id is read as a one-item array. Empty or **Any** stores `[]` and means no restriction. A weapon that appears under both Weapons and Weapon Masteries on an Instructor uses the same id, so either choice stores it once. Capability types with no specialty catalog hide **Specialty** and keep any specialties already saved. The capability field labeled **Notes** is still stored as `source`.
+
+A Forge specialty is the D&D 2024 equipment categories, not each weapon, armor, or weapon mastery. **Armor** covers Light Armor, Medium Armor, Heavy Armor, and Shields. **Weapons** covers Simple Weapons, Martial Weapons, their melee and ranged children, and Ammunition. A stored parent allows its children. A saved weapon, armor, or mastery id is rewritten to its category. A saved value that is not a category becomes **Any**. Smith's Tools still map to Forge through `toolCapabilityType`. That mapping is separate from the Forge category list.
+
+A Workshop capability uses the same window. The choices are professions: Alchemist, Brewer, Calligrapher, Carpenter, Cartographer, Cobbler, Cook, Glassblower, Jeweler, Leatherworker, Mason, Painter, Potter, Tinker, Weaver, and Woodcarver. **Any** means no profession restriction. Each choice stores the dnd5e tool id, such as `cobbler` for Cobbler and `alchemist` for Alchemist. The label is only the profession. One Workshop row can include several professions. Brewer and Cook stay on Workshop. If a module registers a Tavern capability, those two move to Tavern and Tavern shows them as its specialty list. Carpenter, Mason, Calligrapher, and Cartographer stay on Workshop. Smith stays on Forge and is labeled Smith when a Workshop list includes it. A saved specialty that is not in the list stays available. `locationAllowsSpecialty(location, "alchemist")` and a capability requirement of type `alchemist` both use the Workshop specialty `alchemist`.
+
+```js
+const locations = game.modules.get("morelord-core").api.locations;
+locations.toolCapabilityType("Smith's Tools"); // "forge"
+locations.toolCapabilityType("Alchemist's Supplies"); // "workshop"
+locations.toolCapabilityType("cobbler"); // "workshop"
+locations.listWorkshopSpecialties(); // [{ id, label, capabilityType }]
+```
+
+```js
+const locations = game.modules.get("morelord-core").api.locations;
+const choices = locations.listTrainingSpecialties();
+const instructor = locations.buildSpecialtyOptions("instructor", { current: null });
+const forge = locations.buildSpecialtyOptions("forge", { current: null });
+locations.locationAllowsSpecialty(location, "instructor", "ste");
+locations.locationAllowsSpecialty(location, "forge", "longsword");
+```
+
+`listTrainingSpecialties()` returns the fixed D&D 2024 skills, languages, tool proficiencies, weapon proficiencies, armor proficiencies, and weapon masteries. `listForgeSpecialties()` returns the Forge equipment categories: Armor, Weapons, and their children. It does not include weapon masteries or individual weapons. Each training choice has `kind`, `id`, `label`, `category`, and `trainingValue` (`kind:id`). The lists do not read Configure Sources or compendium documents. `buildSpecialtyOptions(typeId, { choices, current })` returns `null` when that registered type has no `specialtyCatalog`, and otherwise returns grouped options. For Forge, `choices` is ignored and the category list is used. `registerCapability({ id, name, icon, supportsSpecialty, specialtyCatalog })` accepts `specialtyCatalog: "training"` for the Instructor list and `specialtyCatalog: "forge"` for the equipment categories.
+
+`locations.forgeCategoryKeys(item)` maps a dnd5e weapon, armor, or ammunition item to category keys, root first. A martial melee weapon returns `["weapon", "mar", "martialM"]`. Heavy armor returns `["armor", "hvy"]`. Ammunition returns `["weapon", "ammo"]`. A string may be a category id, a dnd5e type value such as `"simpleR"` or `"heavy"`, or a legacy item id such as `"longsword"`. Anything else returns `[]`. Craftworks checks the most specific key: `locationAllowsSpecialty(location, "forge", forgeCategoryKeys(item).at(-1))`. That is true when the Forge specialty is empty or includes that key or one of its parents. `openOptionPicker({ choices, selected, onConfirm })` opens the shared Select Specialty window.
+
+`locationAllowsSpecialty(location, type, specialtyKey)` reports whether a location allows a subject. The signature is unchanged. It returns true when any capability of `type` has no restriction or includes that key. Any, an empty list, or a legacy empty string allows every key. Any or an empty `specialtyKey` is allowed by every capability of that type. A location with no capability of that type returns false. This check does not compare tier. `evaluateRequirements` uses the same specialty match: a named specialty passes when the key is in the capability's array, or when that array is empty. Use `meetsTier` or the requirement's `tier` when the tier matters. A saved specialty is an array, so comparing `capability.specialty` with `===` does not match a stored key.
+
+`locations.activeContext(user)` resolves the place those workflows should use. It looks up the location for the scene `user` is viewing first. Downtime keeps one active session for the world. When Downtime is active and that session has a location id, the result is that saved location (`source: "downtime"`). The explicit id wins over the scene. When the session's location id is blank, the result is that viewed scene's location (`source: "scene"`) and `sessionId` stays the active session. The virtual **On the Road** place (`source: "road"`, `metadata.virtual: true`, no capabilities) is returned only when the session location id is blank and the viewed scene has no associated location. It is not a saved location. When Downtime is inactive, has no active session, or its project state cannot be read, the result is the viewed scene (`source: "scene"`) and `sessionId` is null. Omit `user` to use the current user. A user with no viewed scene falls back to the local canvas scene only when that user is the current user; another user's missing scene does not use this client’s scene. No scene location and no active session returns `source: "none"` and `location: null`. `sessionId` is set for an active session, including when its location id is blank. A session location id that no longer exists returns `source: "downtime"` and `location: null`.
+
+```js
+const place = game.modules.get("morelord-core").api.locations.activeContext(user);
+```
 
 ## Export and import settings
 
 GMs can open **Morelord Core → Export / Import Settings** in Module Settings. Export downloads `morelord-settings.json` with configuration from every enabled Morelord module, including hidden defaults and current-browser preferences. Import replaces matching settings and leaves settings absent from the file unchanged. Missing or disabled modules and unknown keys are skipped; enable a module before importing its settings. Reload Foundry after importing to refresh module views.
 
-Account credentials and access caches, shops, shared locations, active journeys, downtime projects, and window positions are excluded. Actor/user references keep their IDs; they are not remapped between worlds. Modules with no configurable settings add no entries. Files are validated before writing; if a write fails, Core attempts to restore the previous values and reports any restoration failures.
+Account credentials and access caches, shops, Locations, active journeys, downtime projects, and window positions are excluded. Marketplace's **Enable Locations** setting is included with its other configuration settings. Actor/user references keep their IDs; they are not remapped between worlds. Modules with no configurable settings add no entries. Files are validated before writing; if a write fails, Core attempts to restore the previous values and reports any restoration failures.
 
 ## Module API
 
@@ -199,6 +240,8 @@ Use `ml-grid` with `data-columns="2"` for responsive card collections with Core-
 
 `core.ui.renderPreservingScroll(application, renderOperation, options)` preserves page positions by default, plus panels marked with `data-ml-scroll-key`. Pass a per-window `positions: new Map()` to remember keyed panels across tabs. `reset: true` clears saved positions and returns the new page to the top. `selector: "*", deferred: true` also preserves nested scroll regions after layout settles. Feature modules should use this service instead of maintaining their own capture/restore algorithms.
 
+`core.ui.renderInBackground(application, options)` refreshes a window that is already open and leaves it where it is in the stack. Foundry v14 `ApplicationRenderOptions` documents `force`, `isFirstRender`, `parts`, `position`, `tab`, and `window`. It does not document `focus`. `ApplicationV2#render({ force: true })` still calls `bringToFront()`, so a settings or location hook that re-renders another open module window puts that window in front of the one the user clicked. `renderInBackground` calls `render({ force: false, focus: false })` and does nothing when the window is not open. Core also wraps `ApplicationV2#render` so a re-render of an already open window ignores `bringToFront` unless the caller passes `focus: true`. Pass `focus: true`, or call `bringToFront()` after render, when the user asked to open that window.
+
 `core.ui.decorateActorSelect(select, resolveUuid)` displays the selected actor's portrait. UUID-valued selects need no resolver; ID-valued controls can pass `id => game.actors.get(id)?.uuid` while retaining their existing stored values.
 
 `npm run check:design-system` checks all six feature repositories, including Character Export and Downtime. It checks available sources even when a module has no stylesheet directory. Chat templates use the shared chat-card contract rather than the full application shell. Live visual and multiplayer verification remains a separate check.
@@ -325,7 +368,7 @@ Per-version release history lives in `release-notes/RELEASE-NOTES-<version>.md`,
 
 Core 0.4.2 exposes `ui.participation.canUseActorInventory(actor, user = game.user, { actors = game.actors } = {})`: GMs and owners qualify directly; a Group also qualifies when the user owns or is assigned one of its character members. Callers must still validate operation-specific permissions and route restricted writes through a connected GM. `ui.openItemPreview(item)` opens a read-only sheet; restricted sources are copied into an unsaved Observer document without changing the source or its ownership.
 
-The shared quantity-controls partial accepts optional `cartType`, `clearAction`, `classes`, and `quantityClass` values. `clearAction` adds an accessible remove button with `data-delta="0"`; existing plus/minus consumers keep their behavior. Documentation uses `ui.documentation.open(moduleId)` to open the supported module page on Morelord Gaming in a new browser tab, falling back to the documentation index for modules without a dedicated page. Ignored-only characters are excluded from shared character choices, including explicit saved selections; eligible offline owners remain supported.
+The shared quantity-controls partial accepts optional `cartType`, `clearAction`, `classes`, and `quantityClass` values. `clearAction` adds an accessible remove button with `data-delta="0"`; existing plus/minus consumers keep their behavior. Documentation uses `ui.documentation.open(moduleId, section)` to open the supported module page on Morelord Gaming in a new browser tab. `section` is an optional heading slug, such as `locations`, and is appended as a hash. Anything other than a slug is ignored. Modules without a dedicated page open the documentation index. Ignored-only characters are excluded from shared character choices, including explicit saved selections; eligible offline owners remain supported.
 ## Sidebar multiselect
 
 GM-only **Select multiple** controls support Scenes, Actors, Items, Journals, Rollable Tables, Cards, Macros, Playlists, and Compendium Packs, including pop-out directories. Checkboxes are the leftmost control on each row, including to the left of thumbnails and at the left of playlist headers, and use Foundry's flat checkbox. On a compendium pack card the checkbox sits over the upper left so the banner, title, and footer stay in place. Compact directory portraits stay beside the checkbox instead of underneath it. Clicks on checkboxes do not activate the underlying directory entry or open the pack. Shift-click selects the visible range from the previous checkbox. Select individual entries or **Select visible**, then use **Move selected (N)** to place them in a folder or **Root (no folder)**, or review the named list before confirming **Delete selected (N)**. On Compendium Packs, **Lock selected (N)** and **Unlock selected (N)** change the pack lock, and **Delete selected (N)** includes only world compendiums. **Clear selection** and **Done selecting** clear hidden selections too. Move changes only the selected entries' folder. Folders themselves remain; document and world-compendium deletion is permanent and uses Foundry's native API. No linked account or premium access is required. See `CORE-GM-PRODUCT-GUIDE.md` for every control and scope.
