@@ -130,6 +130,8 @@ Foundry `DialogV2` requires `config.content` itself to have no attributes. Never
 </div>
 ```
 
+`MorelordCore.ui.confirm({ title, content, yesLabel, noLabel, danger })` opens the shared yes/no dialog. It is about 400 pixels wide and only as tall as its text. **Yes** and **No** fill the footer side by side at equal width. `danger: true` marks **Yes** with the danger color and makes **No** the default. `content` is HTML inside the dialog shell.
+
 Dialog content and footer are separate layout rows:
 
 - Only the content body scrolls.

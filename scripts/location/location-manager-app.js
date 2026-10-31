@@ -3,6 +3,7 @@ import { decorateCapabilityRows, listTrainingSpecialties } from "./training-spec
 import { choicesFromGroups } from "../ui/option-picker.js";
 import { openOptionPicker } from "../ui/option-picker-app.js";
 import { renderPreservingScroll } from "../ui/scroll-preservation.js";
+import { confirm } from "../ui/confirm-dialog.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -220,10 +221,10 @@ export class LocationManagerApp extends HandlebarsApplicationMixin(ApplicationV2
   static async delete(event, target) {
     event.preventDefault();
     if (!this.draft?.id) return;
-    const confirmed = await foundry.applications.api.DialogV2.confirm({
-      window: { title: "Delete Morelord Location" },
+    const confirmed = await confirm({
+      title: "Delete Morelord Location",
       content: `<p>Delete <strong>${foundry.utils.escapeHTML(this.draft.name)}</strong>? Projects and integrations that reference it may become unavailable.</p>`,
-      modal: true
+      danger: true
     });
     if (!confirmed) return;
     target.disabled = true;

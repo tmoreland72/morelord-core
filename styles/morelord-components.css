@@ -402,6 +402,44 @@
   pointer-events: none;
 }
 
+/* Compact confirm. The body is only as tall as its text. Yes and No split the footer. */
+.ml-window.ml-confirm-dialog { height: auto; }
+.ml-window.ml-confirm-dialog .window-content,
+.ml-window.ml-confirm-dialog .window-content:has(.form-footer),
+.ml-window.ml-confirm-dialog .window-content:has(.form-footer) > :where(form, .standard-form):has(> .form-footer) {
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  min-height: 0;
+  overflow: visible;
+}
+.ml-window.ml-confirm-dialog .window-content:has(.form-footer) :where(.dialog-content, .ml-dialog-shell) {
+  flex: 0 0 auto;
+  min-height: 0;
+  overflow: visible;
+}
+.ml-window.ml-confirm-dialog .window-content:has(.form-footer) :where(.dialog-content, .ml-dialog-shell)::after {
+  content: none;
+  display: none;
+  height: 0;
+}
+.ml-window.ml-confirm-dialog .form-footer {
+  display: flex;
+  width: 100%;
+}
+.ml-window.ml-confirm-dialog .form-footer > button {
+  flex: 1 1 0;
+  width: auto;
+  min-width: 0;
+  max-width: none;
+}
+.ml-window.ml-confirm-dialog--danger .form-footer button[data-action="yes"] {
+  --button-background-color: var(--ml-color-danger);
+  --button-border-color: var(--ml-color-danger);
+  --button-text-color: var(--ml-color-on-accent);
+  color: var(--ml-color-on-accent);
+}
+
 @media (max-width: 560px) {
   .ml-hero { align-items: flex-start; }
   .ml-access-card { grid-template-columns: auto minmax(0, 1fr); }

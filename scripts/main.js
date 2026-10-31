@@ -26,6 +26,7 @@ import { applyPageLayout } from "./ui/page-layout.js";
 import { activateTabs } from "./ui/tabs.js";
 import { activateMultiSelects } from "./ui/multi-select.js";
 import { openOptionPicker } from "./ui/option-picker-app.js";
+import { confirm } from "./ui/confirm-dialog.js";
 import { activateCardSelection } from "./ui/card-selection.js";
 import { sortable } from "./ui/sortable.js";
 import { activateCollapsibleSections, createCollapsibleSection } from "./ui/collapsible-section.js";
@@ -479,10 +480,9 @@ class MorelordConnectionApp extends HandlebarsApplicationMixin(ApplicationV2) {
 
   static async disconnect(event) {
     event.preventDefault();
-    const confirmed = await foundry.applications.api.DialogV2.confirm({
-      window: { title: "Disconnect Morelord Account" },
-      content: "<p>Disconnect this Foundry installation from your Morelord account?</p>",
-      modal: true
+    const confirmed = await confirm({
+      title: "Disconnect Morelord Account",
+      content: "<p>Disconnect this Foundry installation from your Morelord account?</p>"
     });
     if (!confirmed) return;
     await disconnect();
@@ -710,6 +710,7 @@ Hooks.once("ready", async () => {
       activateTabs,
       activateMultiSelects,
       openOptionPicker,
+      confirm,
       activateCardSelection,
       activateCollapsibleSections,
       createCollapsibleSection,

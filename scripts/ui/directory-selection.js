@@ -1,3 +1,5 @@
+import { confirm } from "./confirm-dialog.js";
+
 const documentTypes = new Set(['Scene', 'Actor', 'Item', 'JournalEntry', 'RollTable', 'Cards', 'Macro', 'Playlist']);
 const states = new WeakMap();
 const isolatedTargets = new WeakSet();
@@ -287,28 +289,24 @@ async function confirmDelete(entries, noun, skipped) {
   const title = noun === 'document'
     ? `Delete ${entries.length} selected documents`
     : `Delete ${entries.length} selected ${entries.length === 1 ? 'compendium' : 'compendiums'}`;
-  return globalThis.foundry.applications.api.DialogV2.confirm({
-    classes: ['ml-window'],
-    window: { title },
-    content: `<div class="ml-app"><div class="ml-app-shell"><p>${prompt}</p>${list.outerHTML}</div></div>`,
-    modal: true,
-    rejectClose: false,
-    yes: { label: 'Delete selected' },
-    no: { label: 'Cancel', default: true }
+  return confirm({
+    title,
+    content: `<p>${prompt}</p>${list.outerHTML}`,
+    yesLabel: "Delete selected",
+    noLabel: "Cancel",
+    danger: true
   });
 }
 
 async function confirmUnlock(entries) {
   const list = nameList('ml-core-directory-move-list', entries);
   const prompt = `Unlocking a system or module compendium can be overwritten when that package updates. Unlock these ${counted(entries.length, 'compendium')}?`;
-  return globalThis.foundry.applications.api.DialogV2.confirm({
-    classes: ['ml-window'],
-    window: { title: `Unlock ${counted(entries.length, 'compendium')}` },
-    content: `<div class="ml-app"><div class="ml-app-shell"><p>${prompt}</p>${list.outerHTML}</div></div>`,
-    modal: true,
-    rejectClose: false,
-    yes: { label: 'Unlock selected' },
-    no: { label: 'Cancel', default: true }
+  return confirm({
+    title: `Unlock ${counted(entries.length, 'compendium')}`,
+    content: `<p>${prompt}</p>${list.outerHTML}`,
+    yesLabel: "Unlock selected",
+    noLabel: "Cancel",
+    danger: true
   });
 }
 
