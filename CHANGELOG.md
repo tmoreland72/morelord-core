@@ -22,6 +22,7 @@
 - Alchemist is no longer its own location capability. A saved Alchemist row becomes the Workshop specialty `alchemist`, or merges into the existing Workshop row. A Workshop that is already Any stays Any. The tier is the higher of the two. A check for capability type `alchemist` uses that Workshop specialty.
 - The Instructor specialty list matches the D&D 2024 training subjects. The headings Artisan's Tools, Gaming Set, and Musical Instrument are gone, as are Vehicles and land and water vehicles. Three-Dragon Ante is included. Studded leather armor is labeled **Studded Leather Armor**. A saved specialty that left the list stays stored and keeps its name.
 - `api.ui.confirm({ title, content, yesLabel, noLabel, danger })` opens a compact yes/no dialog. It is 400 pixels wide and only as tall as its text. **Yes** and **No** fill the footer side by side at equal width. `danger: true` marks **Yes** with the danger color and makes **No** the default.
+- Bottom form actions use `ml-form-footer`. The buttons sit on the right at their natural width. Confirm dialogs keep the two equal-width buttons.
 
 ### Fixed
 

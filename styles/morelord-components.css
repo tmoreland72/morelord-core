@@ -340,7 +340,8 @@
 .ml-quantity-list > dt { min-width: 0; overflow-wrap: anywhere; }
 .ml-quantity-list > dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
 .ml-window .form-footer,
-.ml-window .ml-page-footer {
+.ml-window .ml-page-footer,
+.ml-window .ml-form-footer {
   position: static !important;
   z-index: 10;
   flex: 0 0 auto;
@@ -353,13 +354,25 @@
   isolation: isolate;
   box-shadow: 0 -8px 18px rgb(0 0 0 / 28%);
 }
-.ml-window .ml-page-footer {
+.ml-form-footer,
+.ml-window .ml-page-footer,
+.ml-window .ml-form-footer,
+.ml-window:not(.ml-confirm-dialog) .form-footer {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   flex-wrap: wrap;
+  gap: var(--ml-space-2);
   margin: 0;
   min-width: 0;
+  border-top: 1px solid var(--ml-color-border);
+}
+.ml-window :is(.ml-form-footer, .ml-page-footer) > button,
+.ml-window:not(.ml-confirm-dialog) .form-footer > button {
+  flex: 0 0 auto;
+  width: auto;
+  max-width: none;
+  align-self: center;
 }
 .ml-window .form-footer::before,
 .ml-window .form-footer::after { background: var(--ml-color-footer) !important; }
@@ -514,9 +527,7 @@
 .ml-window .window-content label.ml-setting-row:has(> input[type="checkbox"]:first-child) { grid-template-columns: max-content minmax(0, 1fr); }
 @media (max-width: 620px) { .ml-window .window-content label.ml-setting-row:not(:has(> input[type="checkbox"])) { grid-template-columns: minmax(0, 1fr); } }
 
-.ml-window :is(.form-footer, .ml-page-footer):has(> button ~ button) { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); align-items: stretch; }
-.ml-window :is(.form-footer, .ml-page-footer) > button { height: auto; max-height: none; min-width: 0; min-height: var(--ml-control-height); align-self: stretch; white-space: normal; line-height: var(--ml-line-height-body); padding: var(--ml-space-2) var(--ml-space-3); }
-.ml-window :is(.form-footer, .ml-page-footer):has(> button ~ button) > button { width: 100%; }
+.ml-window :is(.form-footer, .ml-page-footer, .ml-form-footer) > button { height: auto; max-height: none; min-height: var(--ml-control-height); white-space: normal; line-height: var(--ml-line-height-body); padding: var(--ml-space-2) var(--ml-space-3); }
 .ml-tabs { display: flex; flex-wrap: wrap; gap: var(--ml-space-3); border-bottom: 1px solid var(--ml-color-border); }
 .ml-tabs > [role="tab"] { padding: var(--ml-space-2) var(--ml-space-1); border-bottom: 2px solid transparent; color: var(--ml-color-muted); text-decoration: none; cursor: pointer; }
 .ml-tabs > [role="tab"][aria-selected="true"] { border-bottom-color: var(--ml-color-accent); color: var(--ml-color-text); }
@@ -607,7 +618,7 @@
 .ml-training-selection__selected { display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; border-left: 1px solid var(--ml-color-border); }
 .ml-training-selection__selected > .ml-training-selection__list { flex: 0 0 auto; align-content: start; justify-content: start; align-items: start; }
 .ml-training-selection__selected .ml-training-selection__option { align-self: start; justify-self: stretch; }
-.ml-training-selection__selected > .ml-actions { margin-top: auto; }
+.ml-training-selection__selected > :is(.ml-actions, .ml-form-footer) { margin-top: auto; }
 .ml-training-selection__option.is-covered { opacity: .55; }
 .ml-training-selection__heading { justify-content: space-between; }
 .ml-training-selection__heading :where(h2, p) { margin: 0; }

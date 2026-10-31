@@ -18,6 +18,7 @@ const PROTECTED = [
   "page-body",
   "page-flow",
   "page-footer",
+  "form-footer",
   "item-row",
   "stack",
   "cluster",
@@ -141,7 +142,7 @@ for (const root of roots) {
       if (/[\\/]templates[\\/][^\\/]*settings\.hbs$/.test(file)) {
         const hero = text.match(/<header\b[^>]*class=["'][^"']*\bml-hero\b[^"']*["'][^>]*>[\s\S]*?<\/header>/)?.[0] ?? "";
         if (!["ml-hero__icon", "ml-hero__body", "<h1", "<p"].every(part => hero.includes(part))) failures.push(`${file}: settings pages require the complete Core hero (icon, body, title, description)`);
-        if (!/<footer\b[^>]*class=["'][^"']*\bml-page-footer\b[^"']*["']/.test(text)) failures.push(`${file}: settings pages require the Core page footer`);
+        if (!/<footer\b[^>]*class=["'][^"']*\bml-(?:form-footer|page-footer)\b[^"']*["']/.test(text)) failures.push(`${file}: settings pages require the Core form footer`);
       }
       if (/\.hbs$/.test(file) && /[\\/]chat[\\/]/.test(file)) {
         const firstElement = text.match(/<(?:div|section|form|article)\b[^>]*>/i);

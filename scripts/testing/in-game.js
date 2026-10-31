@@ -86,7 +86,7 @@ export async function runInGameTests({ checks = [] } = {}) {
           assert(root?.isConnected, "Foundry did not render the window.");
           assert(getComputedStyle(root).getPropertyValue("--ml-color-accent").trim(), "Core CSS tokens did not load.");
           assert(root.querySelector(".window-content.ml-page-layout > .ml-page-body"), "Core page-layout hook did not run.");
-          assert(root.querySelector(".window-content > .ml-page-footer button[type=submit]"), "Shared footer was not separated from the scroll body.");
+          assert(root.querySelector(".window-content > .ml-form-footer button[type=submit]"), "Shared footer was not separated from the scroll body.");
           const boxes = [...root.querySelectorAll('input[name="ignoredUserIds"]')];
           assert(boxes.length === game.users.size, "User controls are missing.");
           const ignored = new Set(JSON.parse(before));

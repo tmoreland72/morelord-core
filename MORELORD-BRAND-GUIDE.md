@@ -138,11 +138,12 @@ Dialog content and footer are separate layout rows:
 - The scrollbar must stop above the footer.
 - The footer is fully opaque and never overlays visible content.
 - Footer actions remain visible at every scroll position.
-- Footer buttons share equal widths and stretch to the height required by the longest wrapped label. Use Core's shared footer sizing, not individual button heights.
+- Page and window action buttons use `ml-form-footer`. They are right-justified at their natural width. Do not stretch them across the footer.
+- `MorelordCore.ui.confirm` is the exception. Its two buttons fill the footer side by side at equal width.
 - Content reserves no fake transparent overlay space.
 
 The same rule applies to every application page. Put page-level bottom actions in
-`<footer class="ml-page-footer ml-actions">`. Core's render hook moves that footer
+`<footer class="ml-form-footer ml-page-footer">`. `ml-form-footer` is the shared footer. `ml-page-footer` lets Core's render hook move that footer
 beside the `.ml-app-shell` body and provides the single page scrollbar, bottom
 spacing, and opaque footer. Form submit buttons retain their form association.
 Inline item actions remain with their item. Do not add pane scrollbars, sticky
@@ -183,7 +184,7 @@ Never use a raw red, green, amber, or blue to represent application state. Domai
 | Need | Component |
 | --- | --- |
 | Window content root | `.ml-app .ml-app-shell` |
-| Page-level bottom actions | `.ml-page-footer .ml-actions` |
+| Page-level bottom actions | `footer.ml-form-footer` (add `ml-page-footer` so page layout lifts it) |
 | Settings description and control | `label.ml-setting-row` with a text `span` and sibling control |
 | Item image, label, and controls | `.ml-item-row` |
 | Character participation choices | `.ml-actor-choice-grid`, `.ml-actor-choice` |
