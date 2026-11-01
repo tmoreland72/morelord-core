@@ -1,4 +1,4 @@
-# Morelord Core 0.9.0
+# Morelord Core 0.8.2
 
 ## What Changed
 
