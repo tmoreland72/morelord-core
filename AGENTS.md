@@ -43,6 +43,11 @@
 - When changing Core, identify and check the modules that consume the changed functionality.
 - Run relevant existing tests and, for shared UI changes, Core's `npm run check:design-system`. Clearly report anything that still needs live Foundry verification.
 
+## Releasing
+
+- HARD RULE: Morelord releases always run through a GitHub Actions Release workflow that uses the repo secrets `FOUNDRY_RELEASE_TOKEN` and `RELEASE_PUBLISH_TOKEN` (already set on this repo). Cloud agents must never run `release.ps1` themselves, never skip the Foundry or website publish steps, and never report the tokens as missing.
+- Agents release only when Troy approves, by running `gh workflow run release.yml -f version=X.Y.Z`, then watching that run. The workflow file is `.github/workflows/release.yml` on `main`. One run publishes the GitHub Release, the Foundry package, and the website feed.
+
 ## Releases and documentation
 
 - Per-version release notes live in `release-notes/RELEASE-NOTES-<version>.md` and are excluded from release archives. Every released module maintains a cumulative root `CHANGELOG.md` (newest version first; `#`, `##`, and `###` headings with a space after `#`; `- ` bullets; no `---` horizontal rules) generated from `release-notes/RELEASE-NOTES-*.md`, auto-updated by `release.ps1`, and packaged at the root of the release `.zip`.
@@ -50,7 +55,7 @@
 
 - Campaign Manager is inactive. Exclude it from active-module inventories, release checks, and development planning unless the user explicitly revives it.
 
-- Follow the affected repository's documented `release.ps1` workflow, `release.config.json`, and release-note conventions when preparing or publishing a requested release.
+- Follow the affected repository's `release.config.json` and release-note conventions when preparing a requested release. Publishing runs through the Release workflow in Releasing.
 - For every release, check the latest stable Foundry VTT version against official release information and verify module compatibility on that version. Update `module.json`'s `compatibility.verified` to the exact verified version/build before packaging, and publish matching compatibility metadata to the Foundry package release. Preserve supported minimum/maximum bounds unless intentionally changing support; do not claim untested compatibility. After publishing, verify the public manifest and Foundry release listing both reflect the updated compatibility, so stale metadata does not leave users with a compatibility-risk warning. Report any verification or publication blocker explicitly.
 - Character Export and Downtime follow the standard release requirements; all modules must follow shared UI and Core asset standards.
 - As part of every code change, review affected documentation and update it when behavior, UI, settings, APIs, dependencies, or workflows change. Include relevant READMEs, user guides, API examples, and release notes; update shared documentation in Core when applicable.
