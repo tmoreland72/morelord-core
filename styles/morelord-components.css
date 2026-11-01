@@ -207,6 +207,16 @@
 .ml-actor-select-field[data-ml-actor-select-layout="inline"] > select { grid-column: 2; grid-row: 1; padding-inline-start: calc(var(--ml-avatar-sm) + 2 * var(--ml-space-2)); }
 .ml-actor-select-field[data-ml-actor-select-layout="inline"] > [data-ml-actor-select-preview] { grid-column: 2; grid-row: 1; justify-self: start; margin-inline-start: var(--ml-space-2); pointer-events: none; }
 .ml-check,
+.ml-multi-select { display: grid; gap: var(--ml-space-1); min-width: 0; }
+.ml-multi-select { grid-template-columns: minmax(0, 1fr); max-width: 100%; }
+.ml-multi-select__label { color: var(--ml-color-muted); font-size: var(--ml-font-size-xs); font-weight: var(--ml-font-weight-bold); letter-spacing: .04em; text-transform: uppercase; }
+.ml-window .window-content .ml-multi-select__summary { display: flex; align-items: center; gap: var(--ml-space-2); box-sizing: border-box; width: 100%; max-width: 100%; min-width: 0; height: var(--ml-control-height); max-height: var(--ml-control-height); min-height: var(--ml-control-height); padding: 0 var(--ml-space-2); overflow: hidden; border: 1px solid var(--ml-color-border); border-radius: var(--ml-radius-md); background: var(--ml-color-surface-raised); color: var(--ml-color-text); font-weight: var(--ml-font-weight-normal); text-align: left; }
+.ml-multi-select__summary > span { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ml-multi-select__summary > i { flex: 0 0 auto; }
+.ml-multi-select__panel { display: grid; gap: var(--ml-space-1); max-width: 100%; min-width: 0; max-height: 220px; margin-top: var(--ml-space-1); padding: var(--ml-space-2); overflow: auto; border: 1px solid var(--ml-color-border); border-radius: var(--ml-radius-md); background: var(--ml-color-window); }
+.ml-multi-select__panel[hidden] { display: none; }
+:is(.ml-window .window-content, .ml-app, .ml-chat-card) .ml-multi-select__heading { margin: var(--ml-space-2) 0 var(--ml-space-1); background: var(--ml-color-window); color: var(--ml-color-accent); font-size: var(--ml-font-size-sm); font-weight: var(--ml-font-weight-bold); }
+.ml-multi-select__group:first-child .ml-multi-select__heading { margin-top: 0; }
 .ml-window .window-content label:has(> input[type="checkbox"]):not(.ml-actor-choice, .ml-choice-card) { display: grid; grid-template-columns: max-content minmax(0, 1fr); align-items: start; gap: var(--ml-space-2); min-width: min-content; margin: 0; white-space: nowrap; }
 /* Trailing checkboxes keep their text in the flexible column. Choice cards already own their portrait columns. */
 .ml-window .window-content label:has(> input[type="checkbox"]):not(.ml-actor-choice, .ml-choice-card):has(> input:last-child):not(:has(> input:first-child)) { grid-template-columns: minmax(0, 1fr) max-content; }
@@ -330,7 +340,8 @@
 .ml-quantity-list > dt { min-width: 0; overflow-wrap: anywhere; }
 .ml-quantity-list > dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
 .ml-window .form-footer,
-.ml-window .ml-page-footer {
+.ml-window .ml-page-footer,
+.ml-window .ml-form-footer {
   position: static !important;
   z-index: 10;
   flex: 0 0 auto;
@@ -343,13 +354,25 @@
   isolation: isolate;
   box-shadow: 0 -8px 18px rgb(0 0 0 / 28%);
 }
-.ml-window .ml-page-footer {
+.ml-form-footer,
+.ml-window .ml-page-footer,
+.ml-window .ml-form-footer,
+.ml-window:not(.ml-confirm-dialog) .form-footer {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   flex-wrap: wrap;
+  gap: var(--ml-space-2);
   margin: 0;
   min-width: 0;
+  border-top: 1px solid var(--ml-color-border);
+}
+.ml-window :is(.ml-form-footer, .ml-page-footer) > button,
+.ml-window:not(.ml-confirm-dialog) .form-footer > button {
+  flex: 0 0 auto;
+  width: auto;
+  max-width: none;
+  align-self: center;
 }
 .ml-window .form-footer::before,
 .ml-window .form-footer::after { background: var(--ml-color-footer) !important; }
@@ -390,6 +413,44 @@
   display: block;
   height: var(--ml-space-5);
   pointer-events: none;
+}
+
+/* Compact confirm. The body is only as tall as its text. Yes and No split the footer. */
+.ml-window.ml-confirm-dialog { height: auto; }
+.ml-window.ml-confirm-dialog .window-content,
+.ml-window.ml-confirm-dialog .window-content:has(.form-footer),
+.ml-window.ml-confirm-dialog .window-content:has(.form-footer) > :where(form, .standard-form):has(> .form-footer) {
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  min-height: 0;
+  overflow: visible;
+}
+.ml-window.ml-confirm-dialog .window-content:has(.form-footer) :where(.dialog-content, .ml-dialog-shell) {
+  flex: 0 0 auto;
+  min-height: 0;
+  overflow: visible;
+}
+.ml-window.ml-confirm-dialog .window-content:has(.form-footer) :where(.dialog-content, .ml-dialog-shell)::after {
+  content: none;
+  display: none;
+  height: 0;
+}
+.ml-window.ml-confirm-dialog .form-footer {
+  display: flex;
+  width: 100%;
+}
+.ml-window.ml-confirm-dialog .form-footer > button {
+  flex: 1 1 0;
+  width: auto;
+  min-width: 0;
+  max-width: none;
+}
+.ml-window.ml-confirm-dialog--danger .form-footer button[data-action="yes"] {
+  --button-background-color: var(--ml-color-danger);
+  --button-border-color: var(--ml-color-danger);
+  --button-text-color: var(--ml-color-on-accent);
+  color: var(--ml-color-on-accent);
 }
 
 @media (max-width: 560px) {
@@ -466,9 +527,7 @@
 .ml-window .window-content label.ml-setting-row:has(> input[type="checkbox"]:first-child) { grid-template-columns: max-content minmax(0, 1fr); }
 @media (max-width: 620px) { .ml-window .window-content label.ml-setting-row:not(:has(> input[type="checkbox"])) { grid-template-columns: minmax(0, 1fr); } }
 
-.ml-window :is(.form-footer, .ml-page-footer):has(> button ~ button) { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); align-items: stretch; }
-.ml-window :is(.form-footer, .ml-page-footer) > button { height: auto; max-height: none; min-width: 0; min-height: var(--ml-control-height); align-self: stretch; white-space: normal; line-height: var(--ml-line-height-body); padding: var(--ml-space-2) var(--ml-space-3); }
-.ml-window :is(.form-footer, .ml-page-footer):has(> button ~ button) > button { width: 100%; }
+.ml-window :is(.form-footer, .ml-page-footer, .ml-form-footer) > button { height: auto; max-height: none; min-height: var(--ml-control-height); white-space: normal; line-height: var(--ml-line-height-body); padding: var(--ml-space-2) var(--ml-space-3); }
 .ml-tabs { display: flex; flex-wrap: wrap; gap: var(--ml-space-3); border-bottom: 1px solid var(--ml-color-border); }
 .ml-tabs > [role="tab"] { padding: var(--ml-space-2) var(--ml-space-1); border-bottom: 2px solid transparent; color: var(--ml-color-muted); text-decoration: none; cursor: pointer; }
 .ml-tabs > [role="tab"][aria-selected="true"] { border-bottom-color: var(--ml-color-accent); color: var(--ml-color-text); }
@@ -531,4 +590,46 @@
   background: var(--ml-color-accent);
   border-radius: var(--ml-radius-pill);
   box-shadow: 0 0 0 1px var(--ml-color-accent-strong);
+}
+
+/* Select Specialty uses Downtime's Select Training layout. The Selected column is the multi-select addition. */
+.ml-training-selection { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: var(--ml-space-3); min-height: 0; padding: var(--ml-space-4); }
+.ml-training-selection:has(> .ml-training-selection__selected) { grid-template-columns: 270px minmax(0, 1fr) 280px; }
+.ml-training-selection__filters { display: flex; flex-direction: column; min-width: 220px; min-height: 0; padding-right: var(--ml-space-2); overflow-x: hidden; overflow-y: auto; border-right: 1px solid var(--ml-color-border); scrollbar-gutter: stable; }
+.ml-training-selection__filter-search { flex: 0 0 auto; margin-bottom: var(--ml-space-4); }
+.ml-training-selection__filter-search > label { display: block; margin-bottom: var(--ml-space-1); font-weight: var(--ml-font-weight-bold); }
+.ml-training-selection__search { position: relative; min-width: 0; }
+.ml-training-selection__search input { width: 100%; padding-right: var(--ml-space-5); }
+.ml-training-selection__clear-search { position: absolute; top: 50%; right: .45rem; display: flex; align-items: center; justify-content: center; width: 1.45rem; height: 1.45rem; min-height: unset; margin: 0; padding: 0; transform: translateY(-50%); border: none; background: transparent; box-shadow: none; opacity: 0; pointer-events: none; }
+.ml-training-selection__search:hover .ml-training-selection__clear-search,
+.ml-training-selection__search:focus-within .ml-training-selection__clear-search { opacity: .75; pointer-events: auto; }
+.ml-training-selection__search input:placeholder-shown + .ml-training-selection__clear-search { opacity: 0; pointer-events: none; }
+.ml-training-selection__clear-search:hover { opacity: 1; }
+.ml-training-selection__filter-group { flex: 0 0 auto; padding: var(--ml-space-3) 0; border-top: 1px solid var(--ml-color-border); }
+.ml-training-selection__filter-group h4 { margin: 0 0 var(--ml-space-2); font-size: var(--ml-font-size-sm); text-transform: uppercase; }
+.ml-training-selection__filter-options { display: flex; flex-direction: column; gap: var(--ml-space-1); }
+.ml-training-selection__category { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: center; gap: .4rem; width: 100%; min-width: 0; padding: .28rem .35rem; border: none; background: transparent; box-shadow: none; text-align: left; opacity: .9; }
+.ml-training-selection__category:hover { background: rgba(255, 255, 255, .07); }
+.ml-training-selection__category span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ml-training-selection__category small { margin-left: auto; opacity: .7; }
+.ml-training-selection__category.is-active { font-weight: 600; opacity: 1; }
+.ml-training-selection__results,
+.ml-training-selection__selected { min-width: 0; min-height: 0; padding: var(--ml-space-4); overflow-y: auto; }
+.ml-training-selection__selected { display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; border-left: 1px solid var(--ml-color-border); }
+.ml-training-selection__selected > .ml-training-selection__list { flex: 0 0 auto; align-content: start; justify-content: start; align-items: start; }
+.ml-training-selection__selected .ml-training-selection__option { align-self: start; justify-self: stretch; }
+.ml-training-selection__selected > :is(.ml-actions, .ml-form-footer) { margin-top: auto; }
+.ml-training-selection__option.is-covered { opacity: .55; }
+.ml-training-selection__heading { justify-content: space-between; }
+.ml-training-selection__heading :where(h2, p) { margin: 0; }
+.ml-training-selection__list { display: grid; gap: var(--ml-space-2); }
+.ml-training-selection__option { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--ml-space-3); width: 100%; height: auto !important; min-height: 68px !important; max-height: none !important; padding: var(--ml-space-3) var(--ml-space-4); text-align: left; }
+.ml-training-selection__option span { display: grid; gap: var(--ml-space-1); min-width: 0; }
+.ml-training-selection__option small { color: var(--ml-color-muted); }
+.ml-training-selection__option.is-selected { border-color: var(--ml-color-accent); box-shadow: inset 3px 0 var(--ml-color-accent); }
+@media (max-width: 760px) {
+  .ml-training-selection,
+  .ml-training-selection:has(> .ml-training-selection__selected) { grid-template-columns: 1fr; }
+  .ml-training-selection__filters { border-right: 0; border-bottom: 1px solid var(--ml-color-border); }
+  .ml-training-selection__selected { border-left: 0; border-top: 1px solid var(--ml-color-border); }
 }

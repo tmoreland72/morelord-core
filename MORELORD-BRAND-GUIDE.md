@@ -84,7 +84,7 @@ Morelord Core owns:
 - Cards, surfaces, heroes, sections, fields, actions, icon buttons, badges, statuses, empty states, choice cards, and progress bars
 - Dialog footer layout and appearance
 - Accessibility and design-system release checks
-- Shared Location management, actor participation, documentation UI, and window geometry services
+- Location management, actor participation, documentation UI, and window geometry services
 
 Feature modules own:
 
@@ -130,17 +130,20 @@ Foundry `DialogV2` requires `config.content` itself to have no attributes. Never
 </div>
 ```
 
+`MorelordCore.ui.confirm({ title, content, yesLabel, noLabel, danger })` opens the shared yes/no dialog. It is about 400 pixels wide and only as tall as its text. **Yes** and **No** fill the footer side by side at equal width. `danger: true` marks **Yes** with the danger color and makes **No** the default. `content` is HTML inside the dialog shell.
+
 Dialog content and footer are separate layout rows:
 
 - Only the content body scrolls.
 - The scrollbar must stop above the footer.
 - The footer is fully opaque and never overlays visible content.
 - Footer actions remain visible at every scroll position.
-- Footer buttons share equal widths and stretch to the height required by the longest wrapped label. Use Core's shared footer sizing, not individual button heights.
+- Page and window action buttons use `ml-form-footer`. They are right-justified at their natural width. Do not stretch them across the footer.
+- `MorelordCore.ui.confirm` is the exception. Its two buttons fill the footer side by side at equal width.
 - Content reserves no fake transparent overlay space.
 
 The same rule applies to every application page. Put page-level bottom actions in
-`<footer class="ml-page-footer ml-actions">`. Core's render hook moves that footer
+`<footer class="ml-form-footer ml-page-footer">`. `ml-form-footer` is the shared footer. `ml-page-footer` lets Core's render hook move that footer
 beside the `.ml-app-shell` body and provides the single page scrollbar, bottom
 spacing, and opaque footer. Form submit buttons retain their form association.
 Inline item actions remain with their item. Do not add pane scrollbars, sticky
@@ -181,7 +184,7 @@ Never use a raw red, green, amber, or blue to represent application state. Domai
 | Need | Component |
 | --- | --- |
 | Window content root | `.ml-app .ml-app-shell` |
-| Page-level bottom actions | `.ml-page-footer .ml-actions` |
+| Page-level bottom actions | `footer.ml-form-footer` (add `ml-page-footer` so page layout lifts it) |
 | Settings description and control | `label.ml-setting-row` with a text `span` and sibling control |
 | Item image, label, and controls | `.ml-item-row` |
 | Character participation choices | `.ml-actor-choice-grid`, `.ml-actor-choice` |
@@ -209,7 +212,8 @@ Add the shared class alongside a readable module class. The shared class owns co
 Standard paragraphs, list prose, and descriptions use Core's normal body weight across windows, dialogs, and chat cards. Reserve bold for headings, labels, and deliberate inline emphasis. Core owns this default in `morelord-primitives.css`; do not override ordinary prose weight in feature modules.
 
 - Inputs, selects, and textareas use the shared height, background, border, radius, and focus treatment.
-- Select menus must remain readable in their expanded native popup; Morelord’s dark windows use a dark `color-scheme` and opaque option background.
+- Select menus must remain readable in their expanded native popup; Morelord’s dark windows use a dark `color-scheme` and opaque option background. `optgroup` labels use that same option background, `--ml-color-accent`, and bold type. Options keep the text color and normal weight.
+- `.ml-multi-select` is the closed summary for a field that stores several values. It stays in its column at the shared control height: the text truncates with an ellipsis, the chevron stays inside the button padding, and the button's `title` shows the full list, or **Any** when nothing is selected. Choosing it opens the shared Select Specialty window, which uses the Select Training layout: search, category filters, and option rows. The option list stays visible. A chosen row is marked, and choosing it again clears the mark. The right panel is **Selected**, where each picked row can be removed and **Clear all** empties the list. **Confirm** applies the ids. **Cancel** discards them. Location **Specialty** uses this control for Instructor, Forge, and Workshop. `ui.openOptionPicker({ choices, selected, onConfirm })` opens it.
 - Field labels use the shared uppercase eyebrow treatment.
 - Checkbox and radio accents use the Core accent color.
 - Buttons containing only an icon require an accessible name.
@@ -249,7 +253,7 @@ Preserve module IDs, stored setting keys, flags, pack IDs, and public API identi
 
 ## Settings
 
-Feature-module configuration should use one Configure application, with implementation settings registered using `config: false` and existing keys preserved. Core currently exposes separate account, troubleshooting, and shared Location menus, plus its usage-statistics setting. These are existing shared-service entry points; do not remove them to force a single menu. Character Export is a sheet action and Compendium is a content package, so neither needs an empty Configure application.
+Feature-module configuration should use one Configure application, with implementation settings registered using `config: false` and existing keys preserved. Core currently exposes separate account, troubleshooting, and Location menus, plus its usage-statistics setting. These are existing shared-service entry points; do not remove them to force a single menu. Character Export is a sheet action and Compendium is a content package, so neither needs an empty Configure application.
 
 ## Accessibility
 
@@ -597,7 +601,7 @@ Shared accounts, UI, and Location services for Morelord modules.
 
 ### Foundry package description
 
-The shared foundation for connected Morelord Foundry VTT modules. Manage account access, shared Locations, consistent application controls, documentation, and support diagnostics from common services.
+The shared foundation for connected Morelord Foundry VTT modules. Manage account access, Locations, consistent application controls, documentation, and support diagnostics from common services.
 
 ### Website short
 
@@ -620,11 +624,11 @@ GMs can review membership, refresh access after an account change, open account 
 
 ```html
 <h3>Bring your Morelord campaign tools together.</h3>
-<p>Spend your attention on the campaign. Morelord Core provides the shared foundation behind connected Morelord modules, bringing account access, familiar controls, documentation, and shared Locations into one suite of services inside Foundry VTT.</p>
+<p>Spend your attention on the campaign. Morelord Core provides the shared foundation behind connected Morelord modules, bringing account access, familiar controls, documentation, and Locations into one suite of services inside Foundry VTT.</p>
 <ul>
   <li><strong>Connect the world once.</strong> Link a Morelord Gaming account and let supported modules use that shared connection for feature access.</li>
   <li><strong>Know where your access stands.</strong> Review recognized membership and refresh access after an account change.</li>
-  <li><strong>Build a consistent campaign context.</strong> Manage shared Locations, settlement capabilities, and Scene associations for modules that use them.</li>
+  <li><strong>Build a consistent campaign context.</strong> Manage Locations, settlement capabilities, and Scene associations for modules that use them.</li>
   <li><strong>Feel at home across the suite.</strong> Shared interface and documentation services give connected tools familiar patterns.</li>
   <li><strong>Get useful support information.</strong> Export sanitized diagnostics to help investigate an issue.</li>
 </ul>

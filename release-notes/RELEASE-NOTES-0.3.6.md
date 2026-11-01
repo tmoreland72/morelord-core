@@ -4,7 +4,7 @@
 
 ### Improvements
 
-- Show suggested population ranges for Hamlet, Village, Town, City, and Metropolis in the shared Locations Manager's Settlement Type dropdown.
+- Show suggested population ranges for Hamlet, Village, Town, City, and Metropolis in the Locations Manager's Settlement Type dropdown.
 - Share nested and keyed-panel scroll preservation, phase resets, and deferred restoration across Morelord modules.
 - Support portrait decoration for actor-ID controls through a UUID resolver.
 - Include development modules and chat templates in the shared design check.

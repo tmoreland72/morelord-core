@@ -1,7 +1,7 @@
 // Hidden configuration is explicitly included; campaign records and account secrets are not.
 const CONFIGURATION_KEYS = {
   "morelord-core": "serverUrl developerMode developerTier ignoredUserIds",
-  "morelord-marketplace": "buyRate sellRate enableSelling enableBuying requireSellApproval requireBuyApproval postTransactionCards",
+  "morelord-marketplace": "buyRate sellRate enableSelling enableBuying enableLocations requireSellApproval requireBuyApproval postTransactionCards",
   "morelord-journeys": "dayEncounterDie journeyPlannerDefaults phaseWeather phasePace phaseEncounters phaseDiscovery phaseNavigation phasePressOn phaseForaging phaseCamp suppressSleepDeprivationExhaustion enableNightEncounters enableSleepAndShelter skipDiceAnimation dcConfiguration",
   "morelord-encounters": "lastEncounterSources defaultEncounterConfiguration defaultEncounterConfigurationV2 defaultsConfigured defaultDifficulty defaultPartyUuids defaultSourceIds defaultEncounterSource defaultDrakkenheimTableId",
   "morelord-craftworks": "harvestDcModifier harvestChoicesMin harvestChoicesMax harvestRareBias harvestNat20DoubleClaim harvestSelectedCharacterUuids deleriumSearchDefaults gatherDcModifier gatherDcOverrides gatherQuantityMultiplier gatherRareBias gatherSelectedCharacterUuids lootEnableMaterials lootEnableCoin lootEnableSpecial lootMaterialChanceModifier lootCoinChanceModifier lootSpecialChanceModifier lootMaterialQuantityMultiplier lootCoinMultiplier usePartyRecipient partyActorUuid hiddenRecipeIds craftingFacilityRules recipeFacilityOverrides showRecipesForPreferredToolProficiency"

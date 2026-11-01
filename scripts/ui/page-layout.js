@@ -11,8 +11,8 @@ export function applyPageLayout(application, renderedElement) {
 
   content.classList.add("ml-page-layout");
   body.classList.add("ml-page-body");
-  const footers = [...body.querySelectorAll(".ml-page-footer")];
-  const previous = content.querySelector(":scope > .ml-page-footer");
+  const footers = [...body.querySelectorAll(".ml-form-footer, .ml-page-footer")];
+  const previous = content.querySelector(":scope > .ml-form-footer, :scope > .ml-page-footer");
   // A new template root means any footer detached from the previous root is stale.
   if (application._morelordPageBody !== body || footers.length) previous?.remove();
   application._morelordPageBody = body;

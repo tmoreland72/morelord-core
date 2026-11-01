@@ -19,9 +19,11 @@ export class DocumentationService {
 
   list() { return Array.from(this.#products.values(), product => structuredClone(product)); }
 
-  open(id) {
+  open(id, section) {
     const products = ['morelord-character-export', 'morelord-core', 'morelord-craftworks', 'morelord-downtime', 'morelord-encounters', 'morelord-journeys', 'morelord-marketplace'];
     const path = products.includes(id) ? `/docs/${id}` : '/docs';
-    return window.open(`https://morelordgaming.com${path}`, '_blank', 'noopener,noreferrer');
+    const slug = String(section ?? "").trim().toLowerCase();
+    const hash = /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) ? `#${slug}` : "";
+    return window.open(`https://morelordgaming.com${path}${hash}`, '_blank', 'noopener,noreferrer');
   }
 }

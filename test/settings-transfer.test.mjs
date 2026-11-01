@@ -9,6 +9,7 @@ test("settings round trip skips missing modules and protects records, validates 
     ["morelord-core", "installationToken", String, "secret"],
     ["morelord-core", "locations", Object, {}],
     ["morelord-marketplace", "buyRate", Number, 1],
+    ["morelord-marketplace", "enableLocations", Boolean, false],
     ["morelord-marketplace", "shops", Array, []],
     ["morelord-journeys", "dcConfiguration", Object, { pressOn: 12 }],
     ["morelord-journeys", "activeJourney", Object, {}],
@@ -32,9 +33,11 @@ test("settings round trip skips missing modules and protects records, validates 
     assert.equal(file.modules["morelord-core"].locations, undefined);
     assert.equal(file.modules["morelord-core"].shareUsageStatistics, undefined);
     assert.equal(file.modules["morelord-marketplace"].shops, undefined);
+    assert.equal(file.modules["morelord-marketplace"].enableLocations, false);
     assert.equal(file.modules["morelord-journeys"].activeJourney, undefined);
     file.modules["morelord-core"].shareUsageStatistics = false;
     file.modules["morelord-marketplace"].buyRate = 2;
+    file.modules["morelord-marketplace"].enableLocations = true;
     file.modules["morelord-missing"] = null;
     file.modules["morelord-core"].installationToken = "overwrite";
     const result = await importSettings(JSON.parse(JSON.stringify(file)));
@@ -42,6 +45,7 @@ test("settings round trip skips missing modules and protects records, validates 
     assert.equal(values.get("morelord-core.shareUsageStatistics"), true);
     assert.equal(values.get("morelord-core.installationToken"), "secret");
     assert.equal(values.get("morelord-marketplace.buyRate"), 2);
+    assert.equal(values.get("morelord-marketplace.enableLocations"), true);
     assert.deepEqual(exportSettings().modules["morelord-encounters"].defaultPartyUuids, ["Actor.a"]);
     writes.length = 0;
     file.modules["morelord-marketplace"].buyRate = 0;
