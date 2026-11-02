@@ -66,6 +66,7 @@ export class WindowGeometryService {
     const saved = this.all()[key];
     if (!key || !saved || typeof application.setPosition !== "function") return;
     requestAnimationFrame(() => {
+      if (!application.rendered || !application.element?.isConnected) return;
       const geometry = this.fitToViewport(saved);
       this.restoring.add(application);
       application.setPosition(geometry);
