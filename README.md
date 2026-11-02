@@ -160,28 +160,15 @@ Run `npm test` for isolated code tests. The opt-in [in-game regression suite](IN
 
 ## Release workflow
 
-Morelord Core uses the same guarded PowerShell release workflow as the other Morelord Foundry modules.
+Published releases are dispatched from the **Release** workflow, `.github/workflows/release.yml`, on the `main` branch. The workflow runs `release.ps1` under PowerShell on `ubuntu-latest` and passes the repository secrets `FOUNDRY_RELEASE_TOKEN` and `RELEASE_PUBLISH_TOKEN`. One run creates the GitHub Release, publishes the Foundry VTT package, and publishes `https://morelordgaming.com/releases`. It does not run in-Foundry tests.
 
-Prerequisites:
+Dispatch it with an explicit version. Leave `version` empty to use `bump`: `patch` (default), `minor`, or `major`. `publish_only` republishes an existing version to the website and then to Foundry, and does not create a commit, tag, or GitHub Release.
 
-- Git and GitHub CLI (`gh`) installed
-- `gh auth login` completed
-- Clean `main` branch synchronized with `origin`
-- Repository remote pointing to `tmoreland72/morelord-core`
-
-Validate packaging without changing Git or GitHub:
-
-```powershell
-.\release.ps1 -Version 0.1.2 -DryRun
+```bash
+gh workflow run release.yml -f version=X.Y.Z
 ```
 
-Create the release:
-
-```powershell
-.\release.ps1 -Version 0.1.2
-```
-
-The script updates `module.json`, rebuilds root `CHANGELOG.md` from `release-notes/RELEASE-NOTES-*.md`, packages runtime files plus that changelog at the ZIP root, verifies the ZIP structure and encoding, commits `module.json` and `CHANGELOG.md`, creates and pushes an annotated tag, and publishes the GitHub Release. `-DryRun` and `-ValidateOnly` leave an already current `CHANGELOG.md` untouched.
+`release.ps1` requires Git, GitHub CLI (`gh`), a clean `main` branch synchronized with `origin`, and a remote pointing at `tmorelord72/morelord-core`. It updates `module.json`, rebuilds root `CHANGELOG.md` from `release-notes/RELEASE-NOTES-*.md`, packages runtime files plus that changelog at the ZIP root, verifies the ZIP structure and encoding, commits `module.json` and `CHANGELOG.md`, creates and pushes an annotated tag, publishes the GitHub Release, then publishes Foundry and the website. `-DryRun` and `-ValidateOnly` leave an already current `CHANGELOG.md` untouched and do not publish. The Release workflow does not pass `-SkipFoundryPublish` or `-SkipWebsitePublish`.
 
 Foundry manifest URL:
 
@@ -194,37 +181,19 @@ https://raw.githubusercontent.com/tmoreland72/morelord-core/main/module.json
 New and existing worlds receive a one-time GM reporting notice in the next Core update. **Share feature usage** and **Share error reports** are both preselected by default, preserving saved opt-outs. Uncheck either before saving to opt out, or change it anytime in **Morelord Core → Core Settings**. No account connection is required. Legacy worlds send no broader reports until the GM saves; existing explicit choices remain intact. Reports use a pseudonymous random world reporting ID and exclude campaign content and credentials. Developer Mode suppresses reporting. See [TELEMETRY.md](TELEMETRY.md) for notice behavior, collected fields, 90-day raw-event retention and counting limitations.
 ## Standard release workflow
 
-Production Morelord Foundry modules use the same `release.ps1`. Character Export and Downtime follow these release steps. Project-specific values are stored in `release.config.json`, so improvements to the workflow can be copied between repositories without editing module logic.
+Production Morelord Foundry modules use the same `release.ps1`, invoked by `.github/workflows/release.yml` on `main`. Character Export and Downtime follow these release steps. Project-specific values are stored in `release.config.json`, so improvements to the workflow can be copied between repositories without editing module logic. The workflow supplies `RELEASE_PUBLISH_TOKEN` and `FOUNDRY_RELEASE_TOKEN` from repository secrets.
 
 Before a normal release, create `release-notes/RELEASE-NOTES-x.y.z.md`. The same Markdown file is used for the GitHub Release and parsed into the public Morelord Gaming `/releases` feed. Recognized headings are `Added`, `Features`, `Improvements`, `Changed`, `Fixed`, `Breaking Changes`, and `Security`. Prefix a bullet with `[Premium]` or `[Champion]` when the change is tier-specific; otherwise it is treated as Standard. `release.ps1` rebuilds the root `CHANGELOG.md` from every `release-notes/RELEASE-NOTES-*.md` file, newest version first, and packages that file at the root of the release ZIP. Per-version notes stay out of the archive. Use `#`/`##`/`###` headings with a space after `#`, `- ` bullets, and no `---` horizontal rules so in-Foundry changelog viewers can read `CHANGELOG.md`.
 
-Set the website publishing token once in your PowerShell environment:
+Publish from `main` with the Release workflow. `version` is `x.y.z`. An empty `version` uses `bump`.
 
-```powershell
-$env:RELEASE_PUBLISH_TOKEN = "<release publish token>"
+```bash
+gh workflow run release.yml -f version=x.y.z
 ```
 
-Validate without changing Git, GitHub, or the website:
+`release.ps1` reads `RELEASE_PUBLISH_TOKEN` and `FOUNDRY_RELEASE_TOKEN` from the environment. The workflow sets both. A normal invocation validates the repository, updates `module.json`, rebuilds `CHANGELOG.md`, builds and verifies the Foundry ZIP, commits `module.json` and `CHANGELOG.md`, tags the release, pushes it, creates the GitHub Release from the same release-notes file, publishes the Foundry package, and publishes `https://morelordgaming.com/releases`. Draft and prerelease builds intentionally skip the public website feed and Foundry. `-DryRun` and `-ValidateOnly` do not rewrite `CHANGELOG.md` when it is already current.
 
-```powershell
-.\release.ps1 -Version x.y.z -DryRun
-```
-
-Publish the normal release:
-
-```powershell
-.\release.ps1 -Version x.y.z
-```
-
-The normal workflow validates the repository, updates `module.json`, rebuilds `CHANGELOG.md`, builds and verifies the Foundry ZIP, commits `module.json` and `CHANGELOG.md`, tags the release, pushes it, creates the GitHub Release from the same release-notes file, and publishes the release to `https://morelordgaming.com/releases`. Draft and prerelease builds intentionally skip the public website feed. `-DryRun` and `-ValidateOnly` do not rewrite `CHANGELOG.md` when it is already current.
-
-If GitHub release creation succeeds but website publication fails, retry only the idempotent website step:
-
-```powershell
-.\release.ps1 -Version x.y.z -WebsiteOnly
-```
-
-Use `-SkipWebsitePublish` only when intentionally creating a normal GitHub/Foundry release that should not appear on the Morelord website.
+`-WebsiteOnly` and `-FoundryOnly` republish an existing version. They do not commit, tag, or create a GitHub Release. `publish_only` runs those two steps in that order. Use `-SkipWebsitePublish` or `-SkipFoundryPublish` only for an exceptional local invocation that should omit one destination. The Release workflow does not pass either switch.
 
 ## Shared source-book labels
 
