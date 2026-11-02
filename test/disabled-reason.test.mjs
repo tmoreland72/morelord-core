@@ -224,5 +224,5 @@ test("disabled tooltip helper and public wiring", () => {
   assert.match(main, /registerDisabledTooltipHelper\(\)/);
   assert.match(main, /setDisabled,/);
   assert.match(read("MORELORD-BRAND-GUIDE.md"), /## Disabled buttons say why/);
-  assert.match(read("release-notes/UNRELEASED.md"), /## 0\.9\.0[\s\S]*setDisabled/);
+  assert.match(read("release-notes/RELEASE-NOTES-0.9.0.md"), /# Morelord Core 0\.9\.0[\s\S]*setDisabled/);
 });
