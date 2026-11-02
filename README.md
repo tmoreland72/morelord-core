@@ -316,6 +316,33 @@ Outside dnd5e, Core does not apply this filter. Pack ids are full collection ids
 
 Locations stay open after Save. Shared field labels align their controls at the top, checkbox labels remain on one line, resource rows have room for multi-line descriptions, and dialog buttons grow to fit their text.
 
+## Delerium Search
+
+`MorelordCore.deleriumSearch` is the same object as `game.modules.get("morelord-core").api.deleriumSearch`. It is available from the `init` hook. The caller owns the session, including where it is stored. Core does not keep a session map.
+
+`available(game)` is true when `drakkenheim-core`, `drakkenheim-monsters`, or `drakkenheim-scgd` is active. A missing delerium item does not hide the search. Awarding still looks up **Delerium Chip**, **Delerium Fragment**, and **Delerium Shard** by exact name in an allowed `drakkenheim-monsters` Item compendium.
+
+```js
+const search = game.modules.get("morelord-core").api.deleriumSearch;
+if (!search.available()) return;
+const session = search.start("outer", { scene: canvas.scene });
+session.messageMode = "blind"; // or "public", before the award
+search.attempt(session, {
+  userId, actorUuid, skillId: "inv", total, naturalD20: MorelordCore.rolls.naturalD20(roll)
+});
+search.decline(session, { userId, actorUuid });
+await search.finalize(session);
+await search.rollAndAward(session, recipientUuid);
+```
+
+Zones are Outer City (DC 15) and Inner City (DC 20). Skills are Arcana (`arc`), Investigation (`inv`), and Survival (`sur`). `getZones()` and `getSkillOptions()` return copies. A check takes one hour and covers a quarter mile. Pass the d20 face from `rolls.naturalD20`. A natural 20, or a total at least 5 above the DC, is two successes. Any other pass is one. A failure adds one failure. A decline adds none.
+
+`finalize(session)` awards nothing for fewer than three successes. Three successes award a Delerium Chip (`3d6`). Four add a Delerium Fragment (`1d6`). Five or more also add a Delerium Shard (`1`). The order is Chip, then Fragment, then Shard. Two or more failures set `randomEncounter` and still keep any rewards. Each item has to be in an allowed Monsters of Drakkenheim Item pack. Configure Sources can exclude a pack. The first allowed exact, case-insensitive name match is stored with its uuid, name, image, formula, and rarity.
+
+`rollAndAward(session, recipientUuid)` accepts a character or a group. It resolves every source before it writes inventory. A stored uuid that is missing or excluded by Configure Sources is looked up by name again. Each quantity is rolled once, posted as `Delerium Search — <name>`, and kept on the reward. A later failure resumes the same recipient and does not reroll a quantity that was already stored. The items are copied onto the recipient, then one **Delerium Found** chat card is posted for that recipient. `messageMode` of `blind` or `public` is passed to each quantity roll and to that card.
+
+`openResults(session, { award, defaultRecipientUuid })` opens **Delerium Search Results**. `award(recipientUuid)` is required. Omitting it throws `Delerium search results require an award function.` The caller routes the award to the authority GM and returns the updated session. The window is documented in `CORE-GM-PRODUCT-GUIDE.md`.
+
 ## Shared roll requests and compendiums
 
 Core 0.3.11 provides shared chat roll controls, immediate Completed feedback, GM fallback, grouped request cards, and dice-animation outcome scheduling for Game Master, Craftworks, and Journeys. Module-owned private outcomes remain in GM-only messages. The contextual socket service exposes runSerialized for local commits coordinated with remote requests.
