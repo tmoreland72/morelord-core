@@ -1,5 +1,11 @@
 # Morelord Core Changelog
 
+## 0.9.1
+
+### Fixed
+
+- Closing a Morelord window before its saved position is restored no longer leaves that window on the page. The restore waits one frame, then does nothing unless the window is still rendered and its element is still connected. A dialog that closes during that frame can finish closing.
+
 ## 0.9.0
 
 ### Added
