@@ -40,6 +40,7 @@ import { actorSkillModifier, extractNaturalD20, rollSkill } from "./services/ski
 import { SUBSCRIPTION_TIERS, normalizeSubscriptionTier, capSubscriptionTier, applySubscriptionTesting } from "./services/subscription-testing.js";
 import { createToolsRegistry, mergeCoreApi } from "./ui/tools-registry.js";
 import { bindMorelordModulesButton } from "./ui/morelord-modules.js";
+import { deleriumSearch } from "./services/delerium-search.js";
 
 const MODULE_ID = "morelord-core";
 guardApplicationRender(globalThis.foundry?.applications?.api?.ApplicationV2);
@@ -582,6 +583,7 @@ Hooks.once("init", () => {
     const api = coreModule.api ??= {};
     api.tools ??= toolsRegistry.api;
     api.sources = publishedSources();
+    api.deleriumSearch = deleriumSearch;
     globalThis.MorelordCore = api;
   }
   installConfigureSourcesWatcher();
@@ -774,7 +776,8 @@ Hooks.once("ready", async () => {
       open: options => new LocationManagerApp(options).render({ force: true })
     }),
     openLocations: options => new LocationManagerApp(options).render({ force: true }),
-    tools: toolsRegistry.api
+    tools: toolsRegistry.api,
+    deleriumSearch
   });
   game.modules.get(MODULE_ID).api = api;
   globalThis.MorelordCore = api;
