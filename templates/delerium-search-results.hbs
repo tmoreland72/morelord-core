@@ -1,0 +1,85 @@
+<section class="ml-app ml-app-shell">
+  <header class="ml-hero">
+    <i class="fa-solid fa-gem ml-hero__icon"></i>
+    <div class="ml-hero__body">
+      <h1>Delerium Search Results</h1>
+      <p>{{session.zone.name}} · {{session.successes}} successes · {{session.failures}} failures</p>
+    </div>
+  </header>
+
+  <section class="ml-surface ml-stack">
+    <div class="ml-section-heading">
+      <div>
+        <h2>{{encounterTitle}}</h2>
+        <p>{{encounterText}}</p>
+      </div>
+    </div>
+    {{#if session.randomEncounter}}
+      {{#if encountersActive}}
+        <div class="ml-actions">
+          <button type="button" data-action="openEncounters"><i class="fa-solid fa-dice-d20"></i> Open Morelord Encounters</button>
+        </div>
+      {{else}}
+        <p><strong>{{encountersUnavailableText}}</strong></p>
+        {{#unless encountersInstalled}}
+          <p><a href="{{encountersProductUrl}}" target="_blank" rel="noopener noreferrer">Get Morelord Encounters</a></p>
+        {{/unless}}
+      {{/if}}
+    {{/if}}
+  </section>
+
+  <section class="ml-surface ml-stack">
+    <div class="ml-section-heading">
+      <div>
+        <h2>What the Party Found</h2>
+        <p>Review the rewards earned by this search.</p>
+      </div>
+    </div>
+    {{#if hasResult}}
+      {{#each awardedItems}}
+        <div class="ml-item-row" data-document-uuid="{{sourceUuid}}">
+          <img src="{{img}}" alt="{{name}}">
+          <span class="ml-stack" data-gap="1">
+            <strong>{{quantity}} × {{name}}</strong>
+            <small>Awarded to {{recipientName}}.</small>
+          </span>
+        </div>
+      {{/each}}
+    {{else if hasReward}}
+      <p>All rewards up to {{session.successes}} successes are included.</p>
+      {{#each rewards}}
+        <div class="ml-item-row" data-document-uuid="{{sourceUuid}}">
+          <img src="{{img}}" alt="{{name}}">
+          <span class="ml-stack" data-gap="1">
+            <strong>{{name}}</strong>
+            <small>Quantity: {{formula}}</small>
+          </span>
+        </div>
+      {{/each}}
+    {{else}}
+      <p>No delerium was found. The party needs at least three successes.</p>
+    {{/if}}
+  </section>
+
+  {{#if hasReward}}{{#unless hasResult}}
+    <section class="ml-surface ml-stack">
+      <div class="ml-section-heading">
+        <div>
+          <h2>Recipient</h2>
+          <p>Choose the character or party inventory that receives these items.</p>
+        </div>
+      </div>
+      <label>
+        <span>Recipient</span>
+        <select name="recipientUuid">
+          {{#each recipients}}<option value="{{uuid}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}
+        </select>
+      </label>
+      {{#unless recipients.length}}<p class="ml-text" data-tone="danger">No player character or group Actor is available.</p>{{/unless}}
+    </section>
+  {{/unless}}{{/if}}
+
+  <footer class="ml-form-footer ml-page-footer">
+    <button type="button" data-action="rollAward" {{#unless canAward}}disabled{{/unless}}><i class="fa-solid fa-dice"></i> Roll &amp; Award All Delerium</button>
+  </footer>
+</section>

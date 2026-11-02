@@ -377,6 +377,22 @@ Create a location named **Highmarket**. Set **Settlement Type** to Town (1,001â€
 
 While the party is viewing the town scene and no Downtime session is active, crafting and shopping use Highmarket. Start a Downtime session, choose **Highmarket** as its **Location**, and they keep using Highmarket. Start that session with **No Location** and they still use Highmarket, because the viewed scene is associated with it. On the Road applies when the session has **No Location** and the viewed scene is not associated with a location. Downtime can still list a recipe the town scene itself allows.
 
+## Delerium Search results
+
+Other Morelord modules open this window by calling Core. It is not a Core Game Settings page, and Core does not add a setting for it. The search is available while **Drakkenheim Core**, **Drakkenheim Monsters**, or **Drakkenheim SCGD** is active. The window title is **Delerium Search Results**.
+
+The heading **Delerium Search Results** shows the zone name, the success total, and the failure total. Outer City is DC 15. Inner City is DC 20.
+
+**Random Encounter Required** means two or more characters failed. The text is "Two or more characters failed their checks. Resolve a random encounter for this search." **Open Morelord Encounters** is shown when Morelord Encounters is active. It opens that module's encounter builder. When Morelord Encounters is installed but inactive, the window says "Morelord Encounters is installed but not active. Enable it in Manage Modules to build this encounter." When it is not installed, the window says "Install Morelord Encounters from Foundry's Add-on Modules screen to build this encounter automatically." **Get Morelord Encounters** opens `https://morelord.com/products/morelord-encounters` in a new browser tab.
+
+**No Random Encounter** means fewer than two characters failed. The text is "Fewer than two characters failed. This search does not trigger a random encounter."
+
+**What the Party Found** lists the delerium from this search. Before the award, each row shows the item image, the item name, and **Quantity:** followed by the roll formula. A Chip uses `3d6`, a Fragment uses `1d6`, and a Shard uses `1`. Three successes include the Chip. Four include the Chip and the Fragment. Five or more include all three. The line "All rewards up to N successes are included." uses that success total. After the award, each row shows the image, the rolled quantity, the item name, and **Awarded to** the recipient. When the party has fewer than three successes, the window says "No delerium was found. The party needs at least three successes."
+
+**Recipient** chooses who receives the items. The menu lists every group Actor first, labeled `Name (Group Inventory)`, then each character from Core's character list. The label on the menu is **Recipient**. The caller can supply the starting selection. Otherwise the window selects the first character who took part in the search and is in the menu, or the first menu entry.
+
+**Roll & Award All Delerium** rolls every remaining quantity and adds those items to the selected character or group. The button is disabled when this search found nothing, or when the result was already awarded. A search that stopped partway keeps the quantities already rolled and continues for the same recipient.
+
 ## Export and Import Settings
 
 Open **Morelord Core â†’ Export / Import Settings**. The list shows enabled modules with eligible settings and their counts. **Export Settings** downloads `morelord-settings.json`, including eligible world settings and preferences from the current browser.
