@@ -965,7 +965,23 @@ Application shells may opt into inline-size container queries with `data-ml-resp
 
 Actor dropdown labels may opt into `data-ml-actor-select-layout="inline"` with a text `span` followed by the native `select`. Core's `decorateActorSelect` places the selected portrait inside the control, keeping the label and selector on one row. Existing actor selectors keep their default layout.
 
-For minus/quantity/plus controls, preload `modules/morelord-core/templates/components/quantity-controls.hbs` and pass `action`, `name`, `quantity`, `increaseEnabled`, and optional `disabled`, `itemId`, or `stockKey`. Module action handlers validate the delta and bounds. Marketplace Shop Manager stock and Transfer cart share this component.
+For minus/quantity/plus controls, preload `modules/morelord-core/templates/components/quantity-controls.hbs` and pass `action`, `name`, `quantity`, `increaseEnabled`, and optional `disabled`, `disabledReason`, `itemId`, or `stockKey`. Module action handlers validate the delta and bounds. Marketplace Shop Manager stock and Transfer cart share this component.
+
+## Disabled buttons say why
+
+A disabled control tells the player why it cannot be used. Pass optional `disabledReason` to the shared button partial or to `quantity-controls.hbs`, or call `MorelordCore.ui.setDisabled(element, reason)`. The same function is `game.modules.get("morelord-core").api.ui.setDisabled`. The first line of the reason is the bold tooltip title. Each later line is a short line under it. The control renders `disabled`, `aria-disabled="true"`, and a `data-tooltip` with that text. Without `disabledReason`, the partial markup stays as it was. `null`, `""`, or a blank reason enables the element and removes the tooltip and `aria-disabled`. Repeating either call leaves the element as it already is.
+
+Preload `modules/morelord-core/templates/components/ml-button.hbs` before using the partial. `label` is the visible text. Optional `icon`, `action`, `tone`, `variant`, `class`, `type`, and `disabled` match the usual button attributes.
+
+~~~hbs
+{{> "modules/morelord-core/templates/components/ml-button.hbs" label="Buy" action="buyItem" disabledReason=buyDisabledReason}}
+~~~
+
+~~~js
+const buyDisabledReason = "Need more coin\nThe purse does not cover this price.";
+game.modules.get("morelord-core").api.ui.setDisabled(buyButton, buyDisabledReason);
+game.modules.get("morelord-core").api.ui.setDisabled(buyButton, "");
+~~~
 
 
 Use `.ml-roll-controls` for three skill-roll buttons in DIS / Roll / ADV order; the center control is wider. Core `rolls.skill` accepts optional `advantage` and `disadvantage` booleans. Omitted or false values leave automatic system rules untouched; true adds that modifier and the native system handles cancellation.

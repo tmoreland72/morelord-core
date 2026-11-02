@@ -40,6 +40,7 @@ import { actorSkillModifier, extractNaturalD20, rollSkill } from "./services/ski
 import { SUBSCRIPTION_TIERS, normalizeSubscriptionTier, capSubscriptionTier, applySubscriptionTesting } from "./services/subscription-testing.js";
 import { createToolsRegistry, mergeCoreApi } from "./ui/tools-registry.js";
 import { bindMorelordModulesButton } from "./ui/morelord-modules.js";
+import { registerDisabledTooltipHelper, setDisabled } from "./ui/disabled-reason.js";
 
 const MODULE_ID = "morelord-core";
 guardApplicationRender(globalThis.foundry?.applications?.api?.ApplicationV2);
@@ -577,6 +578,7 @@ class MorelordDiscordApp extends ApplicationV2 {
 }
 
 Hooks.once("init", () => {
+  registerDisabledTooltipHelper();
   const coreModule = game.modules.get(MODULE_ID);
   if (coreModule) {
     const api = coreModule.api ??= {};
@@ -717,6 +719,7 @@ Hooks.once("ready", async () => {
       createChoiceGroup,
       renderPreservingScroll,
       renderInBackground,
+      setDisabled,
       participation: Object.freeze({ canUseActorInventory, listCharacterActors, listCharacterChoices, participantRecords, primaryPartyGroup, selectedCharacterUuids }),
       documentation: Object.freeze({
         register: definition => documentationService.register(definition),
