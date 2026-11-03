@@ -48,6 +48,28 @@ test("skillChoiceLabel uses the localized dnd5e skill and the actor total", () =
   }
 });
 
+test("skillChoiceLabel calls localize with the i18n receiver", () => {
+  const previousConfig = globalThis.CONFIG;
+  const previousGame = globalThis.game;
+  globalThis.CONFIG = { DND5E: { skills: { rel: { label: "DND5E.SkillRel" } } } };
+  globalThis.game = {
+    i18n: {
+      translations: { "DND5E.SkillRel": "Religion" },
+      localize(key) {
+        return this.translations[key] ?? key;
+      }
+    }
+  };
+  try {
+    assert.equal(skillChoiceLabel({ system: { skills: { rel: { total: 5 } } } }, "rel"), "Religion (+5)");
+  } finally {
+    if (previousConfig === undefined) delete globalThis.CONFIG;
+    else globalThis.CONFIG = previousConfig;
+    if (previousGame === undefined) delete globalThis.game;
+    else globalThis.game = previousGame;
+  }
+});
+
 test("skillChoiceLabel keeps the configured label when localization is unavailable", () => {
   const previousConfig = globalThis.CONFIG;
   const previousGame = globalThis.game;

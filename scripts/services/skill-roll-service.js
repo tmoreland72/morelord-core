@@ -42,8 +42,8 @@ export function formatModifier(n) {
 export function skillChoiceLabel(actor, skillKey) {
   const configured = globalThis.CONFIG?.DND5E?.skills?.[skillKey]?.label;
   const raw = typeof configured === "string" && configured ? configured : skillKey ?? "";
-  const localize = globalThis.game?.i18n?.localize;
-  const localized = typeof localize === "function" ? localize(raw) : raw;
+  const i18n = globalThis.game?.i18n;
+  const localized = typeof i18n?.localize === "function" ? i18n.localize(raw) : raw;
   const label = localized || raw;
   return `${label} (${formatModifier(actorSkillModifier(actor, skillKey))})`;
 }
