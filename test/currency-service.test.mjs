@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import {
+  addCoins,
   addCurrency,
   adjustCurrencyCopper,
   applyGpDelta,
@@ -29,6 +30,19 @@ function withCurrencies(currencies, run) {
     if (previous === undefined) delete globalThis.CONFIG;
     else globalThis.CONFIG = previous;
   }
+}
+
+function purseActor(currency) {
+  const actor = {
+    name: "Aric",
+    system: { currency: { ...currency } },
+    updates: [],
+    async update(change) {
+      actor.updates.push(change);
+      actor.system.currency = { ...change["system.currency"] };
+    }
+  };
+  return actor;
 }
 
 function actorWith(currency) {
@@ -149,6 +163,61 @@ test("adjustCurrencyCopper spends and refuses a short purse", async () => {
   await assert.rejects(() => deductCurrency(actor, Number.NaN), /The currency amount is not a number\./);
 });
 
+test("addCoins adds denominations as-is without re-splitting the purse", async () => {
+  const actor = purseActor({ pp: 1, gp: 0, ep: 0, sp: 15, cp: 4 });
+  const next = await addCoins(actor, { gp: 1, cp: 1 });
+  assert.deepEqual(next, { pp: 1, gp: 1, ep: 0, sp: 15, cp: 5 });
+  assert.notDeepEqual(next, cpToCurrency(currencyToCp(next)));
+  assert.deepEqual(actor.system.currency, next);
+  assert.deepEqual(actor.updates, [{ "system.currency": next }]);
+});
+
+test("addCoins adds a partial purse and ignores unknown keys", async () => {
+  const actor = purseActor({ pp: 2, gp: 4, sp: 6 });
+  const next = await addCoins(actor, { ep: 3, gems: 9 });
+  assert.deepEqual(next, { pp: 2, gp: 4, ep: 3, sp: 6, cp: 0 });
+  assert.equal("gems" in actor.system.currency, false);
+});
+
+test("addCoins treats missing and non-finite counts as zero and truncates to integers", async () => {
+  const actor = purseActor({ gp: 1.9, sp: Number.POSITIVE_INFINITY, cp: "4.8" });
+  const next = await addCoins(actor, { gp: 1.2, pp: Number.NaN, sp: "2.9" });
+  assert.deepEqual(next, { pp: 0, gp: 2, ep: 0, sp: 2, cp: 4 });
+  const emptied = purseActor({ gp: 3, sp: 1.8 });
+  assert.deepEqual(await addCoins(emptied, null), { pp: 0, gp: 3, ep: 0, sp: 1, cp: 0 });
+});
+
+test("addCoins spends exact coins when a denomination is negative", async () => {
+  const actor = purseActor({ gp: 5, sp: 3 });
+  const next = await addCoins(actor, { gp: -2 });
+  assert.deepEqual(next, { pp: 0, gp: 3, ep: 0, sp: 3, cp: 0 });
+  const fractional = purseActor({ gp: 5 });
+  assert.equal((await addCoins(fractional, { gp: -2.9 })).gp, 3);
+  const exact = purseActor({ cp: 4 });
+  assert.equal((await addCoins(exact, { cp: -4 })).cp, 0);
+});
+
+test("addCoins throws and does not write when a denomination would be negative", async () => {
+  const actor = purseActor({ gp: 1, sp: 4 });
+  const before = { ...actor.system.currency };
+  await assert.rejects(
+    () => addCoins(actor, { gp: -2 }),
+    { name: "Error", message: "Aric does not have enough gp." }
+  );
+  assert.deepEqual(actor.updates, []);
+  assert.deepEqual(actor.system.currency, before);
+  await assert.rejects(
+    () => addCoins(actor, { cp: -1, gp: -5 }),
+    { name: "Error", message: "Aric does not have enough gp." }
+  );
+  assert.deepEqual(actor.updates, []);
+  assert.deepEqual(actor.system.currency, before);
+  await assert.rejects(
+    () => addCoins({ name: "Aric", system: { currency: { gp: 1 } } }, { gp: 1 }),
+    /A currency Actor is required\./
+  );
+});
+
 test("applyGpDelta pays and spends a purse without updating an actor", () => {
   assert.equal(applyGpDelta({ gp: 1, sp: 5 }, 0.5).gp >= 1, true);
   assert.deepEqual(applyGpDelta({ gp: 1, sp: 5 }, 0.5), { pp: 0, gp: 2, ep: 0, sp: 0, cp: 0 });
@@ -162,7 +231,7 @@ test("the public API publishes currency on init and ready", () => {
   assert.match(main, /currency: publishedCurrency\(\)/);
   const start = main.indexOf("function publishedCurrency");
   const published = main.slice(start, main.indexOf("registerDirectorySelection();", start));
-  for (const name of ["getCurrency", "currencyToCp", "totalCp", "cpToCurrency", "currencyFromCp", "copperRate", "gpAmount", "formatCp", "getCurrencyDisplay", "getCurrencyCopper", "canAfford", "setCurrency", "addCurrency", "deductCurrency", "adjustCurrencyCopper", "applyGpDelta"]) {
+  for (const name of ["getCurrency", "currencyToCp", "totalCp", "cpToCurrency", "currencyFromCp", "copperRate", "gpAmount", "formatCp", "getCurrencyDisplay", "getCurrencyCopper", "canAfford", "setCurrency", "addCurrency", "addCoins", "deductCurrency", "adjustCurrencyCopper", "applyGpDelta"]) {
     assert.match(published, new RegExp(`\\b${name}\\b`));
   }
 });

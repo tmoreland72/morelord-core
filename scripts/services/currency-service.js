@@ -21,6 +21,12 @@ function coinCount(value) {
   return Number.isFinite(count) && count > 0 ? count : 0;
 }
 
+/** Integer coin count. Missing and non-finite values are 0. Negatives are kept so a spend can be exact. */
+function integerCoin(value) {
+  const count = Math.trunc(Number(value));
+  return Number.isFinite(count) ? count : 0;
+}
+
 function asPurse(source) {
   const currency = source?.system?.currency;
   if (currency && typeof currency === "object") return currency;
@@ -132,6 +138,26 @@ export async function setCurrency(actor, cp) {
 
 export async function addCurrency(actor, cpToAdd) {
   return setCurrency(actor, getCurrencyCopper(actor) + finiteAmount(cpToAdd));
+}
+
+/**
+ * Add a partial purse to the actor's coins without re-splitting denominations.
+ * Missing and non-finite counts are 0. Counts are truncated to integers.
+ * A negative count spends that coin.
+ */
+export async function addCoins(actor, coins) {
+  requireActor(actor);
+  const current = getCurrency(actor);
+  const purse = current && typeof current === "object" ? current : {};
+  const delta = coins && typeof coins === "object" ? coins : {};
+  const next = {};
+  for (const denomination of DENOMINATIONS) {
+    const value = integerCoin(purse[denomination]) + integerCoin(delta[denomination]);
+    if (value < 0) throw new Error(`${actor.name} does not have enough ${denomination}.`);
+    next[denomination] = value;
+  }
+  await actor.update({ "system.currency": next });
+  return next;
 }
 
 export async function deductCurrency(actor, cpToDeduct) {
