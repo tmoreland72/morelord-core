@@ -351,7 +351,7 @@ Zones are Outer City (DC 15) and Inner City (DC 20). Skills are Arcana (`arc`), 
 
 `gpAmount(source)` is that total in gold pieces, including fractional coins, so 5 sp is 0.5. Pass an actor or a purse. `getCurrency(actor)` reads `actor.system.currency`. `getCurrencyCopper(actor)` is that purse in copper. `formatCp(cp)` returns a price such as `12 gp, 5 sp`, or `0 cp` when the amount is empty. Prices are written in gp, sp, and cp. `getCurrencyDisplay(actor)` formats the actor's purse the same way. `canAfford(actor, priceCp)` compares the purse with a copper price.
 
-`setCurrency(actor, cp)`, `addCurrency(actor, cpToAdd)`, and `deductCurrency(actor, cpToDeduct)` write `system.currency.pp`, `gp`, `ep`, `sp`, and `cp`, and normalize the whole purse. `deductCurrency` throws `Insufficient funds.` and does not write when the purse is short. `adjustCurrencyCopper(actor, deltaCopper)` adds or removes copper and throws `<name> does not have enough currency.` when the result would be negative. A non-numeric amount throws `The currency amount is not a number.` An actor without `update` throws `A currency Actor is required.` `applyGpDelta(currency, deltaGp)` returns the next purse and does not update an actor. A positive delta pays and a negative delta spends. It throws `The gold amount is not a number.` or `Not enough money. This costs <need> gp and the character has <have> gp.`
+`setCurrency(actor, cp)`, `addCurrency(actor, cpToAdd)`, and `deductCurrency(actor, cpToDeduct)` write `system.currency.pp`, `gp`, `ep`, `sp`, and `cp`, and normalize the whole purse. `deductCurrency` throws `Insufficient funds.` and does not write when the purse is short. `adjustCurrencyCopper(actor, deltaCopper)` adds or removes copper and throws `<name> does not have enough currency.` when the result would be negative. A non-numeric amount throws `The currency amount is not a number.` An actor without `update` throws `A currency Actor is required.` `applyGpDelta(currency, deltaGp)` returns the next purse and does not update an actor. A positive delta pays and a negative delta spends. It throws `The gold amount is not a number.` or `Not enough money. This costs <need> gp and the character has <have> gp.` `addCoins(actor, coins)` adds a partial `{pp, gp, ep, sp, cp}` to the actor's existing purse, writes `system.currency`, and returns that purse without re-splitting the coins. Missing and non-finite counts are 0, every count is truncated to an integer, and unknown keys are ignored. A negative count spends that denomination. It throws `<name> does not have enough <denom>.` and does not write when any denomination would become negative.
 
 ```js
 const currency = game.modules.get("morelord-core").api.currency;
@@ -359,6 +359,7 @@ currency.formatCp(1250); // "12 gp, 5 sp"
 currency.gpAmount(actor);
 await currency.deductCurrency(actor, 250);
 await currency.addCurrency(actor, currency.copperRate("gp"));
+await currency.addCoins(actor, { gp: 2, sp: -5 });
 ```
 
 ## Shared roll requests and compendiums

@@ -38,7 +38,7 @@ import { DocumentationApp } from "./documentation/documentation-app.js";
 import { canUseActorInventory, listCharacterActors, listCharacterChoices, participantRecords, primaryPartyGroup, selectedCharacterUuids } from "./ui/actor-participation.js";
 import { actorSkillModifier, extractNaturalD20, formatModifier, rollSkill, skillChoiceLabel } from "./services/skill-roll-service.js";
 import {
-  addCurrency, adjustCurrencyCopper, applyGpDelta, canAfford, copperRate, cpToCurrency, currencyFromCp,
+  addCoins, addCurrency, adjustCurrencyCopper, applyGpDelta, canAfford, copperRate, cpToCurrency, currencyFromCp,
   currencyToCp, deductCurrency, formatCp, getCurrency, getCurrencyCopper, getCurrencyDisplay, gpAmount,
   setCurrency, totalCp
 } from "./services/currency-service.js";
@@ -83,6 +83,7 @@ function publishedCurrency() {
     canAfford,
     setCurrency,
     addCurrency,
+    addCoins,
     deductCurrency,
     adjustCurrencyCopper,
     applyGpDelta
