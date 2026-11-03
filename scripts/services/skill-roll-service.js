@@ -32,3 +32,18 @@ export function extractNaturalD20(roll) {
 export function actorSkillModifier(actor, skillId) {
   return Number(actor?.system?.skills?.[skillId]?.total ?? actor?.system?.skills?.[skillId]?.mod ?? 0);
 }
+
+export function formatModifier(n) {
+  const value = Number(n);
+  const modifier = Number.isFinite(value) ? value : 0;
+  return `${modifier >= 0 ? "+" : ""}${modifier}`;
+}
+
+export function skillChoiceLabel(actor, skillKey) {
+  const configured = globalThis.CONFIG?.DND5E?.skills?.[skillKey]?.label;
+  const raw = typeof configured === "string" && configured ? configured : skillKey ?? "";
+  const i18n = globalThis.game?.i18n;
+  const localized = typeof i18n?.localize === "function" ? i18n.localize(raw) : raw;
+  const label = localized || raw;
+  return `${label} (${formatModifier(actorSkillModifier(actor, skillKey))})`;
+}
