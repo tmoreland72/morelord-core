@@ -345,6 +345,8 @@ Zones are Outer City (DC 15) and Inner City (DC 20). Skills are Arcana (`arc`), 
 
 ## Shared roll requests and compendiums
 
+`MorelordCore.rolls` is the same object as `game.modules.get("morelord-core").api.rolls`. `formatModifier(n)` returns a signed modifier such as `+5`, `-1`, or `+0`. A non-finite value is `+0`. `skillChoiceLabel(actor, skillKey)` returns the localized dnd5e skill name and that actor's computed skill total, such as `Religion (+5)`. The name comes from `CONFIG.DND5E.skills[skillKey].label` through `game.i18n.localize`, or the skill key when that label is missing. The total is `system.skills[skillKey].total`, then `mod` when `total` is absent.
+
 Core 0.3.11 provides shared chat roll controls, immediate Completed feedback, GM fallback, grouped request cards, and dice-animation outcome scheduling for Game Master, Craftworks, and Journeys. Module-owned private outcomes remain in GM-only messages. The contextual socket service exposes runSerialized for local commits coordinated with remote requests.
 
 The compendiums API exposes organize(entries, folderPath, {migration}) and labels(entries). Entries use collection and optional label. Organization preserves pack identifiers and configuration and migrates each pack once, respecting later manual moves. Display labels apply on connected clients; existing world-pack disk labels are not rewritten. Core components include the hotbar-sized macro image button used by Game Master.

@@ -36,7 +36,7 @@ import { openItemPreview } from "./ui/item-preview.js";
 import { DocumentationService } from "./documentation/documentation-service.js";
 import { DocumentationApp } from "./documentation/documentation-app.js";
 import { canUseActorInventory, listCharacterActors, listCharacterChoices, participantRecords, primaryPartyGroup, selectedCharacterUuids } from "./ui/actor-participation.js";
-import { actorSkillModifier, extractNaturalD20, rollSkill } from "./services/skill-roll-service.js";
+import { actorSkillModifier, extractNaturalD20, formatModifier, rollSkill, skillChoiceLabel } from "./services/skill-roll-service.js";
 import { SUBSCRIPTION_TIERS, normalizeSubscriptionTier, capSubscriptionTier, applySubscriptionTesting } from "./services/subscription-testing.js";
 import { createToolsRegistry, mergeCoreApi } from "./ui/tools-registry.js";
 import { bindMorelordModulesButton } from "./ui/morelord-modules.js";
@@ -732,7 +732,7 @@ Hooks.once("ready", async () => {
     }),
     sortable,
     sources: publishedSources(),
-    rolls: Object.freeze({ skill: rollSkill, skillModifier: actorSkillModifier, naturalD20: extractNaturalD20 }),
+    rolls: Object.freeze({ skill: rollSkill, skillModifier: actorSkillModifier, naturalD20: extractNaturalD20, formatModifier, skillChoiceLabel }),
     socket: Object.freeze({
       get ready() { return contextualSocket.ready; },
       createChannel: namespace => contextualSocket.createChannel(namespace),
