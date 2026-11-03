@@ -37,6 +37,11 @@ import { DocumentationService } from "./documentation/documentation-service.js";
 import { DocumentationApp } from "./documentation/documentation-app.js";
 import { canUseActorInventory, listCharacterActors, listCharacterChoices, participantRecords, primaryPartyGroup, selectedCharacterUuids } from "./ui/actor-participation.js";
 import { actorSkillModifier, extractNaturalD20, formatModifier, rollSkill, skillChoiceLabel } from "./services/skill-roll-service.js";
+import {
+  addCurrency, adjustCurrencyCopper, applyGpDelta, canAfford, copperRate, cpToCurrency, currencyFromCp,
+  currencyToCp, deductCurrency, formatCp, getCurrency, getCurrencyCopper, getCurrencyDisplay, gpAmount,
+  setCurrency, totalCp
+} from "./services/currency-service.js";
 import { SUBSCRIPTION_TIERS, normalizeSubscriptionTier, capSubscriptionTier, applySubscriptionTesting } from "./services/subscription-testing.js";
 import { createToolsRegistry, mergeCoreApi } from "./ui/tools-registry.js";
 import { bindMorelordModulesButton } from "./ui/morelord-modules.js";
@@ -60,6 +65,27 @@ function publishedSources() {
     filterAllowed,
     onConfigureSourcesChanged,
     configureSourcesChanged: CONFIGURE_SOURCES_CHANGED
+  });
+}
+
+function publishedCurrency() {
+  return Object.freeze({
+    getCurrency,
+    currencyToCp,
+    totalCp,
+    cpToCurrency,
+    currencyFromCp,
+    copperRate,
+    gpAmount,
+    formatCp,
+    getCurrencyDisplay,
+    getCurrencyCopper,
+    canAfford,
+    setCurrency,
+    addCurrency,
+    deductCurrency,
+    adjustCurrencyCopper,
+    applyGpDelta
   });
 }
 registerDirectorySelection();
@@ -585,6 +611,7 @@ Hooks.once("init", () => {
     const api = coreModule.api ??= {};
     api.tools ??= toolsRegistry.api;
     api.sources = publishedSources();
+    api.currency = publishedCurrency();
     api.deleriumSearch = deleriumSearch;
     globalThis.MorelordCore = api;
   }
@@ -733,6 +760,7 @@ Hooks.once("ready", async () => {
     sortable,
     sources: publishedSources(),
     rolls: Object.freeze({ skill: rollSkill, skillModifier: actorSkillModifier, naturalD20: extractNaturalD20, formatModifier, skillChoiceLabel }),
+    currency: publishedCurrency(),
     socket: Object.freeze({
       get ready() { return contextualSocket.ready; },
       createChannel: namespace => contextualSocket.createChannel(namespace),

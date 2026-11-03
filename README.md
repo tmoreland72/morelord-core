@@ -343,6 +343,24 @@ Zones are Outer City (DC 15) and Inner City (DC 20). Skills are Arcana (`arc`), 
 
 `openResults(session, { award, defaultRecipientUuid })` opens **Delerium Search Results**. `award(recipientUuid)` is required. Omitting it throws `Delerium search results require an award function.` The caller routes the award to the authority GM and returns the updated session. The window is documented in `CORE-GM-PRODUCT-GUIDE.md`.
 
+## Currency
+
+`MorelordCore.currency` is the same object as `game.modules.get("morelord-core").api.currency`. It is available from the `init` hook. Rates come from `CONFIG.DND5E.currencies`. Each `conversion` is how many of that coin equal 1 gp, and the copper value of one coin is `cp.conversion / conversion`. When a rate is missing, Core uses the SRD 5.2 exchange: 1 pp = 10 gp, 1 ep = 1/2 gp, 1 sp = 1/10 gp, and 1 cp = 1/100 gp.
+
+`copperRate(denomination)` returns that copper value. `currencyToCp(currency)` and `totalCp(currency)` sum a purse to copper. A missing, fractional, or negative count contributes nothing. `cpToCurrency(cp)` and `currencyFromCp(cp)` split copper into `{pp, gp, ep, sp, cp}`, largest denomination first. A negative or non-numeric total is an empty purse.
+
+`gpAmount(source)` is that total in gold pieces, including fractional coins, so 5 sp is 0.5. Pass an actor or a purse. `getCurrency(actor)` reads `actor.system.currency`. `getCurrencyCopper(actor)` is that purse in copper. `formatCp(cp)` returns a price such as `12 gp, 5 sp`, or `0 cp` when the amount is empty. Prices are written in gp, sp, and cp. `getCurrencyDisplay(actor)` formats the actor's purse the same way. `canAfford(actor, priceCp)` compares the purse with a copper price.
+
+`setCurrency(actor, cp)`, `addCurrency(actor, cpToAdd)`, and `deductCurrency(actor, cpToDeduct)` write `system.currency.pp`, `gp`, `ep`, `sp`, and `cp`, and normalize the whole purse. `deductCurrency` throws `Insufficient funds.` and does not write when the purse is short. `adjustCurrencyCopper(actor, deltaCopper)` adds or removes copper and throws `<name> does not have enough currency.` when the result would be negative. A non-numeric amount throws `The currency amount is not a number.` An actor without `update` throws `A currency Actor is required.` `applyGpDelta(currency, deltaGp)` returns the next purse and does not update an actor. A positive delta pays and a negative delta spends. It throws `The gold amount is not a number.` or `Not enough money. This costs <need> gp and the character has <have> gp.`
+
+```js
+const currency = game.modules.get("morelord-core").api.currency;
+currency.formatCp(1250); // "12 gp, 5 sp"
+currency.gpAmount(actor);
+await currency.deductCurrency(actor, 250);
+await currency.addCurrency(actor, currency.copperRate("gp"));
+```
+
 ## Shared roll requests and compendiums
 
 `MorelordCore.rolls` is the same object as `game.modules.get("morelord-core").api.rolls`. `formatModifier(n)` returns a signed modifier such as `+5`, `-1`, or `+0`. A non-finite value is `+0`. `skillChoiceLabel(actor, skillKey)` returns the localized dnd5e skill name and that actor's computed skill total, such as `Religion (+5)`. The name comes from `CONFIG.DND5E.skills[skillKey].label` through `game.i18n.localize`, or the skill key when that label is missing. The total is `system.skills[skillKey].total`, then `mod` when `total` is absent.
