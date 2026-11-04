@@ -30,7 +30,7 @@ parser.add_argument('--marked')
 parser.add_argument('--brand-only', action='store_true', help='Retired. Brand docs now live in Google Drive and are not built here.')
 args = parser.parse_args()
 if args.brand_only:
-    raise SystemExit('Brand and business docs now live in Google Drive (Morelord Gaming/Docs) and are not built from this repository.')
+    raise SystemExit('Brand and business docs now live in Google Drive (Morelord Gaming) and are not built from this repository.')
 if not args.node or not args.marked:
     parser.error('the following arguments are required: --node, --marked')
 for name, file in [('Arial','arial.ttf'),('Arial-Bold','arialbd.ttf'),('Arial-Italic','ariali.ttf'),('Arial-BoldItalic','arialbi.ttf')]:

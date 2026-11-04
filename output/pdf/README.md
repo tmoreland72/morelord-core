@@ -2,7 +2,7 @@
 
 Generated September 7, 2026 using the shared Morelord document style: Arial, US Letter, white pages, pale-blue table headers, muted running labels, and numbered pages.
 
-Brand and business docs (brand guide, product guide, demo recording guide) now live in Google Drive: [Morelord Gaming/Docs](https://drive.google.com/drive/folders/1X136uF1zUc6Z3Xq_n9jFVrDzAYsDrnTh). This folder no longer includes a branding-guide PDF.
+Brand and business docs (brand guide, product guide, demo recording guide) now live in Google Drive: [Morelord Gaming](https://drive.google.com/drive/folders/1JKMCzl8f7MyNhgtuIMzCz1Y2o4_w9cC0). This folder no longer includes a branding-guide PDF.
 
 - [Core reference](Morelord-Core-Reference.pdf): September 7, 2026 snapshot of the README and the GM product guide. The product guide now lives in Google Drive; this PDF is not rebuilt from that guide.
 - [Character Export reference](Morelord-Character-Export-Reference.pdf): README, usage, export format, and release instructions.

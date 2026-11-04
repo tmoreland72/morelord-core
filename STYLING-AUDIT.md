@@ -1,6 +1,6 @@
 # Morelord UI styling audit
 
-The durable rules derived from this audit live in [AGENTS.md](./AGENTS.md). The full brand guide is in Google Drive: [Morelord Gaming/Docs](https://drive.google.com/drive/folders/1X136uF1zUc6Z3Xq_n9jFVrDzAYsDrnTh). Future UI changes should follow `AGENTS.md` and that guide.
+The durable rules derived from this audit live in [AGENTS.md](./AGENTS.md). The full brand guide is in Google Drive: [Morelord Gaming](https://drive.google.com/drive/folders/1JKMCzl8f7MyNhgtuIMzCz1Y2o4_w9cC0). Future UI changes should follow `AGENTS.md` and that guide.
 
 Audited 2026-08-21 across:
 
