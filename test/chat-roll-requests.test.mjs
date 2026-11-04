@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { ChatRollRequests, canRollForActor, rollAuthority, rollControls } from "../scripts/services/chat-roll-requests.js";
+import { ChatRollRequests, canRollForActor, completeChatRoll, rollAuthority, rollControls } from "../scripts/services/chat-roll-requests.js";
 import { ContextualSocketService } from "../scripts/services/contextual-socket-service.js";
 
 test("chat requests authorize owners and fallback GMs, serialize resolution, and keep private outcomes out of acknowledgments", async t => {
@@ -95,7 +95,8 @@ test("group creation keeps one message, independent rows, resend completion, and
   const rest = await service.create({ type: "group", key: "rest", title: "Long Rest", modes: false, actionLabel: "Long Rest" });
   assert.ok(rest.content.includes('class="ml-button" data-ml-core-roll="normal" aria-label="Long Rest">Long Rest</button>'));
   assert.match(rest.content, /ml-award-card__recipient"><i class="fa-solid fa-user"><\/i>Game master/);
-  assert.match(rest.content, /<span>Game master<\/span>/);
+  assert.equal((rest.content.match(/Game master/g) ?? []).length, 1);
+  assert.doesNotMatch(rest.content, /<span>Game master<\/span>/);
   assert.ok(!rest.content.includes('data-ml-core-roll="adv"'));
   assert.ok(!rest.content.includes(">DIS<") && !rest.content.includes(">ADV<"));
 });
@@ -125,6 +126,8 @@ test("a single character card puts the shared DC in the award header and keeps r
   assert.match(html, /ml-award-card__title">Watch &lt;Checks&gt;/);
   assert.match(html, /ml-award-card__subtitle">DC 14/);
   assert.match(html, /ml-award-card__recipient"><i class="fa-solid fa-user"><\/i>Ada &lt;Bee&gt;/);
+  assert.doesNotMatch(html, /ml-actor-identity/);
+  assert.equal((html.match(/Ada &lt;Bee&gt;/g) ?? []).length, 1);
   assert.match(html, /data-ml-roll-entry=""/);
   assert.match(html, /data-ml-roll-choice/);
   assert.match(html, /<option value="sur">Survival<\/option>/);
@@ -154,3 +157,285 @@ test("roll request styles share the award frame and give every button the same h
   }
   assert.match(css, /\.ml-core-roll-request \.ml-button\[data-ml-core-roll="normal"\]:not\(\[data-ml-roll-decline\]\)/);
 });
+
+test("one character is named in the header only, and a party keeps a name on each row", t => {
+  const previous = {
+    foundry: Object.getOwnPropertyDescriptor(globalThis, "foundry"),
+    fromUuidSync: Object.getOwnPropertyDescriptor(globalThis, "fromUuidSync")
+  };
+  t.after(() => {
+    for (const [key, descriptor] of Object.entries(previous)) {
+      if (descriptor) Object.defineProperty(globalThis, key, descriptor);
+      else delete globalThis[key];
+    }
+  });
+  globalThis.foundry = { utils: { escapeHTML: String } };
+  globalThis.fromUuidSync = uuid => ({ name: uuid === "Actor.ada" ? "Ada" : "Bea" });
+  const service = new ChatRollRequests({ createChannel: () => ({ on() {} }) });
+  const single = service.html({ title: "Long Rest", actorUuid: "Actor.ada", modes: false, actionLabel: "Long Rest", choices: [] });
+  assert.match(single, /ml-award-card__recipient"><i class="fa-solid fa-user"><\/i>Ada/);
+  assert.equal((single.match(/Ada/g) ?? []).length, 1);
+  assert.doesNotMatch(single, /ml-actor-identity/);
+  const steps = service.html({
+    title: "Treasure",
+    entries: {
+      coins: { title: "Coins", actorUuid: "Actor.ada", modes: false, actionLabel: "Roll", choices: [], dc: null },
+      gems: { title: "Gems", actorUuid: "Actor.ada", modes: false, actionLabel: "Roll", choices: [], dc: null }
+    }
+  });
+  assert.match(steps, /ml-award-card__recipient"><i class="fa-solid fa-user"><\/i>Ada/);
+  assert.equal((steps.match(/Ada/g) ?? []).length, 1);
+  assert.doesNotMatch(steps, /ml-actor-identity/);
+  assert.match(steps, />Coins</);
+  assert.match(steps, />Gems</);
+  const party = service.html({
+    title: "Party Check",
+    dc: 12,
+    entries: {
+      ada: { title: "Party Check", actorUuid: "Actor.ada", modes: true, choices: [], dc: 12 },
+      bea: { title: "Party Check", actorUuid: "Actor.bea", modes: true, choices: [], dc: 12 }
+    }
+  });
+  assert.doesNotMatch(party, /ml-award-card__recipient/);
+  assert.equal((party.match(/class="ml-actor-identity"/g) ?? []).length, 2);
+  assert.match(party, />Ada</);
+  assert.match(party, />Bea</);
+});
+
+test("a bare function register path ignores rollData and sends the original click payload", async t => {
+  const keys = ["game", "foundry", "ui", "Hooks", "fromUuid", "fromUuidSync", "document"];
+  const saved = keys.map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]);
+  t.after(() => { for (const [key, descriptor] of saved) if (descriptor) Object.defineProperty(globalThis, key, descriptor); else delete globalThis[key]; });
+  globalThis.document = { createElement: () => ({ className: "", setAttribute() {}, textContent: "" }) };
+  const gm = { id: "gm", active: true, isGM: true }, player = { id: "player", active: true, isGM: false };
+  const actor = { uuid: "Actor.hero", testUserPermission: user => user === player };
+  const users = [gm, player];
+  users.get = id => users.find(user => user.id === id);
+  const request = { type: "plain", actorUuid: actor.uuid, modes: true, choices: [], data: { requestId: "keep" }, completed: false };
+  const message = { id: "request", author: gm, getFlag: () => request, async setFlag(_id, _key, value) { Object.assign(request, value); } };
+  const messages = [message];
+  messages.get = id => messages.find(item => item.id === id);
+  globalThis.game = { user: gm, users, messages, settings: { settings: new Map() } };
+  globalThis.foundry = { utils: { escapeHTML: String } };
+  globalThis.fromUuid = async () => actor;
+  globalThis.fromUuidSync = () => actor;
+  const sent = [];
+  let handler;
+  const service = new ChatRollRequests({ createChannel: () => ({
+    on(_type, fn) { handler = fn; },
+    executeAsUser: async (type, data, userId) => {
+      sent.push({ type, data, userId });
+      const previous = game.user;
+      game.user = users.get(userId);
+      try { return await handler(data, { senderUserId: previous.id }); }
+      finally { game.user = previous; }
+    }
+  }) });
+  const contexts = [];
+  service.register("plain", (data, context) => {
+    contexts.push({ data, keys: Object.keys(context), hasRollData: Object.hasOwn(context, "rollData") });
+    return { accepted: true };
+  });
+  assert.deepEqual(await handler({ messageId: "request", mode: "normal", rollData: { injected: true } }, { senderUserId: player.id }), { accepted: true });
+  assert.deepEqual(contexts[0].data, { requestId: "keep" });
+  assert.deepEqual(contexts[0].keys.sort(), ["actor", "choice", "message", "mode", "senderUserId"]);
+  assert.equal(contexts[0].hasRollData, false);
+  request.completed = false;
+  const hooks = [];
+  globalThis.ui = { notifications: { error() {} }, chat: { updateMessage() {} } };
+  globalThis.Hooks = { on(_name, fn) { hooks.push(fn); } };
+  service.start();
+  const harness = rollButton();
+  game.user = player;
+  hooks[0](message, harness.html);
+  await harness.click();
+  assert.deepEqual(Object.keys(sent[0].data).sort(), ["choice", "entryKey", "messageId", "mode"]);
+  assert.equal(sent[0].userId, gm.id);
+  assert.equal(sent[0].data.mode, "normal");
+});
+
+test("prepare runs on the clicking client, and cancel or throw leaves the row open", async t => {
+  const keys = ["game", "foundry", "ui", "Hooks", "fromUuid", "fromUuidSync", "document"];
+  const saved = keys.map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]);
+  t.after(() => { for (const [key, descriptor] of saved) if (descriptor) Object.defineProperty(globalThis, key, descriptor); else delete globalThis[key]; });
+  globalThis.document = { createElement: () => ({ className: "", setAttribute() {}, textContent: "" }) };
+  const gm = { id: "gm", active: true, isGM: true }, player = { id: "player", active: true, isGM: false }, stranger = { id: "stranger", active: true, isGM: false };
+  const actor = { uuid: "Actor.hero", testUserPermission: user => user === player };
+  const users = [gm, player, stranger];
+  users.get = id => users.find(user => user.id === id);
+  let request = { type: "prepared", actorUuid: actor.uuid, modes: true, choices: [], data: { requestId: "roll" }, completed: false };
+  const message = { id: "m1", author: gm, getFlag: () => request, async setFlag(_id, _key, value) { request = value; } };
+  const messages = [message];
+  messages.get = id => messages.find(item => item.id === id);
+  globalThis.game = { user: player, users, messages, settings: { settings: new Map() } };
+  globalThis.foundry = { utils: { escapeHTML: String } };
+  globalThis.fromUuid = async () => actor;
+  globalThis.fromUuidSync = () => actor;
+  const notices = [];
+  globalThis.ui = { notifications: { error(messageText) { notices.push(messageText); } }, chat: { updateMessage() {} } };
+  const sent = [];
+  const resolved = [];
+  let handler, handlerOptions, outcome = { total: 18 };
+  const service = new ChatRollRequests({ createChannel: () => ({
+    on(_type, fn, options) { handler = fn; handlerOptions = options; },
+    executeAsUser: async (type, data, userId) => {
+      sent.push({ type, data, userId });
+      const previous = game.user;
+      game.user = users.get(userId);
+      try { return await handler(data, { senderUserId: previous.id }); }
+      finally { game.user = previous; }
+    }
+  }) });
+  const prepares = [];
+  service.register("prepared", {
+    prepare: async (entry, choice, info) => {
+      prepares.push({ userId: game.user.id, entry, choice, mode: info.mode, message: info.message });
+      if (outcome instanceof Error) throw outcome;
+      return outcome;
+    },
+    resolve: (data, context) => {
+      resolved.push({ data, rollData: context.rollData, senderUserId: context.senderUserId });
+      return { accepted: true, secret: context.rollData.total };
+    }
+  }, { serialize: "table.queue" });
+  assert.equal(handlerOptions.serialize, "table.queue");
+  game.user = gm;
+  assert.equal((await handler({ messageId: "m1", mode: "normal", rollData: { total: 4 } }, { senderUserId: stranger.id })).accepted, false);
+  game.user = player;
+  assert.equal(resolved.length, 0);
+  const hooks = [];
+  globalThis.Hooks = { on(_name, fn) { hooks.push(fn); } };
+  service.start();
+  const harness = rollButton();
+  hooks[0](message, harness.html);
+  const open = request;
+  await harness.click();
+  assert.equal(prepares[0].userId, player.id);
+  assert.equal(prepares[0].message, message);
+  assert.equal(prepares[0].mode, "normal");
+  assert.equal(prepares[0].entry, open);
+  assert.deepEqual(sent[0].data.rollData, { total: 18 });
+  assert.deepEqual(sent[0].data.messageId, "m1");
+  assert.equal(sent[0].userId, gm.id);
+  assert.deepEqual(resolved[0].rollData, { total: 18 });
+  assert.equal(resolved[0].senderUserId, player.id);
+  assert.equal(resolved[0].data.requestId, "roll");
+  assert.equal(Object.hasOwn(resolved[0], "secret"), false);
+  request = { ...request, completed: false };
+  outcome = null;
+  const cancelled = rollButton();
+  hooks[0](message, cancelled.html);
+  await cancelled.click();
+  assert.equal(sent.length, 1);
+  assert.equal(cancelled.completed(), false);
+  outcome = new Error("The roll dialog closed.");
+  const failed = rollButton();
+  hooks[0](message, failed.html);
+  await failed.click();
+  assert.equal(sent.length, 1);
+  assert.equal(failed.completed(), false);
+  assert.deepEqual(notices, ["The roll dialog closed."]);
+});
+
+test("create passes speaker, whisper, and flags without replacing the roll request", async t => {
+  const keys = ["game", "foundry", "ChatMessage", "ui"];
+  const saved = keys.map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]);
+  t.after(() => { for (const [key, descriptor] of saved) if (descriptor) Object.defineProperty(globalThis, key, descriptor); else delete globalThis[key]; });
+  const gm = { id: "gm", isGM: true, active: true };
+  const messages = [];
+  messages.get = id => messages.find(message => message.id === id);
+  globalThis.game = { user: gm, users: [gm], messages, settings: { settings: new Map() } };
+  globalThis.foundry = { utils: { escapeHTML: String } };
+  globalThis.ui = { chat: { updateMessage() {} } };
+  globalThis.ChatMessage = { async create(data) {
+    const message = { ...data, id: "card", author: gm, getFlag: (id, key) => message.flags[id][key] };
+    messages.push(message);
+    return message;
+  } };
+  const service = new ChatRollRequests({ createChannel: () => ({ on() {} }) });
+  service.register("posted", () => ({ accepted: true }));
+  const plain = await service.create({ type: "posted", key: "plain", title: "Check" });
+  assert.equal(Object.hasOwn(plain, "speaker"), false);
+  assert.deepEqual(plain.whisper, []);
+  assert.deepEqual(Object.keys(plain.flags), ["morelord-core"]);
+  assert.deepEqual(Object.keys(plain.flags["morelord-core"]), ["rollRequest"]);
+  const callerFlags = { "morelord-gm": { nested: { step: 1 } }, "morelord-core": { note: "keep", rollRequest: { hacked: true } } };
+  const posted = await service.create({
+    type: "posted", key: "private", title: "Private Check",
+    speaker: { alias: "GM" }, whisper: [gm.id], flags: callerFlags
+  });
+  assert.deepEqual(posted.speaker, { alias: "GM" });
+  assert.deepEqual(posted.whisper, [gm.id]);
+  assert.equal(posted.flags["morelord-core"].note, "keep");
+  assert.equal(posted.flags["morelord-core"].rollRequest.hacked, undefined);
+  assert.equal(posted.flags["morelord-core"].rollRequest.key, "private");
+  callerFlags["morelord-gm"].nested.step = 9;
+  assert.equal(posted.flags["morelord-gm"].nested.step, 1);
+});
+
+test("updateEntry re-renders a GM patch, and completeChatRoll can reopen without changing a normal close", async t => {
+  const keys = ["game", "foundry", "ui", "fromUuidSync"];
+  const saved = keys.map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]);
+  t.after(() => { for (const [key, descriptor] of saved) if (descriptor) Object.defineProperty(globalThis, key, descriptor); else delete globalThis[key]; });
+  const gm = { id: "gm", isGM: true, active: true }, player = { id: "player", active: true, isGM: false };
+  globalThis.game = { user: player, users: [gm, player], messages: [], settings: { settings: new Map() } };
+  globalThis.foundry = { utils: { escapeHTML: String } };
+  globalThis.fromUuidSync = () => ({ name: "Ada" });
+  const updates = [];
+  globalThis.ui = { chat: { updateMessage(message) { updates.push(["refresh", message.id]); } } };
+  const entryKey = "aa";
+  let card = { type: "steps", key: "batch", title: "Treasure", entries: { [entryKey]: { type: "steps", key: "one", title: "Coins", actorUuid: "Actor.ada", dc: 10, modes: false, actionLabel: "Roll", choices: [], data: { requestId: "one", step: 1 }, completed: false } } };
+  const message = { id: "hoard", author: gm, getFlag: () => card, async update(changes) {
+    updates.push(changes);
+    if (changes.content) message.content = changes.content;
+    const flag = changes["flags.morelord-core.rollRequest"];
+    if (flag) card = flag;
+    const completed = changes[`flags.morelord-core.rollRequest.entries.${entryKey}.completed`];
+    if (completed !== undefined) card.entries[entryKey].completed = completed;
+  }, async setFlag() { throw new Error("A grouped card closes through update."); } };
+  const service = new ChatRollRequests({ createChannel: () => ({ on() {} }) });
+  await assert.rejects(() => service.updateEntry(message, entryKey, { title: "Nope" }), /eligible GM/);
+  assert.equal(updates.length, 0);
+  game.user = gm;
+  const next = await service.updateEntry(message, entryKey, { title: "Gems", actionLabel: "Confirm", dc: 15, data: { step: 2 }, completed: false });
+  assert.equal(next.entries[entryKey].title, "Gems");
+  assert.equal(next.entries[entryKey].data.requestId, "one");
+  assert.equal(next.entries[entryKey].data.step, 2);
+  assert.equal(next.entries[entryKey].dc, 15);
+  assert.equal(next.type, "steps");
+  assert.match(message.content, />Gems</);
+  assert.match(message.content, /aria-label="Confirm">Confirm</);
+  assert.match(message.content, /DC 15/);
+  await assert.rejects(() => service.updateEntry(message, "missing", { title: "Lost" }), /does not exist/);
+  updates.length = 0;
+  await completeChatRoll(message, entryKey);
+  assert.deepEqual(Object.keys(updates[0]), [`flags.morelord-core.rollRequest.entries.${entryKey}.completed`]);
+  assert.equal(updates[0][`flags.morelord-core.rollRequest.entries.${entryKey}.completed`], true);
+  assert.equal(card.entries[entryKey].completed, true);
+  updates.length = 0;
+  await completeChatRoll(message, entryKey, { reopen: true, title: "Art", actionLabel: "Keep rolling" });
+  assert.equal(card.entries[entryKey].completed, false);
+  assert.equal(card.entries[entryKey].title, "Art");
+  assert.equal(card.entries[entryKey].actionLabel, "Keep rolling");
+  assert.match(message.content, /aria-label="Keep rolling">Keep rolling</);
+  assert.equal(updates.some(entry => entry[0] === "refresh"), true);
+});
+
+function rollButton() {
+  let completed = false;
+  const row = {
+    dataset: { mlRollEntry: "" },
+    querySelector(selector) { return selector === ".ml-roll-completed" && completed ? {} : null; },
+    querySelectorAll() { return [{ remove() {} }]; },
+    append() { completed = true; }
+  };
+  const listeners = [];
+  const button = {
+    dataset: { mlCoreRoll: "normal" },
+    disabled: false,
+    hasAttribute: () => false,
+    closest: () => row,
+    addEventListener(_type, fn) { listeners.push(fn); }
+  };
+  return { html: { querySelectorAll: () => [button] }, click: () => listeners[0](), completed: () => completed };
+}
