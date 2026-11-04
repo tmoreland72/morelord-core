@@ -19,7 +19,7 @@
 ## Brand and interface consistency
 
 - ALL Foundry UI in every Morelord module MUST use Core's shared components, styles, tokens, and UI functions. This applies to new and existing windows, dialogs, forms, cards, lists, chat output, and sheet integrations, including prototypes and unreleased modules.
-- The full brand guide lives with the other brand and business docs in Google Drive: [Morelord Gaming/Docs](https://drive.google.com/drive/folders/1X136uF1zUc6Z3Xq_n9jFVrDzAYsDrnTh). Keep these developer rules here:
+- The full brand guide lives with the other brand and business docs in Google Drive: [Morelord Gaming](https://drive.google.com/drive/folders/1JKMCzl8f7MyNhgtuIMzCz1Y2o4_w9cC0). Keep these developer rules here:
 - Every ApplicationV2 window includes `ml-window` in `DEFAULT_OPTIONS.classes`. Every full application template begins with `ml-app` and normally `ml-app-shell`.
 - DialogV2 `config.content` has no attributes. Put the shell on an inner wrapper: `ml-app ml-app-shell ml-dialog-shell`.
 - Use readable `ml-{module}-*` namespaces (`ml-core-*`, `ml-marketplace-*`, `ml-journeys-*`, `ml-craftworks-*`, `ml-encounters-*`, `ml-downtime-*`, `ml-character-export-*`). Do not introduce `mlm-*`, `mjourneys-*`, `mcw-*`, `mlh-*`, or `morelord-encounter-*`.
@@ -72,7 +72,7 @@
 
 ## Demo videos
 
-- Before planning, scripting, recording, editing, or exporting any Morelord demo video, read and follow the demo recording guide in [Morelord Gaming/Docs](https://drive.google.com/drive/folders/1X136uF1zUc6Z3Xq_n9jFVrDzAYsDrnTh).
+- Before planning, scripting, recording, editing, or exporting any Morelord demo video, read and follow the demo recording guide in [Morelord Gaming](https://drive.google.com/drive/folders/1JKMCzl8f7MyNhgtuIMzCz1Y2o4_w9cC0).
 - Save reusable demo instructions and corrections from the user in that guide; keep video-specific requirements in the video's brief. Check the finished video against those requirements before delivery.
 
 ## Maintaining these guidelines
