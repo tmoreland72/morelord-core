@@ -1,8 +1,8 @@
 # Foundry HTML descriptions
 
-Copy the contents of a module HTML file into the Foundry description editor's HTML/source view. Each fragment is generated from the Foundry Description section in `../../MORELORD-BRAND-GUIDE.md`; edit that source and rebuild to keep the document and snippets synchronized.
+Copy the contents of a module HTML file into the Foundry description editor's HTML/source view. These fragments are the local copies. The brand guide that originally supplied them now lives in Google Drive: [Morelord Gaming/Docs](https://drive.google.com/drive/folders/1X136uF1zUc6Z3Xq_n9jFVrDzAYsDrnTh). Edit a fragment here when the listing copy changes; this repository no longer regenerates them from a markdown source.
 
-Both the PDF and Markdown show literal HTML code with visible tags. These files contain the same HTML without code fences for direct reuse. No package manifest or public listing has been changed. Compendium is a draft for the existing v13 content package; confirm its distribution scope before public use.
+These files contain the HTML without code fences for direct reuse. No package manifest or public listing has been changed. Compendium is a draft for the existing v13 content package; confirm its distribution scope before public use.
 
 - [morelord-marketplace.html](morelord-marketplace.html)
 - [morelord-journeys.html](morelord-journeys.html)

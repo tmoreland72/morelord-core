@@ -19,7 +19,13 @@
 ## Brand and interface consistency
 
 - ALL Foundry UI in every Morelord module MUST use Core's shared components, styles, tokens, and UI functions. This applies to new and existing windows, dialogs, forms, cards, lists, chat output, and sheet integrations, including prototypes and unreleased modules.
-- Before UI work, read Morelord Core's `MORELORD-BRAND-GUIDE.md` (in Core's repository, or `../morelord-core/MORELORD-BRAND-GUIDE.md` from sibling module repositories).
+- The full brand guide lives with the other brand and business docs in Google Drive: [Morelord Gaming/Docs](https://drive.google.com/drive/folders/1X136uF1zUc6Z3Xq_n9jFVrDzAYsDrnTh). Keep these developer rules here:
+- Every ApplicationV2 window includes `ml-window` in `DEFAULT_OPTIONS.classes`. Every full application template begins with `ml-app` and normally `ml-app-shell`.
+- DialogV2 `config.content` has no attributes. Put the shell on an inner wrapper: `ml-app ml-app-shell ml-dialog-shell`.
+- Use readable `ml-{module}-*` namespaces (`ml-core-*`, `ml-marketplace-*`, `ml-journeys-*`, `ml-craftworks-*`, `ml-encounters-*`, `ml-downtime-*`, `ml-character-export-*`). Do not introduce `mlm-*`, `mjourneys-*`, `mcw-*`, `mlh-*`, or `morelord-encounter-*`.
+- Use semantic Core tokens (`--ml-color-accent`, `--ml-color-success`, `--ml-color-info`, `--ml-color-warning`, `--ml-color-danger`, `--ml-color-muted`). Do not use a raw red, green, amber, or blue for application state.
+- Keep footers opaque and outside the scroll region. Only the content body scrolls.
+- Disabled buttons say why. Pass `disabledReason`, or call `MorelordCore.ui.setDisabled(element, reason)`. The first line is the bold tooltip title and each later line is a short line under it. A blank reason enables the control and removes the tooltip.
 - Use the appropriate Core component with its required markup, classes, and behavior. Adding `ml-*` classes or Core tokens to independently designed markup is not sufficient. Core is the source of truth; another module is only an example of consuming it, not a design system to copy.
 - Bottom form and window actions use `<footer class="ml-form-footer">`. The footer has a top border and a gap, and its buttons sit on the right at their natural width. Do not stretch those buttons. `MorelordCore.ui.confirm` is the exception: its two buttons fill that footer at equal width. Keep `ml-page-footer` on the same footer when Core's page layout should move it out of the scrolling body.
 - Do not recreate, override, or patch shared UI in a feature module. If Core lacks a needed shared component or its component does not work correctly, add or fix it in Core, preserve existing consumers, and have the feature module consume that implementation.
@@ -66,7 +72,7 @@
 
 ## Demo videos
 
-- Before planning, scripting, recording, editing, or exporting any Morelord demo video, read and follow Core's `DEMO-RECORDING-GUIDE.md`. Resolve it from the Core repository in the workspace (normally `../morelord-core`; in this installation, `E:/Foundry14Dev-Data/Data/modules/morelord-core` also serves Compendium in the separate DND data tree).
+- Before planning, scripting, recording, editing, or exporting any Morelord demo video, read and follow the demo recording guide in [Morelord Gaming/Docs](https://drive.google.com/drive/folders/1X136uF1zUc6Z3Xq_n9jFVrDzAYsDrnTh).
 - Save reusable demo instructions and corrections from the user in that guide; keep video-specific requirements in the video's brief. Check the finished video against those requirements before delivery.
 
 ## Maintaining these guidelines
