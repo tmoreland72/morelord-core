@@ -287,6 +287,31 @@ The shared release validator supports required runtime files (including root mai
 
 `scripts/services/item-rarity.js` exports `itemRarities(system)` and `itemRarity(system)`. They accept legacy rarity strings/choice objects and D&D 5e v6 rarity arrays/Sets without modifying data. An explicitly empty v6 collection is mundane. Single-rarity workflows use the lowest listed rarity, matching the v6 Item getter. Compendium consumers must request both `system.rarity` and `system.rarities`.
 
+## Award item chat cards
+
+`MorelordCore.ui.itemCard(options)` is the same function as `game.modules.get("morelord-core").api.ui.itemCard(options)`. It returns an HTML string. The caller posts that string. Foundry enriches `@UUID[uuid]{name}` into a content link, which supplies the item type icon. A missing uuid is escaped text. A missing or mundane rarity omits the rarity line, and the row still renders. Rarity text comes from `itemRarity`: `common`, `uncommon`, `rare`, `veryrare`, `legendary`, and `artifact` become Common, Uncommon, Rare, Very Rare, Legendary, and Artifact.
+
+```js
+const html = game.modules.get("morelord-core").api.ui.itemCard({
+  title: "Encounter Loot Received",
+  icon: "fa-solid fa-sack",
+  recipientName: "Ada",
+  subtitle: "From the vault",
+  items: [{ uuid, name: "Potion of Healing", img, rarity: "rare", quantity: 2, value: "50 gp" }],
+  sections: [{ heading: "Potions", items: [] }],
+  emptyText: "None.",
+  coins: { pp: 5, sp: 3, cp: 5 },
+  totalLabel: "Total 50 gp",
+  footer: "Morelord Craftworks",
+  bodyHTML: "",
+  actionsHTML: ""
+});
+```
+
+`title` is the card heading. `icon` is a Font Awesome class list and defaults to `fa-solid fa-gift`. `recipientName` and `subtitle` are optional. `items` and each `sections[].items` entry use `{ uuid, name, img, rarity, quantity, value }`. `name` is required. `img` defaults to `icons/svg/item-bag.svg`. `quantity` defaults to 1. `value` is the optional right-hand price. `sections` are headed groups such as Coin, Crafting Materials, or Potions, and every row uses the same item markup. `emptyText` is shown for an empty item list, or inside an empty section. `coins` is `{ pp, gp, ep, sp, cp }`. A positive count is listed in that order, and a zero or negative count is left out. The row is omitted when every count is blank. `coinLabel` is the plain-text fallback for that row. `formatCp` is not used here, because it rebuckets a copper total into gp, sp, and cp. `totalLabel` is an optional total line. `footer` is the module label, rendered in uppercase. `bodyHTML` is inserted raw after the header, and `actionsHTML` is inserted raw before the footer. Every other value is escaped.
+
+The root is `.ml-chat-card.ml-award-card`. Parts are `__header`, `__icon`, `__heading`, `__title`, `__recipient`, `__subtitle`, `__section`, `__section-heading`, `__items`, `__item`, `__item-image`, `__item-body`, `__item-name`, `__item-rarity`, `__item-value`, `__item-quantity`, `__empty`, `__coins`, `__total`, and `__footer`.
+
 ## Configure Sources
 
 D&D 5e **Configure Sources** (Game Settings menu **Compendium Browser Sources**, label **Configure Sources**) is the primary compendium filter for every Morelord module. The screen lists Actor and Item compendiums. dnd5e stores the choices in the world setting `packSourceConfiguration`. `CompendiumBrowserSettingsConfig.isSourceEnabled(pack)` is the decision, and Core calls that method when dnd5e has loaded it:

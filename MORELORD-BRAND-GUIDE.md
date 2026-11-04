@@ -204,8 +204,11 @@ Never use a raw red, green, amber, or blue to represent application state. Domai
 | Account/access state | `.ml-access-card` |
 | Progress | `.ml-progress`, `.ml-progress__fill` |
 | Generated chat content | `.ml-chat-card` |
+| Award or received-item chat card | `.ml-chat-card.ml-award-card` from `ui.itemCard` |
 
 Add the shared class alongside a readable module class. The shared class owns common appearance; the module class owns domain layout or content-specific adjustments.
+
+`ui.itemCard(options)` returns the shared award card. Use it for received items, loot, and headed item groups instead of a module-specific card. The options and class parts are documented in the Core README. A `.ml-help-button` inside a label stays at `1em` (`height`, `max-height`, `min-height: 0`, `flex: none`), including when the window button rule or `.ml-icon-button` would otherwise stretch it to the 34px control height.
 
 ## Forms and controls
 
