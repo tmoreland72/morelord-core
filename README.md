@@ -401,6 +401,8 @@ Core 0.3.12 fixes the 0.3.11 public socket export: socket.runSerialized(key, cal
 
 Shared chat roll requests accept a `groupKey` to keep one persistent public party card, with independent character DCs, choices, DIS/Roll/ADV controls, completion, and GM fallback. Use a fresh group key for a new batch; retain it for resends. Existing single-character cards remain supported. Keep private outcomes in domain-owned GM-only messages, not request flags or socket acknowledgments.
 
+The card root is `section.ml-chat-card.ml-stack.ml-core-roll-request`. Its header is the shared award-card header: icon circle, title, and, on a single-character card, the recipient. A DC shared by every row is that header's subtitle. Each character remains in `[data-ml-roll-entry]`, with the same `data-ml-roll-choice`, `data-ml-core-roll`, and `data-ml-roll-decline` attributes. Those buttons use `ml-button` and share one height. `rollControls` still returns the DIS / Roll / ADV row, or one full-width button when `modes` is false.
+
 
 Clicking a character's roll immediately removes that row's controls and shows centered **Completed** text; other rows remain usable. Shared `submitChatRoll(message, key, row, submit)` and `isRollSubmitted(message, key)` preserve this local state during rerenders and restore controls when the GM rejects or cancels the roll. `completeChatRoll(message, entryKey)` persists completion once the GM records it. Permissions, offline-player GM fallback, and duplicate protection are unchanged.
 

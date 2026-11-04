@@ -1,4 +1,5 @@
-import { actorIdentity } from "../ui/actor-identity.js";
+import { actorIdentity, actorIdentityName } from "../ui/actor-identity.js";
+import { awardCardHeader } from "../ui/item-card.js";
 import { activePlayerForActor, isIgnored, listUsers } from "./user-service.js";
 
 const ID = "morelord-core";
@@ -25,7 +26,7 @@ export function canRollForActor(actor, user = game.user) {
 export function rollControls(attributes, { modes = true, actionLabel = "Roll" } = {}) {
   const safeLabel = actionLabel === "Roll" ? "Roll" : escape(actionLabel);
   return `<div class="ml-roll-controls">${(modes ? [["dis", "DIS"], ["normal", "Roll"], ["adv", "ADV"]] : [["normal", safeLabel]]).map(([mode, label]) =>
-    `<button type="button" ${attributes(mode)} aria-label="${mode === "dis" ? "Roll with disadvantage" : mode === "adv" ? "Roll with advantage" : safeLabel}">${label}</button>`).join("")}</div>`;
+    `<button type="button" class="ml-button" ${attributes(mode)} aria-label="${mode === "dis" ? "Roll with disadvantage" : mode === "adv" ? "Roll with advantage" : safeLabel}">${label}</button>`).join("")}</div>`;
 }
 export function markRollCompleted(row) {
   if (!row || row.querySelector(".ml-roll-completed")) return;
@@ -92,9 +93,16 @@ export class ChatRollRequests {
   html(request) {
     const entries = request.entries ? Object.entries(request.entries) : [["", request]];
     const commonDC = entries.every(([, entry]) => entry.dc === entries[0][1].dc) ? entries[0][1].dc : null;
-    return `<section class="ml-chat-card ml-stack ml-core-roll-request"><h3>${escape(request.title)}</h3>${commonDC == null ? "" : `<p>DC ${escape(commonDC)}</p>`}${entries.map(([key, entry]) => {
+    const single = entries.length === 1 ? entries[0][1] : null;
+    const header = awardCardHeader({
+      title: request.title ?? "",
+      icon: "fa-solid fa-dice-d20",
+      subtitle: commonDC == null ? "" : `DC ${commonDC}`,
+      recipientName: single ? (single.actorUuid ? actorIdentityName(single) : "Game master") : ""
+    });
+    return `<section class="ml-chat-card ml-stack ml-core-roll-request">${header}${entries.map(([key, entry]) => {
       const choices = entry.choices.filter(option => option.id !== "decline");
-      return `<div class="ml-card ml-stack" data-ml-roll-entry="${escape(key)}">${entry.actorUuid ? actorIdentity(entry) : "<span>Game master</span>"}${entry.title !== request.title ? `<p>${escape(entry.title)}</p>` : ""}${entry.dc == null || commonDC != null ? "" : `<p>DC ${escape(entry.dc)}</p>`}${choices.length ? `<select data-ml-roll-choice aria-label="Roll choice">${choices.map(option => `<option value="${escape(option.id)}">${escape(option.label)}</option>`).join("")}</select>` : ""}${rollControls(mode => `data-ml-core-roll="${mode}"`, { modes: entry.modes, actionLabel: entry.actionLabel })}${entry.choices.some(option => option.id === "decline") ? '<button type="button" data-ml-core-roll="normal" data-ml-roll-decline>Decline search</button>' : ""}</div>`;
+      return `<div class="ml-card ml-stack" data-ml-roll-entry="${escape(key)}">${entry.actorUuid ? actorIdentity(entry) : "<span>Game master</span>"}${entry.title !== request.title ? `<p>${escape(entry.title)}</p>` : ""}${entry.dc == null || commonDC != null ? "" : `<p>DC ${escape(entry.dc)}</p>`}${choices.length ? `<select data-ml-roll-choice aria-label="Roll choice">${choices.map(option => `<option value="${escape(option.id)}">${escape(option.label)}</option>`).join("")}</select>` : ""}${rollControls(mode => `data-ml-core-roll="${mode}"`, { modes: entry.modes, actionLabel: entry.actionLabel })}${entry.choices.some(option => option.id === "decline") ? '<button type="button" class="ml-button" data-ml-core-roll="normal" data-ml-roll-decline>Decline search</button>' : ""}</div>`;
     }).join("")}</section>`;
   }
   start() {
