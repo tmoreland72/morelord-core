@@ -164,7 +164,8 @@
 :where(.ml-status, .ml-badge, .ml-text)[data-tone="danger"] { color: var(--ml-color-danger); }
 :where(.ml-status, .ml-badge, .ml-text)[data-tone="premium"] { color: var(--ml-color-accent); }
 
-:is(.ml-window .window-content, .ml-chat-card) .ml-button[data-tone="accent"] { background: var(--ml-color-accent); border-color: var(--ml-color-accent-strong); color: var(--ml-color-on-accent); font-weight: var(--ml-font-weight-bold); }
+:is(.ml-window .window-content, .ml-chat-card) .ml-button[data-tone="accent"],
+.ml-core-roll-request .ml-button[data-ml-core-roll="normal"]:not([data-ml-roll-decline]) { background: var(--ml-color-accent); border-color: var(--ml-color-accent-strong); color: var(--ml-color-on-accent); font-weight: var(--ml-font-weight-bold); }
 :is(.ml-window .window-content, .ml-chat-card) .ml-button[data-tone="accent"][data-variant="outline"] { background: transparent; color: var(--ml-color-accent); }
 :is(.ml-window .window-content, .ml-chat-card) .ml-button[data-tone="accent"][data-variant="outline"]:not(:disabled):is(:hover, :focus-visible) { background: var(--ml-color-accent); color: var(--ml-color-on-accent); }
 
@@ -637,8 +638,8 @@
   .ml-training-selection__selected { border-left: 0; border-top: 1px solid var(--ml-color-border); }
 }
 
-/* Award and received-item chat cards. Lifted from Craftworks' award card. */
-.chat-message .ml-award-card {
+/* Award cards and roll-request cards share this frame. Header parts stay on .ml-award-card__*. */
+.chat-message :is(.ml-award-card, .ml-core-roll-request) {
   overflow: hidden;
   margin: 2px 0;
   border: 1px solid color-mix(in srgb, var(--ml-color-accent) 50%, transparent);
@@ -778,4 +779,59 @@
   box-shadow: none !important;
   filter: none !important;
   transform: none !important;
+}
+
+/* Roll-request rows, controls, and completion. The header reuses .ml-award-card__*. */
+.ml-core-roll-request.ml-stack { gap: 0; }
+.ml-core-roll-request > [data-ml-roll-entry] {
+  border: 0;
+  border-radius: 0;
+  background: color-mix(in srgb, var(--ml-color-window) 72%, transparent);
+  box-shadow: none;
+  padding: 8px 11px;
+}
+.ml-core-roll-request > [data-ml-roll-entry] + [data-ml-roll-entry] {
+  border-top: 1px solid color-mix(in srgb, var(--ml-color-accent) 20%, transparent);
+}
+.ml-core-roll-request .ml-roll-controls { align-items: stretch; }
+.ml-core-roll-request .ml-button {
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--ml-control-height);
+  min-height: var(--ml-control-height);
+  max-height: var(--ml-control-height);
+  margin: 0;
+  padding: 0 var(--ml-space-3);
+  border: 1px solid var(--ml-color-border);
+  border-radius: var(--ml-radius-md);
+  background: var(--ml-color-surface-raised);
+  color: var(--ml-color-text);
+  font-weight: var(--ml-font-weight-medium);
+  line-height: 1;
+  white-space: nowrap;
+}
+.chat-message .ml-core-roll-request button.ml-button {
+  height: var(--ml-control-height);
+  min-height: var(--ml-control-height);
+  max-height: var(--ml-control-height);
+}
+.ml-core-roll-request select[data-ml-roll-choice] {
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--ml-control-height);
+  min-height: var(--ml-control-height);
+  max-height: var(--ml-control-height);
+  margin: 0;
+}
+.ml-core-roll-request .ml-button:disabled { cursor: not-allowed; opacity: .58; }
+.ml-core-roll-request .ml-roll-completed {
+  margin: 0;
+  padding: 4px 0 0;
+  border-top: 1px solid color-mix(in srgb, var(--ml-color-accent) 20%, transparent);
+  color: var(--ml-color-muted);
+  font-size: var(--ml-font-size-xs);
+  font-weight: var(--ml-font-weight-bold);
+  letter-spacing: .04em;
+  text-align: center;
+  text-transform: uppercase;
 }

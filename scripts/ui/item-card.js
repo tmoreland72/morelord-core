@@ -58,17 +58,8 @@ export function itemCard({
   const moduleFooter = text(footer);
   const body = rawSlot(bodyHTML);
   const actions = rawSlot(actionsHTML);
-  const recipient = text(recipientName);
-  const detail = text(subtitle);
-
   return `<section class="ml-chat-card ml-award-card">`
-    + `<header class="ml-award-card__header">`
-    + `<div class="ml-award-card__icon"><i class="${escapeHtml(text(icon) || DEFAULT_ICON)}"></i></div>`
-    + `<div class="ml-award-card__heading">`
-    + `<div class="ml-award-card__title">${escapeHtml(title)}</div>`
-    + (recipient ? `<div class="ml-award-card__recipient"><i class="fa-solid fa-user"></i>${escapeHtml(recipient)}</div>` : "")
-    + (detail ? `<div class="ml-award-card__subtitle">${escapeHtml(detail)}</div>` : "")
-    + `</div></header>`
+    + awardCardHeader({ title, icon, recipientName, subtitle })
     + body
     + itemsHtml
     + sectionsHtml
@@ -77,6 +68,19 @@ export function itemCard({
     + actions
     + (moduleFooter ? `<footer class="ml-award-card__footer">${escapeHtml(moduleFooter.toUpperCase())}</footer>` : "")
     + `</section>`;
+}
+
+/** Icon circle, title, recipient, and subtitle shared with roll-request cards. */
+export function awardCardHeader({ title = "", icon = DEFAULT_ICON, recipientName = "", subtitle = "" } = {}) {
+  const recipient = text(recipientName);
+  const detail = text(subtitle);
+  return `<header class="ml-award-card__header">`
+    + `<div class="ml-award-card__icon"><i class="${escapeHtml(text(icon) || DEFAULT_ICON)}"></i></div>`
+    + `<div class="ml-award-card__heading">`
+    + `<div class="ml-award-card__title">${escapeHtml(title)}</div>`
+    + (recipient ? `<div class="ml-award-card__recipient"><i class="fa-solid fa-user"></i>${escapeHtml(recipient)}</div>` : "")
+    + (detail ? `<div class="ml-award-card__subtitle">${escapeHtml(detail)}</div>` : "")
+    + `</div></header>`;
 }
 
 function renderSection(section, emptyText) {

@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { ChatRollRequests, canRollForActor, rollAuthority } from "../scripts/services/chat-roll-requests.js";
+import { readFile } from "node:fs/promises";
+import { ChatRollRequests, canRollForActor, rollAuthority, rollControls } from "../scripts/services/chat-roll-requests.js";
 import { ContextualSocketService } from "../scripts/services/contextual-socket-service.js";
 
 test("chat requests authorize owners and fallback GMs, serialize resolution, and keep private outcomes out of acknowledgments", async t => {
@@ -72,6 +73,14 @@ test("group creation keeps one message, independent rows, resend completion, and
   assert.equal(Object.keys(entries).length,2);
   assert.equal((first.content.match(/data-ml-roll-entry=/g)??[]).length,2);
   assert.equal((first.content.match(/data-ml-roll-decline/g)??[]).length,2);
+  assert.match(first.content, /<section class="ml-chat-card ml-stack ml-core-roll-request">/);
+  assert.match(first.content, /ml-award-card__header/);
+  assert.match(first.content, /ml-award-card__icon"><i class="fa-solid fa-dice-d20">/);
+  assert.match(first.content, /ml-award-card__title">Party Check</);
+  assert.doesNotMatch(first.content, /ml-award-card__recipient/);
+  assert.match(first.content, /<button type="button" class="ml-button" data-ml-core-roll="dis"/);
+  assert.match(first.content, /<button type="button" class="ml-button" data-ml-core-roll="normal" data-ml-roll-decline>Decline search<\/button>/);
+  assert.match(first.content, />Roll<\/button>/);
   assert.equal((await resolve({messageId:first.id,entryKey:b},{senderUserId:player.id})).accepted,false);
   assert.equal((await resolve({messageId:first.id,entryKey:"__proto__"},{senderUserId:gm.id})).accepted,false);
   assert.deepEqual(await resolve({messageId:first.id,entryKey:a,choice:"sur"},{senderUserId:player.id}),{accepted:true});
@@ -84,6 +93,64 @@ test("group creation keeps one message, independent rows, resend completion, and
   await service.create({...options,groupKey:"next-batch",key:"new",actorUuid:actors[0].uuid});
   assert.equal(messages.length,2);
   const rest = await service.create({ type: "group", key: "rest", title: "Long Rest", modes: false, actionLabel: "Long Rest" });
-  assert.ok(rest.content.includes('aria-label="Long Rest">Long Rest</button>'));
+  assert.ok(rest.content.includes('class="ml-button" data-ml-core-roll="normal" aria-label="Long Rest">Long Rest</button>'));
+  assert.match(rest.content, /ml-award-card__recipient"><i class="fa-solid fa-user"><\/i>Game master/);
+  assert.match(rest.content, /<span>Game master<\/span>/);
   assert.ok(!rest.content.includes('data-ml-core-roll="adv"'));
+  assert.ok(!rest.content.includes(">DIS<") && !rest.content.includes(">ADV<"));
+});
+
+test("a single character card puts the shared DC in the award header and keeps roll attributes", t => {
+  const previous = {
+    foundry: Object.getOwnPropertyDescriptor(globalThis, "foundry"),
+    fromUuidSync: Object.getOwnPropertyDescriptor(globalThis, "fromUuidSync")
+  };
+  t.after(() => {
+    for (const [key, descriptor] of Object.entries(previous)) {
+      if (descriptor) Object.defineProperty(globalThis, key, descriptor);
+      else delete globalThis[key];
+    }
+  });
+  const service = new ChatRollRequests({ createChannel: () => ({ on() {} }) });
+  globalThis.foundry = { utils: { escapeHTML: value => String(value ?? "").replaceAll("<", "&lt;") } };
+  globalThis.fromUuidSync = () => ({ name: "Ada <Bee>" });
+  const html = service.html({
+    title: "Watch <Checks>",
+    dc: 14,
+    actorUuid: "Actor.ada",
+    modes: false,
+    actionLabel: "Roll",
+    choices: [{ id: "sur", label: "Survival" }, { id: "decline", label: "Decline search" }]
+  });
+  assert.match(html, /ml-award-card__title">Watch &lt;Checks&gt;/);
+  assert.match(html, /ml-award-card__subtitle">DC 14/);
+  assert.match(html, /ml-award-card__recipient"><i class="fa-solid fa-user"><\/i>Ada &lt;Bee&gt;/);
+  assert.match(html, /data-ml-roll-entry=""/);
+  assert.match(html, /data-ml-roll-choice/);
+  assert.match(html, /<option value="sur">Survival<\/option>/);
+  assert.match(html, /class="ml-button" data-ml-core-roll="normal" aria-label="Roll">Roll<\/button>/);
+  assert.match(html, /class="ml-button" data-ml-core-roll="normal" data-ml-roll-decline>Decline search<\/button>/);
+  assert.equal((html.match(/data-ml-core-roll="adv"/g) ?? []).length, 0);
+  const controls = rollControls(mode => `data-ml-core-roll="${mode}"`, { modes: true });
+  assert.match(controls, /class="ml-button" data-ml-core-roll="dis" aria-label="Roll with disadvantage">DIS<\/button>/);
+  assert.match(controls, /class="ml-button" data-ml-core-roll="normal" aria-label="Roll">Roll<\/button>/);
+  assert.match(controls, /class="ml-button" data-ml-core-roll="adv" aria-label="Roll with advantage">ADV<\/button>/);
+});
+
+test("roll request styles share the award frame and give every button the same height", async () => {
+  const css = await readFile(new URL("../styles/morelord-components.css", import.meta.url), "utf8");
+  assert.match(css, /\.chat-message :is\(\.ml-award-card, \.ml-core-roll-request\)/);
+  assert.match(css, /\.ml-core-roll-request > \[data-ml-roll-entry\]/);
+  assert.match(css, /\.ml-core-roll-request \.ml-roll-controls \{ align-items: stretch; \}/);
+  assert.match(css, /\.ml-core-roll-request \.ml-roll-completed \{[^}]*text-align: center;/s);
+  const buttons = css.match(/\.ml-core-roll-request \.ml-button \{[^}]+\}/);
+  const chatButtons = css.match(/\.chat-message \.ml-core-roll-request button\.ml-button \{[^}]+\}/);
+  assert.ok(buttons);
+  assert.ok(chatButtons);
+  for (const block of [buttons[0], chatButtons[0]]) {
+    assert.match(block, /height:\s*var\(--ml-control-height\)/);
+    assert.match(block, /min-height:\s*var\(--ml-control-height\)/);
+    assert.match(block, /max-height:\s*var\(--ml-control-height\)/);
+  }
+  assert.match(css, /\.ml-core-roll-request \.ml-button\[data-ml-core-roll="normal"\]:not\(\[data-ml-roll-decline\]\)/);
 });

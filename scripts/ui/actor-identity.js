@@ -1,11 +1,20 @@
 const FALLBACK_AVATAR = "icons/svg/mystery-man.svg";
 const escape = value => String(value ?? "").replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
 
+function loadedActor(identity = {}) {
+  const uuid = identity.actorUuid ?? identity.uuid;
+  try { return uuid ? globalThis.fromUuidSync?.(uuid) ?? null : null; } catch { return null; }
+}
+
+/** Name used by the inline identity and the roll-request header recipient. */
+export function actorIdentityName(identity = {}) {
+  const actor = loadedActor(identity);
+  return identity.name ?? identity.actorName ?? actor?.name ?? "Unknown character";
+}
+
 /** Shared inline identity for actors and saved actor snapshots. */
 export function actorIdentity(identity = {}) {
-  const uuid = identity.actorUuid ?? identity.uuid;
-  let actor;
-  try { actor = uuid ? globalThis.fromUuidSync?.(uuid) : null; } catch { /* Deleted or unavailable actors use their snapshot. */ }
+  const actor = loadedActor(identity);
   const name = identity.name ?? identity.actorName ?? actor?.name ?? "Unknown character";
   const img = identity.img || actor?.img || actor?.prototypeToken?.texture?.src || FALLBACK_AVATAR;
   return `<span class="ml-actor-identity"><img class="ml-avatar" src="${escape(img)}" alt="" loading="lazy"><span>${escape(name)}</span></span>`;
