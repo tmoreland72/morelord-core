@@ -20,6 +20,7 @@ const PROTECTED = [
   "page-footer",
   "form-footer",
   "item-row",
+  "award-card",
   "stack",
   "cluster",
   "grid",
