@@ -585,7 +585,7 @@ class MorelordConnectionApp extends HandlebarsApplicationMixin(ApplicationV2) {
     documentationService.register({
       id: "morelord-core", title: "Morelord Core", icon: "fa-solid fa-link",
       subtitle: "Shared premium access for Morelord Tools modules.",
-      source: "modules/morelord-core/CORE-GM-PRODUCT-GUIDE.md"
+      source: "https://morelordgaming.com/docs/morelord-core"
     });
     return new DocumentationApp({ productId: "morelord-core" }).render({ force: true });
   }

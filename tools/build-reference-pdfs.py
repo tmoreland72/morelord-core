@@ -1,7 +1,8 @@
-"""Render the canonical brand guide and module source manuals in the shared Morelord document style.
+"""Render module source manuals in the shared Morelord document style.
 
 Usage: python tools/build-reference-pdfs.py --node PATH --marked PATH
 Requires ReportLab, Pillow, pypdf, and the marked Node package.
+Brand and business docs are maintained in Google Drive, not in this repository.
 """
 from pathlib import Path
 import argparse
@@ -11,7 +12,6 @@ import re
 import subprocess
 import textwrap
 from io import BytesIO
-from html.parser import HTMLParser
 from reportlab.pdfgen import canvas
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle, Image, KeepTogether
 from reportlab.lib.styles import ParagraphStyle
@@ -25,10 +25,14 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'output/pdf'
 OUT.mkdir(parents=True, exist_ok=True)
 parser = argparse.ArgumentParser()
-parser.add_argument('--node', required=True)
-parser.add_argument('--marked', required=True)
-parser.add_argument('--brand-only', action='store_true', help='Refresh the branding guide and HTML snippets only.')
+parser.add_argument('--node')
+parser.add_argument('--marked')
+parser.add_argument('--brand-only', action='store_true', help='Retired. Brand docs now live in Google Drive and are not built here.')
 args = parser.parse_args()
+if args.brand_only:
+    raise SystemExit('Brand and business docs now live in Google Drive (Morelord Gaming/Docs) and are not built from this repository.')
+if not args.node or not args.marked:
+    parser.error('the following arguments are required: --node, --marked')
 for name, file in [('Arial','arial.ttf'),('Arial-Bold','arialbd.ttf'),('Arial-Italic','ariali.ttf'),('Arial-BoldItalic','arialbi.ttf')]:
     pdfmetrics.registerFont(TTFont(name, str(Path('C:/Windows/Fonts')/file)))
 pdfmetrics.registerFontFamily('Arial',normal='Arial',bold='Arial-Bold',italic='Arial-Italic',boldItalic='Arial-BoldItalic')
@@ -97,37 +101,6 @@ def para(text,style='body'):
     return p
 
 warnings=[]
-class ListingHTML(HTMLParser):
-    """Render semantic listing HTML with the same body typography as Markdown."""
-    def __init__(self):
-        super().__init__(convert_charrefs=True)
-        self.story=[]
-        self.parts=[]
-        self.block=None
-    def handle_starttag(self,tag,attrs):
-        if tag in ('p','li','h2','h3','h4'):
-            self.parts=[]
-            self.block=tag
-        elif tag=='strong': self.parts.append('<b>')
-        elif tag=='em': self.parts.append('<i>')
-        elif tag=='a':
-            href=dict(attrs)['href']
-            self.parts.append('<link href="'+html.escape(href,quote=True)+'" color="#355b78">')
-        elif tag=='br': self.parts.append('<br/>')
-    def handle_endtag(self,tag):
-        if tag in ('p','li','h2','h3','h4'):
-            content=''.join(self.parts)
-            if tag=='li':
-                style=ParagraphStyle('listing-item',parent=styles['body'],leftIndent=12,firstLineIndent=-10,spaceAfter=5)
-                self.story.append(Paragraph('- '+content,style))
-            else: self.story.append(para(content,'h3' if tag.startswith('h') else 'body'))
-            self.parts=[]
-            self.block=None
-        elif tag=='strong': self.parts.append('</b>')
-        elif tag=='em': self.parts.append('</i>')
-        elif tag=='a': self.parts.append('</link>')
-    def handle_data(self,data):
-        if self.block: self.parts.append(esc(data))
 
 def render(tokens,path,depth=0):
     story=[]
@@ -135,8 +108,6 @@ def render(tokens,path,depth=0):
         typ=t['type']
         if typ=='space': continue
         if typ=='heading':
-            if path.name=='MORELORD-BRAND-GUIDE.md' and (t['depth']==1 or (t['depth']==2 and t['text'].startswith('Morelord ') and t['text']!='Morelord Gaming suite') or t['text']=='Foundry Description (HTML)'):
-                story.append(PageBreak())
             story.append(para(inline(t['tokens']), 'h1' if t['depth']==1 else 'h2' if t['depth']==2 else 'h3'))
         elif typ in ('paragraph','text'):
             images=[x for x in t.get('tokens',[]) if x['type']=='image']
@@ -179,13 +150,8 @@ def render(tokens,path,depth=0):
         elif typ=='blockquote': story+=render(t['tokens'],path,depth)
         elif typ=='hr': story.append(Spacer(1,8))
         elif typ=='html':
-            if path.name=='MORELORD-BRAND-GUIDE.md':
-                listing=ListingHTML()
-                listing.feed(t.get('text',''))
-                story.extend(listing.story)
-            else:
-                text=re.sub('<[^>]+>','',t.get('text','')).strip()
-                if text: story.append(para(esc(text)))
+            text=re.sub('<[^>]+>','',t.get('text','')).strip()
+            if text: story.append(para(esc(text)))
         else: raise ValueError(f'Unhandled block {typ} in {path}')
     return story
 
@@ -200,69 +166,33 @@ class Document(SimpleDocTemplate):
             level=1 if flow.style.name=='h2' and getattr(self,'_has_section',False) else 0
             self.canv.addOutlineEntry(title,key,level=level)
 
-def build(name,title,files,brand=False):
+def build(name,title,files):
     dest=OUT/name
-    label='Branding guide' if brand else title+' reference'
+    label=title+' reference'
     def furniture(c,d):
         c.saveState();c.setFont('Arial',8);c.setFillColor(MUTED)
         if d.page>1:c.drawString(50,768,'Morelord Gaming  |  '+label)
         c.drawString(50,27,'Morelord Gaming  |  '+label);c.drawRightString(562,27,str(d.page));c.restoreState()
-    story=[Spacer(1,55),para('Morelord Branding Guide' if brand else title,'cover'),para('Brand identity, product UI, and marketing' if brand else 'Module documentation reference','subtitle'),para('One family. Consistent products and communication.' if brand else 'READMEs and user / GM documentation','subtitle'),Spacer(1,23),para('<b>September 7, 2026 | '+('Version 2.2 | Consolidated guide' if brand else 'Local source snapshot')+'</b>'),Spacer(1,18)]
-    if brand:
-        story += [para('The shared brand and implementation reference for the Morelord family, updated across nine local product folders. Marketing positioning and channel copy now live beside the product UI contract.'),table([[para('<b>Review focus</b>','cell'),para('<b>Contents</b>','cell')],[para('Identity and scope','cell'),para('Names, module inventory, compatibility, and planned-product boundaries.','cell')],[para('Visual system','cell'),para('Core-owned tokens, shells, controls, accessibility, and document styling.','cell')],[para('Product communication','cell'),para('Suite promise, per-product copy, channel templates, and copy governance.','cell')]], [125,379])]
-    else:
-        m=json.loads((files[0].parent/'module.json').read_text(encoding='utf-8-sig'))
-        story.append(para('Local manifest version: <b>'+esc(m['version'])+'</b>. This PDF collects the source documents listed below. Original manual version labels are preserved; older manuals may not cover newer README changes. This conversion does not establish current public release availability.'))
-        story.append(table([[para('<b>Included source</b>','cell'),para('<b>Document</b>','cell')]]+[[para(esc(str(p.relative_to(ROOT.parent)).replace('\\','/')),'cell'),para(esc(next((x['text'] for x in lex(p) if x['type']=='heading'),p.stem)),'cell')] for p in files],[WIDTH*.5,WIDTH*.5]))
+    story=[Spacer(1,55),para(title,'cover'),para('Module documentation reference','subtitle'),para('READMEs and user / GM documentation','subtitle'),Spacer(1,23),para('<b>September 7, 2026 | Local source snapshot</b>'),Spacer(1,18)]
+    m=json.loads((files[0].parent/'module.json').read_text(encoding='utf-8-sig'))
+    story.append(para('Local manifest version: <b>'+esc(m['version'])+'</b>. This PDF collects the source documents listed below. Original manual version labels are preserved; older manuals may not cover newer README changes. This conversion does not establish current public release availability.'))
+    story.append(table([[para('<b>Included source</b>','cell'),para('<b>Document</b>','cell')]]+[[para(esc(str(p.relative_to(ROOT.parent)).replace('\\','/')),'cell'),para(esc(next((x['text'] for x in lex(p) if x['type']=='heading'),p.stem)),'cell')] for p in files],[WIDTH*.5,WIDTH*.5]))
     story.append(Spacer(1,12));story.append(para('Prepared in the shared Morelord document style. Use PDF bookmarks to navigate sections.','small'))
     for path in files:
         story.append(PageBreak())
-        ts=lex(path)
-        if brand:
-            ts=ts[1:]
-        story += render(ts,path)
+        story += render(lex(path),path)
     buffer=BytesIO()
     doc=Document(buffer,pagesize=(612,792),leftMargin=54,rightMargin=54,topMargin=56,bottomMargin=51,title=title,author='Morelord Gaming',pageCompression=1)
     doc.build(story,onFirstPage=furniture,onLaterPages=furniture)
-    try:
-        dest.write_bytes(buffer.getvalue())
-    except PermissionError:
-        if not brand: raise
-        dest=OUT/(Path(name).stem+'-v2.2.pdf')
-        dest.write_bytes(buffer.getvalue())
-        print('Existing PDF is locked; wrote',dest.name)
+    dest.write_bytes(buffer.getvalue())
     p=PdfReader(dest)
     if any(not pg.extract_text().strip() for pg in p.pages): raise ValueError('Blank page in '+name)
     print(dest.name,len(p.pages),'pages')
     return {'file':dest.name,'pages':len(p.pages),'sources':[str(p.relative_to(ROOT.parent)).replace('\\','/') for p in files]}
 
-def export_foundry_descriptions():
-    source=(ROOT/'MORELORD-BRAND-GUIDE.md').read_text(encoding='utf-8')
-    folder=ROOT/'output/foundry-descriptions'
-    folder.mkdir(parents=True,exist_ok=True)
-    files=[]
-    for match in re.finditer(r'^## (Morelord [^\n]+)\n(.*?)(?=^#{1,2} |\Z)',source,re.M|re.S):
-        name,body=match.groups()
-        if '### Foundry Description (HTML)' not in body: continue
-        section=body.split('### Foundry Description (HTML)',1)[1]
-        code=re.search(r'```html\n(.*?)\n```',section,re.S)
-        if not code: raise ValueError(f'Missing literal HTML code block for {name}')
-        listing=code.group(1)
-        target=folder/(name.lower().replace(' ','-')+'.html')
-        target.write_text(listing+'\n',encoding='utf-8')
-        files.append(target.name)
-    if len(files)!=8: raise ValueError(f'Expected eight HTML descriptions, found {len(files)}')
-    (folder/'README.md').write_text('# Foundry HTML descriptions\n\nCopy the contents of a module HTML file into the Foundry description editor\'s HTML/source view. Each fragment is generated from the Foundry Description section in `../../MORELORD-BRAND-GUIDE.md`; edit that source and rebuild to keep the document and snippets synchronized.\n\nBoth the PDF and Markdown show literal HTML code with visible tags. These files contain the same HTML without code fences for direct reuse. No package manifest or public listing has been changed. Compendium is a draft for the existing v13 content package; confirm its distribution scope before public use.\n\n'+''.join('- ['+f+']('+f+')\n' for f in files),encoding='utf-8')
-
-export_foundry_descriptions()
-items=[build('Morelord-Branding-Guide.pdf','Morelord Branding Guide',[ROOT/'MORELORD-BRAND-GUIDE.md'],True)]
-if args.brand_only:
-    previous=json.loads((OUT/'build-manifest.json').read_text(encoding='utf-8'))
-    items += [item for item in previous if not item['file'].startswith('Morelord-Branding-Guide')]
-    (OUT/'build-manifest.json').write_text(json.dumps(items,indent=2)+'\n',encoding='utf-8')
-    raise SystemExit(0)
+items=[]
 mapping={
- 'core':['README.md','CORE-GM-PRODUCT-GUIDE.md'],
+ 'core':['README.md'],
  'character-export':['README.md'],
  'craftworks':['README.md','USER-GUIDE.md','docs/README.md','docs/gm-manual.md','docs/player-manual.md'],
  'downtime':['README.md'],

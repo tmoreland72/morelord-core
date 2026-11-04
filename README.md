@@ -10,9 +10,11 @@ User-facing history and result logs must use readable text. `scripts/ui/log-form
 
 Shared account activation and entitlement services for Morelord Tools Foundry VTT modules.
 
+Brand and business docs (brand guide, product guide, demo recording guide) now live in Google Drive: [Morelord Gaming/Docs](https://drive.google.com/drive/folders/1X136uF1zUc6Z3Xq_n9jFVrDzAYsDrnTh).
+
 ## GM setup
 
-See the [Core GM Product Guide](CORE-GM-PRODUCT-GUIDE.md) for account controls, reporting preferences, Ignored Users, [Locations](CORE-GM-PRODUCT-GUIDE.md#locations), configuration transfer, and troubleshooting.
+See the Core GM product guide in [Morelord Gaming/Docs](https://drive.google.com/drive/folders/1X136uF1zUc6Z3Xq_n9jFVrDzAYsDrnTh) for account controls, reporting preferences, Ignored Users, Locations, configuration transfer, and troubleshooting.
 
 1. Install and enable Morelord Core.
 2. Open **Game Settings → Configure Settings → Module Settings → Morelord Core**.
@@ -33,7 +35,7 @@ While it is checked, a creature in a started combat that uses a D&D 5e activity 
 
 ## Locations Manager
 
-The [Locations](CORE-GM-PRODUCT-GUIDE.md#locations) section of the GM guide explains why a place is defined once, how to set it up, and how Downtime, Craftworks, Marketplace, and Journeys use each capability and Specialty.
+The Locations section of the GM product guide in [Morelord Gaming/Docs](https://drive.google.com/drive/folders/1X136uF1zUc6Z3Xq_n9jFVrDzAYsDrnTh) explains why a place is defined once, how to set it up, and how Downtime, Craftworks, Marketplace, and Journeys use each capability and Specialty.
 
 The built-in types are Forge, Marketplace, Library, Temple, Instructor, and Workshop. Library and Temple have no Specialty. A saved Contractor row is omitted when the location is read or saved. A saved Alchemist capability becomes the Workshop specialty `alchemist`. If that Workshop is already Any, it stays Any, and the tier is the higher of the two. The other rows on that location stay.
 
@@ -366,7 +368,7 @@ Zones are Outer City (DC 15) and Inner City (DC 20). Skills are Arcana (`arc`), 
 
 `rollAndAward(session, recipientUuid)` accepts a character or a group. It resolves every source before it writes inventory. A stored uuid that is missing or excluded by Configure Sources is looked up by name again. Each quantity is rolled once, posted as `Delerium Search — <name>`, and kept on the reward. A later failure resumes the same recipient and does not reroll a quantity that was already stored. The items are copied onto the recipient, then one **Delerium Found** chat card is posted for that recipient. `messageMode` of `blind` or `public` is passed to each quantity roll and to that card.
 
-`openResults(session, { award, defaultRecipientUuid })` opens **Delerium Search Results**. `award(recipientUuid)` is required. Omitting it throws `Delerium search results require an award function.` The caller routes the award to the authority GM and returns the updated session. The window is documented in `CORE-GM-PRODUCT-GUIDE.md`.
+`openResults(session, { award, defaultRecipientUuid })` opens **Delerium Search Results**. `award(recipientUuid)` is required. Omitting it throws `Delerium search results require an award function.` The caller routes the award to the authority GM and returns the updated session. The window is documented in the Core GM product guide in [Morelord Gaming/Docs](https://drive.google.com/drive/folders/1X136uF1zUc6Z3Xq_n9jFVrDzAYsDrnTh).
 
 ## Currency
 
@@ -415,7 +417,7 @@ Core 0.4.2 exposes `ui.participation.canUseActorInventory(actor, user = game.use
 The shared quantity-controls partial accepts optional `cartType`, `clearAction`, `classes`, `quantityClass`, and `disabledReason` values. `clearAction` adds an accessible remove button with `data-delta="0"`; existing plus/minus consumers keep their behavior. `disabledReason` disables those controls and explains why: the first line is a bold tooltip title and each later line is a short line. Omit it and the markup is unchanged. The shared `ml-button` partial takes the same optional `disabledReason`. `ui.setDisabled(element, reason)` disables any element the same way. `null`, `""`, or a blank reason enables it and removes the tooltip and `aria-disabled`. Repeating a call leaves the element as it already is. Documentation uses `ui.documentation.open(moduleId, section)` to open the supported module page on Morelord Gaming in a new browser tab. `section` is an optional heading slug, such as `locations`, and is appended as a hash. Anything other than a slug is ignored. Modules without a dedicated page open the documentation index. Ignored-only characters are excluded from shared character choices, including explicit saved selections; eligible offline owners remain supported.
 ## Sidebar multiselect
 
-GM-only **Select multiple** controls support Scenes, Actors, Items, Journals, Rollable Tables, Cards, Macros, Playlists, and Compendium Packs, including pop-out directories. Checkboxes are the leftmost control on each row, including to the left of thumbnails and at the left of playlist headers, and use Foundry's flat checkbox. On a compendium pack card the checkbox sits over the upper left so the banner, title, and footer stay in place. Compact directory portraits stay beside the checkbox instead of underneath it. Clicks on checkboxes do not activate the underlying directory entry or open the pack. Shift-click selects the visible range from the previous checkbox. Select individual entries or **Select visible**, then use **Move selected (N)** to place them in a folder or **Root (no folder)**, or review the named list before confirming **Delete selected (N)**. On Compendium Packs, **Lock selected (N)** and **Unlock selected (N)** change the pack lock, and **Delete selected (N)** includes only world compendiums. **Clear selection** and **Done selecting** clear hidden selections too. Move changes only the selected entries' folder. Folders themselves remain; document and world-compendium deletion is permanent and uses Foundry's native API. No linked account or premium access is required. See `CORE-GM-PRODUCT-GUIDE.md` for every control and scope.
+GM-only **Select multiple** controls support Scenes, Actors, Items, Journals, Rollable Tables, Cards, Macros, Playlists, and Compendium Packs, including pop-out directories. Checkboxes are the leftmost control on each row, including to the left of thumbnails and at the left of playlist headers, and use Foundry's flat checkbox. On a compendium pack card the checkbox sits over the upper left so the banner, title, and footer stay in place. Compact directory portraits stay beside the checkbox instead of underneath it. Clicks on checkboxes do not activate the underlying directory entry or open the pack. Shift-click selects the visible range from the previous checkbox. Select individual entries or **Select visible**, then use **Move selected (N)** to place them in a folder or **Root (no folder)**, or review the named list before confirming **Delete selected (N)**. On Compendium Packs, **Lock selected (N)** and **Unlock selected (N)** change the pack lock, and **Delete selected (N)** includes only world compendiums. **Clear selection** and **Done selecting** clear hidden selections too. Move changes only the selected entries' folder. Folders themselves remain; document and world-compendium deletion is permanent and uses Foundry's native API. No linked account or premium access is required. See the Core GM product guide in [Morelord Gaming/Docs](https://drive.google.com/drive/folders/1X136uF1zUc6Z3Xq_n9jFVrDzAYsDrnTh) for every control and scope.
 
 ## Shared mass combat services (working tree)
 
