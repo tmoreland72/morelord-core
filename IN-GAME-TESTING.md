@@ -32,6 +32,19 @@ Only run in the **Dev1** world (`game.world.id === "dev1"`, case-insensitive). T
 
 Node tests check isolated logic. In-game tests run against the actual Foundry client, loaded system, modules, documents, templates, styles, and hooks. Keep both layers.
 
+## Core 0.9.2 inventory and roll-request regression
+
+In Dev1, with the Chat tab open and a temporary player logged in, run this on Chuck. The same import on the player client skips these three checks. Each check deletes only the actor or chat messages it creates. The roll checks register one temporary `morelord-core.regression` handler on the live `chatRequests` service for that world session. No report file is required.
+
+```js
+const { runInGameTests } = await import("./modules/morelord-core/scripts/testing/in-game.js");
+const { releaseRegressionChecks } = await import("./modules/morelord-core/scripts/testing/release-regression.js");
+const report = await runInGameTests({ checks: releaseRegressionChecks });
+copy(JSON.stringify(report, null, 2));
+```
+
+`inventoryGrantCheck` (`core.inventory-add-items`) grants two loot piles through `MorelordCore.inventory.addItems`, asserts one document at quantity 3, grants again onto that document, rejects a batch whose second quantity is 0 without changing the pile, keeps two containers separate, and grants one valid retry. `rollRequestVisibilityCheck` (`core.roll-request-visibility`) posts through `chatRequests.create` and reads the saved `ChatMessage` whisper: `preserveMessageMode: true` keeps Chuck and the player, and a call without that flag is still public. `rollRequestStepsCheck` (`core.roll-request-steps`) clicks the rendered Roll button, asserts a held step does not show Completed, completes the last step once, reopens with `completeChatRoll(message, "", { reopen: true })`, and completes that reopened step once.
+
 ## Run the initial smoke suite
 
 September 21 Dev1 pending-release validation: confirmed `game.world.id === "dev1"` before checks on Foundry 14.368 / D&D5e 6.0.3. All 397 Node tests across Core, Craftworks, Encounters, Downtime, Journeys, Marketplace and Character Export passed, as did the design-system scan. The combined live report is `test/in-game-reports/2026-09-21-dev1-release-validation.json`: eight checks passed, including both reporting defaults/opt-outs, Lucky Finds and the Drakkenheim source audit. Settings synchronization exceeded the original 60-second test window; the follow-up `2026-09-21-dev1-settings-sync.json` passed all five checks, with settings save completing in about 115 seconds. The owning regression now allows 180 seconds. All nine distinct combined workflow checks therefore passed across these runs. Shared scrolling preserved 200px across rerenders in both theme configurations (`2026-09-21-dev1-scroll.json`). Visual inspection found dark text on a dark Core window background under the light theme (`2026-09-21-dev1-settings-theme-light.png`); this remains a release blocker, not a visual pass. No worlds were switched; telemetry transport was blocked in test browsers and regression settings were restored. Full 200% zoom and player interaction coverage was not performed in this pass.

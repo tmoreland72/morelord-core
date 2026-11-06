@@ -397,7 +397,9 @@ test("updateEntry re-renders a GM patch, and completeChatRoll can reopen without
   await assert.rejects(() => service.updateEntry(message, entryKey, { title: "Nope" }), /eligible GM/);
   assert.equal(updates.length, 0);
   game.user = gm;
+  card.entries[entryKey].holdCompletion = true;
   const next = await service.updateEntry(message, entryKey, { title: "Gems", actionLabel: "Confirm", dc: 15, data: { step: 2 }, completed: false });
+  assert.equal(next.entries[entryKey].holdCompletion, true);
   assert.equal(next.entries[entryKey].title, "Gems");
   assert.equal(next.entries[entryKey].data.requestId, "one");
   assert.equal(next.entries[entryKey].data.step, 2);
@@ -417,8 +419,150 @@ test("updateEntry re-renders a GM patch, and completeChatRoll can reopen without
   assert.equal(card.entries[entryKey].completed, false);
   assert.equal(card.entries[entryKey].title, "Art");
   assert.equal(card.entries[entryKey].actionLabel, "Keep rolling");
+  assert.equal(card.entries[entryKey].holdCompletion, true);
   assert.match(message.content, /aria-label="Keep rolling">Keep rolling</);
   assert.equal(updates.some(entry => entry[0] === "refresh"), true);
+});
+
+test("message visibility stays public unless the caller opts in to preserving it", async t => {
+  const keys = ["game", "foundry", "ChatMessage", "ui"];
+  const saved = keys.map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]);
+  t.after(() => { for (const [key, descriptor] of saved) if (descriptor) Object.defineProperty(globalThis, key, descriptor); else delete globalThis[key]; });
+  const gm = { id: "gm", isGM: true, active: true };
+  const messages = [];
+  messages.get = id => messages.find(message => message.id === id);
+  const calls = [];
+  globalThis.game = { user: gm, users: [gm], messages, settings: { settings: new Map() } };
+  globalThis.foundry = { utils: { escapeHTML: String } };
+  globalThis.ui = { chat: { updateMessage() {} } };
+  globalThis.ChatMessage = { async create(data, options) {
+    calls.push({ whisper: data.whisper, blind: data.blind, options });
+    const message = {
+      ...data, id: `card-${messages.length}`, author: gm, options,
+      getFlag: (id, key) => message.flags[id][key],
+      async update(changes) {
+        const flag = changes["flags.morelord-core.rollRequest"];
+        if (flag) message.flags["morelord-core"].rollRequest = flag;
+      }
+    };
+    messages.push(message);
+    return message;
+  } };
+  const service = new ChatRollRequests({ createChannel: () => ({ on() {} }) });
+  service.register("posted", () => ({ accepted: true }));
+  const forced = await service.create({
+    type: "posted", key: "forced", title: "Check", whisper: [gm.id], blind: true, messageMode: "blind"
+  });
+  assert.deepEqual(calls[0], { whisper: [gm.id], blind: false, options: { messageMode: "public" } });
+  assert.equal(forced.getFlag("morelord-core", "rollRequest").holdCompletion, undefined);
+  const preserved = await service.create({
+    type: "posted", key: "kept", title: "Private", whisper: [gm.id], blind: false, preserveMessageMode: true
+  });
+  assert.deepEqual(calls[1], { whisper: [gm.id], blind: false, options: {} });
+  assert.equal(preserved.blind, false);
+  const blind = await service.create({
+    type: "posted", key: "blind", title: "Blind", whisper: ["gm"], blind: true, messageMode: "blind", preserveMessageMode: true, holdCompletion: true
+  });
+  assert.deepEqual(calls[2], { whisper: ["gm"], blind: true, options: { messageMode: "blind" } });
+  assert.equal(blind.getFlag("morelord-core", "rollRequest").holdCompletion, true);
+  const grouped = await service.create({
+    type: "posted", key: "ada", groupKey: "batch", title: "Party", preserveMessageMode: true, whisper: ["secret"], messageMode: "gm", holdCompletion: true
+  });
+  assert.equal(calls.length, 4);
+  assert.equal(grouped.getFlag("morelord-core", "rollRequest").entries[Object.keys(grouped.getFlag("morelord-core", "rollRequest").entries)[0]].holdCompletion, true);
+  const joined = await service.create({
+    type: "posted", key: "bea", groupKey: "batch", title: "Party", preserveMessageMode: true, whisper: ["other"], messageMode: "blind"
+  });
+  assert.equal(joined, grouped);
+  assert.equal(calls.length, 4);
+  assert.equal(calls[3].options.messageMode, "gm");
+  assert.deepEqual(calls[3].whisper, ["secret"]);
+});
+
+test("holdCompletion keeps a step open, and a normal handler still completes", async t => {
+  const keys = ["game", "foundry", "ui", "Hooks", "fromUuid", "fromUuidSync", "document"];
+  const saved = keys.map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]);
+  t.after(() => { for (const [key, descriptor] of saved) if (descriptor) Object.defineProperty(globalThis, key, descriptor); else delete globalThis[key]; });
+  globalThis.document = { createElement: () => ({ className: "", setAttribute() {}, textContent: "" }) };
+  const gm = { id: "gm", active: true, isGM: true }, player = { id: "player", active: true, isGM: false };
+  const actor = { uuid: "Actor.hero", testUserPermission: user => user === player };
+  const users = [gm, player];
+  users.get = id => users.find(user => user.id === id);
+  let request = { type: "steps", actorUuid: actor.uuid, modes: true, choices: [], data: {}, completed: false, holdCompletion: true };
+  const message = { id: "steps", author: gm, getFlag: () => request, async setFlag(_id, _key, value) { request = value; } };
+  const messages = [message];
+  messages.get = id => messages.find(item => item.id === id);
+  globalThis.game = { user: gm, users, messages, settings: { settings: new Map() } };
+  globalThis.foundry = { utils: { escapeHTML: String } };
+  globalThis.fromUuid = async () => actor;
+  globalThis.fromUuidSync = () => actor;
+  const notices = [];
+  globalThis.ui = { notifications: { error(text) { notices.push(text); } }, chat: { updateMessage() {} } };
+  let handler;
+  let outcome = {};
+  const service = new ChatRollRequests({ createChannel: () => ({
+    on(_type, fn) { handler = fn; },
+    executeAsUser: async (_type, data, userId) => {
+      const previous = game.user;
+      game.user = users.get(userId);
+      try { return await handler(data, { senderUserId: previous.id }); }
+      finally { game.user = previous; }
+    }
+  }) });
+  service.register("steps", () => outcome);
+  assert.deepEqual(await handler({ messageId: "steps", mode: "normal" }, { senderUserId: player.id }), { accepted: true, held: true });
+  assert.equal(request.completed, false);
+  outcome = { complete: false };
+  assert.equal((await handler({ messageId: "steps", mode: "normal" }, { senderUserId: player.id })).held, true);
+  assert.equal(request.completed, false);
+  outcome = { complete: true };
+  assert.deepEqual(await handler({ messageId: "steps", mode: "normal" }, { senderUserId: player.id }), { accepted: true });
+  assert.equal(request.completed, true);
+  request = { type: "steps", actorUuid: actor.uuid, modes: true, choices: [], data: {}, completed: false };
+  assert.deepEqual(await handler({ messageId: "steps", mode: "normal" }, { senderUserId: player.id }), { accepted: true });
+  assert.equal(request.completed, true);
+  request = { ...request, completed: false };
+  outcome = { accepted: false, reason: "Not this step." };
+  request.holdCompletion = true;
+  assert.equal((await handler({ messageId: "steps", mode: "normal" }, { senderUserId: player.id })).accepted, false);
+  assert.equal(request.completed, false);
+
+  const hooks = [];
+  globalThis.Hooks = { on(_name, fn) { hooks.push(fn); } };
+  service.start();
+  let release;
+  let entered = false;
+  outcome = new Promise(resolve => { release = resolve; });
+  service.register("steps", async () => { entered = true; return outcome; });
+  request = { type: "steps", actorUuid: actor.uuid, modes: true, choices: [], data: {}, completed: false, holdCompletion: true };
+  const open = rollButton();
+  hooks[0](message, open.html);
+  const pending = open.click();
+  await new Promise(resolve => setTimeout(resolve, 0));
+  assert.equal(entered, true);
+  assert.equal(open.completed(), false);
+  const during = rollButton();
+  hooks[0](message, during.html);
+  assert.equal(during.disabled(), true);
+  assert.equal(during.completed(), false);
+  release({ accepted: true });
+  await pending;
+  assert.equal(open.completed(), false);
+  assert.equal(request.completed, false);
+  assert.deepEqual(notices, []);
+
+  request = { type: "steps", actorUuid: actor.uuid, modes: true, choices: [], data: {}, completed: false };
+  let started;
+  const gate = new Promise(resolve => { started = resolve; });
+  service.register("steps", () => gate);
+  const immediate = rollButton();
+  hooks[0](message, immediate.html);
+  const waiting = immediate.click();
+  await new Promise(resolve => setTimeout(resolve, 0));
+  assert.equal(immediate.completed(), true);
+  started({ accepted: true });
+  await waiting;
+  assert.equal(request.completed, true);
 });
 
 function rollButton() {
@@ -437,5 +581,5 @@ function rollButton() {
     closest: () => row,
     addEventListener(_type, fn) { listeners.push(fn); }
   };
-  return { html: { querySelectorAll: () => [button] }, click: () => listeners[0](), completed: () => completed };
+  return { html: { querySelectorAll: () => [button] }, click: () => listeners[0](), completed: () => completed, disabled: () => button.disabled };
 }
