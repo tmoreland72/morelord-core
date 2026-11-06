@@ -36,21 +36,39 @@ function readField(source, key) {
   return value;
 }
 
+function blankCharge(value) {
+  return value == null || value === "" || value === 0;
+}
+
 function chargeToken(uses) {
   if (!uses || typeof uses !== "object" || Array.isArray(uses)) return "";
   const picked = {};
   for (const key of ["max", "spent", "value"]) {
     const value = readField(uses, key);
-    if (value == null || value === "") continue;
+    if (blankCharge(value)) continue;
     picked[key] = value;
   }
   return Object.keys(picked).length ? JSON.stringify(picked) : "";
 }
 
-function stateValue(system, key, boolean = false) {
-  const value = readField(system, key);
-  if (value === undefined) return null;
-  return boolean ? value === true : value;
+/** dnd5e 6 IdentifiableTemplate initializes identified to true when the grant omits it. */
+function identifiedState(system) {
+  const value = readField(system, "identified");
+  if (value == null) return true;
+  return value === true;
+}
+
+/** Equippable items initialize attunement to blank and attuned to false. Loot omits both. */
+function attunementState(system) {
+  const value = readField(system, "attunement");
+  if (value == null || value === "") return "";
+  return value;
+}
+
+function attunedState(system) {
+  const value = readField(system, "attuned");
+  if (value == null) return false;
+  return value === true;
 }
 
 function stateKey(data, source) {
@@ -59,9 +77,9 @@ function stateKey(data, source) {
     type: data?.type ?? "",
     name: data?.name ?? "",
     source: source || "",
-    identified: stateValue(system, "identified", true),
-    attunement: stateValue(system, "attunement"),
-    attuned: stateValue(system, "attuned", true),
+    identified: identifiedState(system),
+    attunement: attunementState(system),
+    attuned: attunedState(system),
     charges: chargeToken(system.uses)
   });
 }
