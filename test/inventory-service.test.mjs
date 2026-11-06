@@ -200,6 +200,76 @@ test("invalid items and actors are rejected before any write", async () => {
   assert.deepEqual(await addItems(actor, []), { created: [], updated: [] });
 });
 
+/** dnd5e 6 writes schema initials onto the embedded item. Identified starts true; equippable attunement starts blank. */
+function dnd5e6Created(item, serial) {
+  const input = item.system ?? {};
+  const proto = {
+    get identified() { return true; },
+    get container() { return null; }
+  };
+  if (item.type === "consumable" || item.type === "equipment" || item.type === "weapon" || item.type === "tool") {
+    proto.attunement = "";
+    proto.attuned = false;
+  }
+  if (item.type === "consumable") proto.uses = { spent: 0, max: "" };
+  const system = Object.assign(Object.create(proto), { quantity: input.quantity ?? 1 });
+  if (input.container) system.container = input.container;
+  if (input.identified != null) Object.defineProperty(system, "identified", { value: input.identified, enumerable: true });
+  if (input.attunement) system.attunement = input.attunement;
+  if (input.attuned != null) system.attuned = input.attuned;
+  if (input.uses) system.uses = input.uses;
+  return {
+    id: `dnd-${serial}`,
+    uuid: `Actor.hero.Item.dnd-${serial}`,
+    name: item.name,
+    type: item.type,
+    system
+  };
+}
+
+test("a second plain grant stacks onto the item dnd5e 6 stored from the first grant", async () => {
+  const items = [];
+  let serial = 0;
+  const actor = {
+    items,
+    async updateEmbeddedDocuments(_type, updates) {
+      for (const update of updates) items.find(item => item.id === update._id).system.quantity = update["system.quantity"];
+    },
+    async createEmbeddedDocuments(_type, data) {
+      const created = data.map(item => dnd5e6Created(item, ++serial));
+      items.push(...created);
+      return created;
+    }
+  };
+  const rations = { name: "Core Regression Rations", type: "loot", system: { quantity: 2 } };
+  const first = await addItems(actor, [rations, { name: "Core Regression Rations", type: "loot", system: { quantity: 1 } }]);
+  assert.equal(first.created.length, 1);
+  assert.equal(items[0].system.identified, true);
+  assert.equal(items[0].system.quantity, 3);
+  const again = await addItems(actor, [rations]);
+  assert.equal(items.filter(item => item.name === "Core Regression Rations").length, 1);
+  assert.equal(items[0].system.quantity, 5);
+  assert.deepEqual(again.created, []);
+  await addItems(actor, [{ name: "Core Regression Rations", type: "loot", system: { quantity: 1, identified: false } }]);
+  assert.equal(items.filter(item => item.name === "Core Regression Rations").length, 2);
+
+  const dagger = { name: "Dagger", type: "weapon", system: { quantity: 1 } };
+  await addItems(actor, [dagger]);
+  await addItems(actor, [dagger]);
+  assert.equal(items.filter(item => item.name === "Dagger").length, 1);
+  assert.equal(items.find(item => item.name === "Dagger").system.quantity, 2);
+  assert.equal(items.find(item => item.name === "Dagger").system.attunement, "");
+  assert.equal(items.find(item => item.name === "Dagger").system.attuned, false);
+
+  const oil = { name: "Oil", type: "consumable", system: { quantity: 1 } };
+  await addItems(actor, [oil]);
+  await addItems(actor, [oil]);
+  assert.equal(items.filter(item => item.name === "Oil").length, 1);
+  assert.equal(items.find(item => item.name === "Oil").system.quantity, 2);
+  await addItems(actor, [{ name: "Oil", type: "consumable", system: { quantity: 1, uses: { max: 1, spent: 1 } } }]);
+  assert.equal(items.filter(item => item.name === "Oil").length, 2);
+});
+
 test("a different source or name does not join an existing stack", async () => {
   const actor = actorWith([{ id: "rations", name: "Rations", type: "loot", system: { quantity: 2 }, _stats: { compendiumSource: "Compendium.dnd5e.equipment24.Item.rations" } }]);
   await addItems(actor, [
