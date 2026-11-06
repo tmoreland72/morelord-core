@@ -389,6 +389,19 @@ await currency.addCurrency(actor, currency.copperRate("gp"));
 await currency.addCoins(actor, { gp: 2, sp: -5 });
 ```
 
+## Inventory
+
+`MorelordCore.inventory` is the same object as `game.modules.get("morelord-core").api.inventory`. It is available from the `init` hook.
+
+`addItems(actor, items)` grants a list of item data or item documents. Compatible consumables and loot combine quantity, including a second grant of the same pile. Equipment, weapons, and tools combine only when `system.quantity` is a positive whole number. Containers stay separate, and so does anything carried in a container (`system.container`). A different name or compendium source stays separate. Charges (`system.uses` `max`, `spent`, and `value`), `system.identified`, and `system.attunement` must match; a boolean `system.attuned` is compared when that property is present. An invalid quantity or a blank stackable name throws before the actor is written. If creating the new documents throws, quantity changes from that call are restored. The call returns `{ created, updated }`. `updated` entries are `{ id, uuid, quantity, previousQuantity }`.
+
+```js
+const inventory = game.modules.get("morelord-core").api.inventory;
+await inventory.addItems(actor, [
+  { name: "Potion of Healing", type: "consumable", system: { quantity: 2, identified: true, uses: { max: 1, spent: 0 } } }
+]);
+```
+
 ## Shared roll requests and compendiums
 
 `MorelordCore.rolls` is the same object as `game.modules.get("morelord-core").api.rolls`. `formatModifier(n)` returns a signed modifier such as `+5`, `-1`, or `+0`. A non-finite value is `+0`. `skillChoiceLabel(actor, skillKey)` returns the localized dnd5e skill name and that actor's computed skill total, such as `Religion (+5)`. The name comes from `CONFIG.DND5E.skills[skillKey].label` through `game.i18n.localize`, or the skill key when that label is missing. The total is `system.skills[skillKey].total`, then `mod` when `total` is absent.
@@ -415,7 +428,11 @@ The card root is `section.ml-chat-card.ml-stack.ml-core-roll-request`. Its heade
 
 `completeChatRoll(message, entryKey)` still marks that entry completed and does not change its title or button. `completeChatRoll(message, entryKey, { reopen: true, title, actionLabel })` sets `completed` to false, applies an optional title and button label, and renders the card again so the row can be used for another step.
 
-Clicking a character's roll immediately removes that row's controls and shows centered **Completed** text; other rows remain usable. A `prepare` cancel happens before that, so the row stays open. Shared `submitChatRoll(message, key, row, submit)` and `isRollSubmitted(message, key)` preserve this local state during rerenders and restore controls when the GM rejects or cancels the roll. Permissions, offline-player GM fallback, and duplicate protection are unchanged.
+`create` still posts with `{ messageMode: "public" }` unless the caller opts in. That public mode is what clears a whisper list. `preserveMessageMode: true` posts the caller's `whisper`, `blind`, and `messageMode` instead. Omit `messageMode` on that call to leave the whisper list as given. A character added to an existing group card does not change that card's visibility. Callers that do not pass `preserveMessageMode: true` are unchanged, including a caller that passes `whisper` or `messageMode` without the flag.
+
+`holdCompletion: true` on `create` stores that flag on the new entry. The row does not show **Completed** when it is clicked, and a successful `resolve` does not mark the entry completed. Return `{ complete: true }` from `resolve`, or call `completeChatRoll`, when the last step is done. `{ complete: false }` holds only when the entry opted in. `completeChatRoll` and `completeChatRoll(message, entryKey, { reopen: true })` are unchanged.
+
+Clicking a character's roll immediately removes that row's controls and shows centered **Completed** text; other rows remain usable. A held step is the exception: the button stays, and a second click while that step is in flight does not resolve again. A `prepare` cancel happens before that, so the row stays open. Shared `submitChatRoll(message, key, row, submit)` and `isRollSubmitted(message, key)` preserve this local state during rerenders and restore controls when the GM rejects or cancels the roll. `submitChatRoll` accepts an optional fifth argument, `{ holdCompletion: true }`. Permissions, offline-player GM fallback, and duplicate protection are unchanged.
 
 `waitForDiceAnimation(message)` delays derived outcomes, not request-card completion. Consumers can schedule `afterDiceAnimation(messages, callback, serializeKey)` without awaiting it inside a socket handler; only its final callback joins `MorelordCore.socket.runSerialized(key, callback)`, sharing the existing mutation queue. Handle its rejected promise, reread current domain state before committing, and retain saved dice for recovery. Animation waits must never hold the roll queue. Craftworks, Journeys, and Game Master use this path; rolls without animations show outcomes immediately after the commit.
 

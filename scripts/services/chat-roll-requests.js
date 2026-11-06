@@ -7,11 +7,12 @@ const ENTRY_PATCH_KEYS = ["title", "actionLabel", "modes", "choices", "dc", "dat
 const escape = value => foundry.utils.escapeHTML(String(value ?? ""));
 const submittedRolls = new Set();
 export const isRollSubmitted = (message, key) => submittedRolls.has(`${message.id}:${key}`);
-export async function submitChatRoll(message, key, row, submit) {
+export async function submitChatRoll(message, key, row, submit, options = {}) {
   if (isRollSubmitted(message, key)) return;
   const id = `${message.id}:${key}`;
   submittedRolls.add(id);
-  markRollCompleted(row);
+  // A held step stays open. Every other click still shows Completed immediately.
+  if (options?.holdCompletion !== true) markRollCompleted(row);
   try { return await submit(); }
   finally {
     submittedRolls.delete(id);
@@ -154,6 +155,8 @@ export class ChatRollRequests {
       if (prepare) context.rollData = rollData;
       const result = await resolve(request.data, context);
       if (result?.accepted === false) return { accepted: false, reason: result.reason ?? "This request is no longer pending." };
+      // holdCompletion skips the automatic close. completeChatRoll, including reopen, is unchanged.
+      if (request.holdCompletion === true && result?.complete !== true) return { accepted: true, held: true };
       await completeChatRoll(message, entryKey);
       return { accepted: true }; // Never return totals or private outcome data to a player.
     }, { serialize });
@@ -163,11 +166,12 @@ export class ChatRollRequests {
     this.creation = operation.catch(() => {});
     return operation;
   }
-  async createCard({ type, key, groupKey = null, groupTitle = null, title, actorUuid = null, dc = null, modes = true, actionLabel = "Roll", choices = [], data = {}, speaker, whisper, flags }) {
+  async createCard({ type, key, groupKey = null, groupTitle = null, title, actorUuid = null, dc = null, modes = true, actionLabel = "Roll", choices = [], data = {}, speaker, whisper, flags, preserveMessageMode = false, messageMode, blind, holdCompletion = false }) {
     if (!game.user.isGM || isIgnored(game.user)) throw new Error("An eligible GM must create roll requests.");
     if (!this.handlers.has(type)) throw new Error(`Roll request handler ${type} is unavailable.`);
     const existing = game.messages.find(message => message.author?.isGM && message.getFlag(ID, "rollRequest")?.key === (groupKey ?? key) && message.getFlag(ID, "rollRequest")?.type === type);
     const request = { type, key, title, actorUuid, dc, modes, actionLabel, choices, data, completed: false };
+    if (holdCompletion === true) request.holdCompletion = true;
     // Entry keys become document update paths, so keep caller identifiers out of them.
     const entryKey = groupKey ? Array.from(new TextEncoder().encode(key), byte => byte.toString(16).padStart(2, "0")).join("") : null;
     if (existing) {
@@ -181,6 +185,13 @@ export class ChatRollRequests {
     const card = groupKey ? { type, key: groupKey, title: groupTitle ?? title, entries: { [entryKey]: request } } : request;
     const messageData = { content: this.html(card), whisper: whisper ?? [], blind: false, flags: messageFlags(flags, card) };
     if (speaker != null) messageData.speaker = speaker;
+    // Public mode clears a whisper. Only an explicit opt-in forwards the caller's visibility.
+    if (preserveMessageMode === true) {
+      if (typeof blind === "boolean") messageData.blind = blind;
+      const options = {};
+      if (typeof messageMode === "string" && messageMode) options.messageMode = messageMode;
+      return ChatMessage.create(messageData, options);
+    }
     return ChatMessage.create(messageData, { messageMode: "public" });
   }
   async updateEntry(message, entryKey, patch = {}) {
@@ -203,7 +214,9 @@ export class ChatRollRequests {
         const row = button.closest("[data-ml-roll-entry]");
         const entryKey = row?.dataset.mlRollEntry;
         const entry = request.entries ? request.entries[entryKey] : request;
-        if (entry?.completed || isRollSubmitted(message, entryKey)) { markRollCompleted(row ?? button.closest(".ml-card")); continue; }
+        const held = entry?.holdCompletion === true;
+        if (entry?.completed || (isRollSubmitted(message, entryKey) && !held)) { markRollCompleted(row ?? button.closest(".ml-card")); continue; }
+        if (held && isRollSubmitted(message, entryKey)) { button.disabled = true; continue; }
         const actor = entry?.actorUuid ? fromUuidSync(entry.actorUuid) : null;
         button.disabled = !entry || entry.completed || !canRollForActor(actor);
         button.addEventListener("click", async () => {
@@ -230,7 +243,7 @@ export class ChatRollRequests {
             await submitChatRoll(message, entryKey, row, async () => {
               const result = await this.channel.executeAsUser(request.type, payload, rollAuthority(message)?.id);
               if (!result?.accepted) throw new Error(result?.reason ?? "No active GM can resolve this request.");
-            });
+            }, { holdCompletion: held });
           } catch (error) { ui.notifications.error(error.message); }
         });
       }

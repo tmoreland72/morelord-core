@@ -42,6 +42,7 @@ import {
   currencyToCp, deductCurrency, formatCp, getCurrency, getCurrencyCopper, getCurrencyDisplay, gpAmount,
   setCurrency, totalCp
 } from "./services/currency-service.js";
+import { addItems } from "./services/inventory-service.js";
 import { SUBSCRIPTION_TIERS, normalizeSubscriptionTier, capSubscriptionTier, applySubscriptionTesting } from "./services/subscription-testing.js";
 import { createToolsRegistry, mergeCoreApi } from "./ui/tools-registry.js";
 import { bindMorelordModulesButton } from "./ui/morelord-modules.js";
@@ -89,6 +90,10 @@ function publishedCurrency() {
     adjustCurrencyCopper,
     applyGpDelta
   });
+}
+
+function publishedInventory() {
+  return Object.freeze({ addItems });
 }
 registerDirectorySelection();
 const telemetry = new TelemetryService();
@@ -614,6 +619,7 @@ Hooks.once("init", () => {
     api.tools ??= toolsRegistry.api;
     api.sources = publishedSources();
     api.currency = publishedCurrency();
+    api.inventory = publishedInventory();
     api.deleriumSearch = deleriumSearch;
     globalThis.MorelordCore = api;
   }
@@ -764,6 +770,7 @@ Hooks.once("ready", async () => {
     sources: publishedSources(),
     rolls: Object.freeze({ skill: rollSkill, skillModifier: actorSkillModifier, naturalD20: extractNaturalD20, formatModifier, skillChoiceLabel }),
     currency: publishedCurrency(),
+    inventory: publishedInventory(),
     socket: Object.freeze({
       get ready() { return contextualSocket.ready; },
       createChannel: namespace => contextualSocket.createChannel(namespace),
