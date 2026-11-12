@@ -29,6 +29,8 @@ Hover over another visible token to see the distance. Players measure from one s
 
 ## Reaction Used
 
+When Midi-QOL is active, it controls the reaction status and its automation. In Midi-QOL's D&D5e 6.x release line, enable **Enforce Reactions** in Midi-QOL to make its reaction status available. Core's **Reaction Used** checkbox has no effect until Midi-QOL is deactivated and the world is reloaded. The saved checkbox value is retained.
+
 **Reaction Used** is a world checkbox under **Game Settings → Configure Settings → Morelord Core** and in **Connect or Manage Account → Core Settings**. It is checked by default. Only a GM can change it; choose **Save Core Settings** in the account window. No account connection or premium access is required.
 
 While it is checked, a creature in a started combat that uses a D&D 5e activity with a reaction activation receives the **Reaction** token status. The label is **Reaction** so it fits the token HUD status grid. The colored lightning-bolt icon appears on the token and in the right-click token status effects, where it can also be toggled by hand for an opportunity attack, a readied action, or a mark that should be removed. The active GM clears the mark when that creature's turn starts. On a shared mob turn from Morelord Encounters, every token in that mob on the scene is cleared. When combat ends, or the round returns to 0, the active GM clears the mark from tokens on that scene. Other GMs and players do not clear marks. Unchecking **Reaction Used** stops automatic marking and clearing; the status stays available on the token HUD.

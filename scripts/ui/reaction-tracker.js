@@ -198,13 +198,16 @@ export function registerReactionTracker({
 } = {}) {
   game.settings.register(MODULE_ID, 'reactionTracker', {
     name: 'Reaction Used',
-    hint: 'Mark a token when it uses a reaction during a started combat. The active GM clears it on that creature\'s next turn and when combat ends.',
+    hint: 'Mark a token when it uses a reaction during a started combat. The active GM clears it on that creature\'s next turn and when combat ends. Midi-QOL handles reactions when active.',
     scope: 'world',
     config: true,
     type: Boolean,
     default: true,
     restricted: true
   });
+  // Midi-QOL registers the same status ID, potentially after Core's startup hooks.
+  if (game.modules?.get('midi-qol')?.active) return;
+
   const enabled = () => {
     try { return game.settings.get(MODULE_ID, 'reactionTracker') !== false; }
     catch { return true; }

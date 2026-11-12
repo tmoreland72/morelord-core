@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { disabledTooltip, registerDisabledTooltipHelper, setDisabled } from "../scripts/ui/disabled-reason.js";
 
 const root = new URL("../", import.meta.url);
-const read = path => readFileSync(new URL(path, root), "utf8");
+const read = path => readFileSync(new URL(path, root), "utf8").replace(/\r\n/g, "\n");
 const buttonTemplate = read("templates/components/ml-button.hbs");
 const quantityTemplate = read("templates/components/quantity-controls.hbs");
 

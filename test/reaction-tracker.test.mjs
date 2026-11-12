@@ -285,6 +285,38 @@ test('non-GM clients never clear reactions, and only an owner applies one', asyn
   assert.deepEqual(applied, [true, false]);
 });
 
+for (const enabled of [false, true]) {
+  test(`Midi-QOL owns reaction registration and automation with Reaction Used ${enabled ? 'on' : 'off'}`, async () => {
+    const hooks = hooksMock();
+    const hero = actor('hero', {owner: true});
+    const combat = startedCombat({combatants: [combatant(hero)], tokens: [token(hero)]});
+    const game = {
+      modules: new Map([['midi-qol', {active: true}]]),
+      settings: {register() {}, get: () => enabled},
+      user: {isGM: true},
+      users: {activeGM: {isSelf: true}},
+      combats: [combat]
+    };
+    const config = {DND5E: {statusEffects: {}}, statusEffects: [], specialStatusEffects: {}};
+    registerReactionTracker({hooks, game, config});
+    await hooks.call('i18nInit');
+    await hooks.call('setup');
+
+    // Model Midi-QOL appending its definition after Core's registration hooks.
+    const midiReaction = {id: 'reaction', img: 'modules/midi-qol/icons/reaction.svg'};
+    config.statusEffects.push(midiReaction);
+    assert.deepEqual(config.statusEffects.filter(effect => effect.id === 'reaction'), [midiReaction]);
+    assert.deepEqual(config.DND5E.statusEffects, {});
+    assert.deepEqual(config.specialStatusEffects, {});
+
+    await hooks.call('dnd5e.postUseActivity', {activation: {type: 'reaction'}, actor: hero});
+    hero.statuses.add(REACTION_STATUS_ID);
+    await hooks.call('updateCombat', combat, {turn: 0});
+    await hooks.call('deleteCombat', combat);
+    assert.deepEqual(hero.calls, []);
+  });
+}
+
 test('core settings register and save the world reaction tracker', () => {
   const template = readFileSync(new URL('../templates/connection.hbs', import.meta.url), 'utf8');
   const main = readFileSync(new URL('../scripts/main.js', import.meta.url), 'utf8');
