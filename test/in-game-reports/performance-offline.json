@@ -1,0 +1,11 @@
+{
+  "ok": true,
+  "scope": "offline",
+  "checks": [
+    "required selection",
+    "three native choices",
+    "apply",
+    "keep settings",
+    "shared footer"
+  ]
+}

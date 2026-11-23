@@ -181,9 +181,13 @@ function scriptFiles(dir) {
   return files;
 }
 
-test('Core settings are world-scoped, and Token Distance plus compendium organization are GM-only', () => {
+test('Core settings are world-scoped except personal performance, and shared world choices are GM-only', () => {
   const clientScoped = scriptFiles('scripts').filter(file => /scope:\s*['"]client['"]/.test(readFileSync(file, 'utf8')));
-  assert.deepEqual(clientScoped, []);
+  assert.deepEqual(clientScoped.map(file => file.replaceAll('\\', '/')), ['scripts/ui/performance-app.js']);
+  const performance = readFileSync('scripts/ui/performance-app.js', 'utf8');
+  assert.equal((performance.match(/scope:\s*'client'/g) ?? []).length, 2);
+  assert.match(performance, /'performancePromptSeen', \{scope: 'client', config: false/);
+  assert.match(performance, /'performancePreset', \{scope: 'client', config: false/);
   const distance = readFileSync('scripts/ui/token-distance.js', 'utf8');
   assert.match(distance, /scope:\s*'world'/);
   assert.match(distance, /restricted:\s*true/);

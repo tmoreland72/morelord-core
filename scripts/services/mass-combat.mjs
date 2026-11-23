@@ -35,14 +35,18 @@ async function reconcileState(state) {
   return cleared;
 }
 
-/** Ordered, focused attacks: unused damage is lost and only later attacks move on. */
+/** Cycle living targets once per attack; damage never spills to another target. */
+function nextTarget(rows,index) {
+  for(let n=0;n<rows.length;n++){const candidate=(index+n)%rows.length;if(rows[candidate].hp>0)return candidate;}
+  return -1;
+}
 function resolveMassCombat(faces, bonus, targets) {
   const rows=targets.map(t=>({...t,before:{hp:t.hp,temp:t.temp},attempts:0,hits:0,criticals:0,damage:0}));
   let index=0,used=0;
   for (const face of faces) {
-    while(index<rows.length && rows[index].hp<=0) index++;
-    if(index===rows.length) break;
-    const target=rows[index];used++;target.attempts++;
+    const next=nextTarget(rows,index);
+    if(next<0)break;
+    const target=rows[next];index=(next+1)%rows.length;used++;target.attempts++;
     if(face===1 || (face!==20 && face+bonus<target.ac)) continue;
     target.hits++;if(face===20)target.criticals++;
     const damage=face===20?target.critical:target.normal;
@@ -88,9 +92,11 @@ function damageFor(actor,profile,critical=false,multiplier=1) {
 
 async function savingThrowResult(targets,profile,uses,activity) {
   const rows=targets.map(t=>({...t,before:{hp:t.hp,temp:t.temp},attempts:0,hits:0,criticals:0,damage:0,passed:0,failed:0})),rolls=[];
+  let index=0;
   for(let use=0;use<uses;use++){
     const living=rows.filter(row=>row.hp>0);
-    const affected=profile.coverage==='all'?living:living.slice(0,profile.targetsPerUse);
+    const affected=profile.coverage==='all'?living:[];
+    if(profile.coverage!=='all')for(let n=0;n<Math.min(living.length,profile.targetsPerUse);n++){const next=nextTarget(rows,index);if(next<0)break;affected.push(rows[next]);index=(next+1)%rows.length;}
     for(const row of affected){
       const actor=canvas.scene.tokens.get(row.id).actor;
       const config={ability:profile.ability,target:profile.dc,saveType:profile.saveType ?? 'ability'};
@@ -113,9 +119,11 @@ async function savingThrowResult(targets,profile,uses,activity) {
 
 async function attackWithSaves(faces,profile,targets,activities){
   const result=resolveMassCombat([],profile.bonus,targets),rolls=[];
+  let index=0;
   for(const face of faces){
-    const row=result.rows.find(r=>r.hp>0);
-    if(!row){result.unused++;continue;}
+    const next=nextTarget(result.rows,index);
+    if(next<0){result.unused++;continue;}
+    const row=result.rows[next];index=(next+1)%result.rows.length;
     const hit=resolveMassCombat([face],profile.bonus,[row]).rows[0];
     for(const key of ['attempts','hits','criticals','damage'])row[key]+=hit[key];
     row.hp=hit.hp;row.temp=hit.temp;result.used++;

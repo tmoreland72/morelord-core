@@ -77,8 +77,8 @@ test('native group saving throws preview half damage with resistance and tempora
  globalThis.ui={notifications:{info(){},error(error){throw Error(error);}}};
  globalThis.CONFIG={DND5E:{abilities:{dex:{label:'Dexterity'}},damageTypes:{fire:{label:'Fire'}}}};
  globalThis.ChatMessage={getSpeaker:()=>({}),async create(data){message={id:'preview',...data,getFlag:()=>message.flags['morelord-encounters'].massCombat,setFlag:async(_m,_k,value)=>{message.flags['morelord-encounters'].massCombat=value;},update:async value=>{message.content=value.content;}};return message;}};
- let onSave='half';
- const api=createMassCombat('morelord-encounters',{selectedTokens:role=>role==='attackers'?[attacker]:targets,presentForm:async config=>{choices.push(config);return {action:'roll',data:new Map(Object.entries({kind:'save',label:'Breath',attacks:'1',ability:'dex',dc:'13',onSave,coverage:'all',targetsPerUse:'1',damage:'8',type:'fire',mode:'normal'}))};}});
+ let onSave='half',coverage='all',attacks='1';
+ const api=createMassCombat('morelord-encounters',{selectedTokens:role=>role==='attackers'?[attacker]:targets,presentForm:async config=>{choices.push(config);return {action:'roll',data:new Map(Object.entries({kind:'save',label:'Breath',attacks,ability:'dex',dc:'13',onSave,coverage,targetsPerUse:'1',damage:'8',type:'fire',mode:'normal'}))};}});
  await api.massCombat('attackers');await api.massCombat('resolve');
  const rows=message.getFlag().result.rows;
  assert.equal(saveRolls,2);assert.deepEqual(rows.map(r=>r.damage),[4,4]);assert.equal(rows[0].hp,19);assert.equal(rows[0].temp,0);assert.equal(rows[1].hp,16);
@@ -87,6 +87,9 @@ test('native group saving throws preview half damage with resistance and tempora
  await api.massCombat('apply');assert.equal(targets[0].actor.system.attributes.hp.value,19);assert.equal(targets[1].actor.system.attributes.hp.value,16);assert.equal(saveRolls,2);
  onSave='none';await api.massCombat('attackers');await api.massCombat('resolve');
  assert.equal(message.getFlag().result.rows[0].damage,0);assert.equal(message.getFlag().result.rows[1].damage,4);
+ await api.massCombat('apply');
+ coverage='limited';attacks='3';await api.massCombat('attackers');await api.massCombat('resolve');
+ assert.deepEqual(message.getFlag().result.rows.map(r=>r.attempts),[2,1],'Limited save uses cycle across living targets');
 });
 
 test('an on-hit zero-damage save stays with its attack and linked Multiattack supplies its count',async()=>{
@@ -103,4 +106,15 @@ test('an on-hit zero-damage save stays with its attack and linked Multiattack su
  assert.match(massCombatProfileFields(choices[0].profile),/On hit: DC 13 con/);
  item.system.description.value='Choose an attack or a saving throw ability.';
  assert.equal((await massCombatActivities({items:{contents:[item]}})).length,2,'Independent activity alternatives stay separate');
+});
+
+test('round-robin attacks visit every living target before repeating, even on misses',()=>{
+ const {resolveMassCombat}=createMassCombat('morelord-encounters');
+ const targets=[{id:'a',hp:100,temp:0,ac:10,normal:2,critical:4},{id:'b',hp:100,temp:0,ac:10,normal:2,critical:4}];
+ const result=resolveMassCombat([1,15,15,15,15],0,targets);
+ assert.deepEqual(result.rows.map(r=>r.attempts),[3,2]);
+ assert.deepEqual(result.rows.map(r=>r.hp),[96,96]);
+ const dead=resolveMassCombat([15,15,15,15],0,[{...targets[0],hp:1},targets[1]]);
+ assert.deepEqual(dead.rows.map(r=>r.attempts),[1,3]);
+ assert.equal(dead.rows[0].damage,1);
 });

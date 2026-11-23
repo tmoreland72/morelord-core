@@ -11,7 +11,7 @@ export function activateCardSelection(application, renderedElement) {
     if (!card || !root.contains(card)) return;
     if (event.target.closest('input, label, select, textarea, button, a, summary, [role="button"], [contenteditable="true"]')) return;
     if (root.ownerDocument.getSelection()?.isCollapsed === false) return;
-    const checkbox = card.querySelector('input[type="checkbox"]');
+    const checkbox = card.querySelector('input[type="checkbox"], input[type="radio"]');
     if (checkbox && !checkbox.matches(":disabled")) checkbox.click();
   });
 }

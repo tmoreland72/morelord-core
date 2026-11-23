@@ -1,0 +1,13 @@
+<div class="ml-app ml-app-shell ml-stack">
+  <header class="ml-hero"><i class="fa-solid fa-laptop ml-hero__icon" aria-hidden="true"></i><div class="ml-hero__body"><h1>Performance Setup</h1><p>Choose a graphics preset for this browser.</p></div><div class="ml-actions"><button type="button" data-action="openDocumentation"><i class="fa-solid fa-book-open"></i> Documentation</button></div></header>
+  <div data-performance-choices></div>
+  <section class="ml-surface ml-stack">
+    <div class="ml-section-heading"><div><h2>Graphics Presets</h2></div></div>
+      <p><strong>Low:</strong> Low graphics, 10 FPS, standard resolution. Antialiasing and vision/light animations off; Photosensitivity Mode on.</p>
+      <p><strong>Balanced:</strong> Medium graphics, 30 FPS, display resolution. Antialiasing and vision/light animations on; Photosensitivity Mode off.</p>
+      <p><strong>High:</strong> Maximum graphics, 60 FPS, display resolution. Antialiasing and vision/light animations on; Photosensitivity Mode off.</p>
+      {{#if diceSoNice}}<p><strong>Dice So Nice:</strong> Low hides all 3D dice; Balanced shows only yours; High shows all players' dice.</p>{{/if}}
+      <p>Reload after applying to finish graphics changes. You can fine-tune Foundry settings afterward.</p>
+  </section>
+  <footer class="ml-form-footer ml-page-footer"><button type="button" data-action="skip">Keep My Settings</button><button type="submit">Apply Performance Settings</button></footer>
+</div>

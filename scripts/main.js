@@ -1,4 +1,5 @@
 import { ChatRollRequests } from './services/chat-roll-requests.js';
+import { registerPerformanceSettings, offerPerformanceSetup } from './ui/performance-app.js';
 import { registerTokenDistance } from './ui/token-distance.js';
 import { registerReactionTracker } from './ui/reaction-tracker.js';
 import { registerDirectorySelection } from './ui/directory-selection.js';
@@ -31,6 +32,7 @@ import { activateCardSelection } from "./ui/card-selection.js";
 import { sortable } from "./ui/sortable.js";
 import { activateCollapsibleSections, createCollapsibleSection } from "./ui/collapsible-section.js";
 import { actorIdentity, decorateActorSelect } from "./ui/actor-identity.js";
+import { numberControl, activateNumberControls } from './ui/number-control.js';
 import { createChoiceGroup } from './ui/choice-group.js';
 import { openItemPreview } from "./ui/item-preview.js";
 import { DocumentationService } from "./documentation/documentation-service.js";
@@ -612,6 +614,7 @@ class MorelordDiscordApp extends ApplicationV2 {
 }
 
 Hooks.once("init", () => {
+  registerPerformanceSettings();
   registerDisabledTooltipHelper();
   const coreModule = game.modules.get(MODULE_ID);
   if (coreModule) {
@@ -720,6 +723,7 @@ Hooks.once("setup", () => {
 });
 
 Hooks.once("ready", async () => {
+  offerPerformanceSetup();
   installConfigureSourcesWatcher();
   const api = game.modules.get(MODULE_ID).api ??= {};
   mergeCoreApi(api, {
@@ -754,6 +758,7 @@ Hooks.once("ready", async () => {
       activateCollapsibleSections,
       createCollapsibleSection,
       createChoiceGroup,
+      numberControl, activateNumberControls,
       renderPreservingScroll,
       renderInBackground,
       setDisabled,
@@ -763,7 +768,7 @@ Hooks.once("ready", async () => {
         register: definition => documentationService.register(definition),
         get: id => documentationService.get(id),
         list: () => documentationService.list(),
-        open: id => documentationService.open(id)
+        open: (id, section) => documentationService.open(id, section)
       })
     }),
     sortable,

@@ -1,5 +1,32 @@
 # Morelord Core
 
+### Personal Performance
+
+The header's **Documentation** button opens this feature's **Personal Performance** section on the Morelord Gaming website in a new browser tab: `https://morelordgaming.com/docs/morelord-core#personal-performance`.
+
+| Foundry setting | Stored key | Low | Balanced | High |
+| --- | --- | --- | --- | --- |
+| Performance Mode | `core.performanceMode` | Low | Medium | Maximum |
+| Maximum Framerate | `core.maxFPS` | 10 FPS | 30 FPS | 60 FPS |
+| Pixel Ratio Resolution Scaling | `core.pixelRatioResolutionScaling` | Off | On | On |
+| Photosensitivity Mode | `core.photosensitiveMode` | On | Off | Off |
+| Zoomed Texture Antialiasing | `core.mipmap` | Off | On | On |
+| Token Vision Animation | `core.visionAnimation` | Off | On | On |
+| Light Source Animation | `core.lightAnimation` | Off | On | On |
+| Dice So Nice: Dice visibility (when active) | Current user's Dice So Nice `settings.visibility` flag | Hide all (`none`) | Show only mine (`mine`) | Show all players' dice (`all`) |
+
+**Game Settings → Configure Settings → Morelord Core → Personal Performance → Open Performance Setup** is available to players and GMs without an account or premium access. **Choose a performance preset** offers **Low**, **Balanced**, and **High**, with the exact values above. The seven Foundry values match the original Potato Or Not presets; Balanced corresponds to its Medium preset. No preset is selected by default; reopening selects your last applied preset. These are starting points, not a hardware benchmark or a guarantee of frame rate.
+
+Refresh an already-open Foundry session after installing this update to register the new menu. **Open Performance Setup** remains available after dismissing the initial offer and when **Offer Performance Setup** is disabled.
+
+**Apply Performance Settings** requires a selection and applies the seven Foundry settings above to the current browser. Low enables **Photosensitivity Mode**; Balanced and High disable it. **Zoomed Texture Antialiasing** is Foundry's name for mipmapping: smaller texture copies reduce shimmering at lower zoom levels. Reload when convenient to finish applying graphics changes; no reload is forced. Manual graphics changes remain respected on subsequent logins. **Keep My Settings** or closing the window dismisses the offer without changing graphics; reopen it from Game Settings anytime.
+
+When Dice So Nice is active, Apply also sets that user's **Dice visibility** using its native `setVisibility` API. Low disables all Dice So Nice 3D rolls on that user's client; Balanced displays only their own; High displays all players' dice allowed by the roll's normal visibility rules. Other dice appearance, sounds, and world options are preserved. Dice So Nice may request a reload when switching to or from **Hide all**. This is an optional integration, not a dependency; inactive/absent Dice So Nice is untouched. An active version without the Dice visibility API must be updated before applying a preset. Foundry graphics remain browser-local; Dice So Nice stores this choice on the current user's world account, so that user's other sessions can share it.
+
+**Offer Performance Setup** is a GM-only world checkbox, enabled by default. It offers setup once per browser storage profile on that Foundry server, including the GM's browser. Disabling it suppresses automatic offers while retaining the menu. The remembered preset and dismissal are intentionally client-scoped because hardware differs between players. Clearing browser storage can show the offer again. For example, start with **Low** on an older laptop, reload, then adjust Foundry's graphics settings if needed.
+
+Inspired by Fantasy Computerworks' [Potato Or Not](https://github.com/fantasycalendar/FoundryVTT-PotatoOrNot); Core uses its own implementation and shared UI, with no dependency on that module.
+
 Core 0.5.1 provides the shared monster cards, action pills, image links, and artwork fallback required by the accompanying Craftworks and Encounters updates. Release Core 0.5.1 before those module updates.
 
 Core's `compendiums.organize(entries, path, {migration})` API places existing packs in a shared native folder hierarchy without changing pack/document IDs or permissions. `entries` contains `{collection, label}` objects. Placement is recorded once per pack/world; later manual moves remain respected. `compendiums.labels(entries)` applies display labels on each client, including generated world packs whose old manifest labels remain on disk. Craftworks and Game Master consume this service for the Morelord Gaming parent folder. Personal Graypes Compendium is organized separately by its own module and is not part of that hierarchy.
@@ -211,7 +238,7 @@ Core's `ml-card`, `ml-card__body`, and `ml-grid` children constrain their minimu
 
 For uniform description cards, use `ml-card` with `data-size="large"` (26rem), a flexible `ml-card__body` preview, optional two-line `ml-card__summary`, and `ml-actions ml-card__footer` for bottom-aligned actions. Add `data-scroll` and `tabindex="0"` to the body to show complete descriptions in a keyboard-accessible scroll region. Without this opt-in, previews remain clipped. The variant is opt-in and does not change existing cards.
 
-Use `ml-grid` with `data-columns="2"` for responsive card collections with Core-owned gaps. Add `data-ml-selectable-card` to an `ml-card` containing one labeled checkbox to make its background and description toggle that checkbox. Core's render hooks activate this behavior automatically for `ml-window` applications; custom renderers can call `core.ui.activateCardSelection(application)`. Links, buttons, labels, disclosure summaries, text selections, and disabled checkboxes retain their native behavior. Keyboard selection remains available through the labeled checkbox. Core owns the hover and checked styling.
+Use `ml-grid` with `data-columns="2"` for responsive card collections with Core-owned gaps. Add `data-ml-selectable-card` to an `ml-card` containing one labeled checkbox or radio to make its background and description activate that control. Core's render hooks activate this behavior automatically for `ml-window` applications; custom renderers can call `core.ui.activateCardSelection(application)`. Links, buttons, labels, disclosure summaries, text selections, and disabled checkboxes retain their native behavior. Keyboard selection remains available through the labeled checkbox. Core owns the hover and checked styling.
 
 `core.ui.renderPreservingScroll(application, renderOperation, options)` preserves page positions by default, plus panels marked with `data-ml-scroll-key`. Pass a per-window `positions: new Map()` to remember keyed panels across tabs. `reset: true` clears saved positions and returns the new page to the top. `selector: "*", deferred: true` also preserves nested scroll regions after layout settles. Feature modules should use this service instead of maintaining their own capture/restore algorithms.
 
@@ -278,6 +305,10 @@ Character eligibility is centralized in `MorelordCore.ui.participation.listChara
 
 
 Core account settings, Ignored Users, and the Location editor use the shared page footer. Save actions remain outside the scrolling content, with native form submission preserved.
+
+Use `<footer class="ml-form-footer ml-page-footer">` for bottom actions. Core keeps buttons on the right at their natural width. Add `ml-footer-status` to a direct status-text child to keep that text on the left; unmarked text retains its existing alignment. Confirmation dialogs retain their equal-width buttons.
+
+Badges support `data-tone="enabled"` (accent text and border) and `data-tone="muted"` (muted text and neutral border). These are opt-in tones; ordinary badges and the existing success, info, warning, danger, and premium tones are unchanged. Encounters uses these tones for source-access badges. Craftworks uses `ml-footer-status` for harvesting progress; Craftworks and Downtime consume Core's footer layout without local overrides. Section headings use `ml-section-heading` directly: the removed Encounters width/stretch override produced identical live layout in both themes at 960px and 560px.
 
 
 Core keeps checkbox descriptions beside their controls, allowing text to wrap within the adjacent column. This applies to checkbox-first and checkbox-last labels, including narrow settings windows; actor choice cards retain their portrait layout.
@@ -464,3 +495,9 @@ Mass-combat batches include their native `combatId`. The `reconcile` action clea
 Mass Combat activity selection is shared through `scripts/services/mass-combat-profiles.mjs`: `massCombatActivities(actor)` extracts native attack/save activities and averages, and `massCombatProfileFields(profile)` renders Core setting rows. `presentForm` receives an optional `onChange(event, root)` callback to update activity-specific fields without replacing a window. Saving activities use native `rollSavingThrow` for each affected token/use with no individual chat messages; typed damage components, save scaling, defenses, temporary HP and serialized application are retained. Encounters owns generic NPC turn consolidation before native `startCombat`; Core does not change combat turn behavior.
 
 Combined attack activities: Mass Combat uses Core’s shared activity profiles. An item’s on-hit save stays with its attack, including saves that deal no damage. The result summarizes native on-hit saving throws alongside weapon damage. A directly named/linked repeated-weapon Multiattack supplies the initial attack count; check **Attacks per troop** for optional attacks or mixed-weapon routines. First-hit-only saves are limited per target within one batch; resolve the full group sequence together. Non-damage effects remain GM-controlled.
+
+Shared numeric controls: `ui.numberControl({name,label,value,min,max,help})` returns a Core settings row using the existing `ml-stepper`, editable integer input, and labeled decrement/increment buttons. After inserting it, call `ui.activateNumberControls(root)` once per new DOM subtree. Changes bubble normally; bounds and disabled-input reasons use `ui.setDisabled`. Encounters consumes this component for all four wave fields. Selectable cards now accept one labeled radio as well as a checkbox, preserving native single-selection and keyboard semantics. Core stacks stretch within Foundry forms; action bars remain horizontal with natural button widths.
+
+Shared Mass Combat resolves attacks in scene-token order across living targets, one attack per target before cycling. Misses advance the cycle, dead targets are skipped, and killing-blow excess is lost. Attached on-hit saves use the same target; limited-target save activities cycle through living targets between uses. Every-target save coverage still affects all selected living targets per use. Encounters and Game Master consume this resolver.
+
+Paused cards: use `ml-card` with `data-state="paused"` for a paused workflow that must remain selectable. Core supplies a dashed border, sunken surface, and muted quantity text. Include a visible Paused status badge; do not disable the card selector needed to resume it. Encounters consumes this variant for individual and all-wave pause controls.

@@ -163,6 +163,8 @@
 :where(.ml-status, .ml-badge, .ml-text)[data-tone="warning"] { color: var(--ml-color-warning); }
 :where(.ml-status, .ml-badge, .ml-text)[data-tone="danger"] { color: var(--ml-color-danger); }
 :where(.ml-status, .ml-badge, .ml-text)[data-tone="premium"] { color: var(--ml-color-accent); }
+.ml-badge[data-tone="enabled"] { color: var(--ml-color-accent); border-color: var(--ml-color-accent); }
+.ml-badge[data-tone="muted"] { color: var(--ml-color-muted); border-color: var(--ml-color-border); }
 
 :is(.ml-window .window-content, .ml-chat-card) .ml-button[data-tone="accent"],
 .ml-core-roll-request .ml-button[data-ml-core-roll="normal"]:not([data-ml-roll-decline]) { background: var(--ml-color-accent); border-color: var(--ml-color-accent-strong); color: var(--ml-color-on-accent); font-weight: var(--ml-font-weight-bold); }
@@ -377,6 +379,7 @@
 }
 .ml-window .form-footer::before,
 .ml-window .form-footer::after { background: var(--ml-color-footer) !important; }
+.ml-window :is(.ml-form-footer, .ml-page-footer) > .ml-footer-status { margin-right: auto; }
 .ml-window .window-content:has(> .form-footer) {
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
@@ -835,3 +838,17 @@
   text-align: center;
   text-transform: uppercase;
 }
+
+/* Action groups retain horizontal, natural-width controls inside Foundry forms. */
+.ml-window .window-content .ml-actions { flex-direction:row; }
+.ml-window .window-content .ml-actions > button { flex:0 0 auto; width:auto; }
+
+/* Foundry standard forms align children to the start; Core stacks fill their available width. */
+.ml-window .window-content .ml-stack { align-items:stretch; min-width:0; }
+.ml-window .window-content label.ml-setting-row { box-sizing:border-box; min-width:0; width:100%; white-space:normal; }
+.ml-window .window-content label.ml-setting-row > :is(input,select,.ml-stepper) { box-sizing:border-box; min-width:0; max-width:100%; }
+.ml-window .window-content label.ml-setting-row.ml-actor-select-field[data-ml-actor-select-layout="inline"] { grid-template-columns:max-content minmax(0,1fr); align-items:center; }
+
+/* Paused workflows stay selectable so their controls can resume them. */
+.ml-window .window-content .ml-card[data-state="paused"] { border-style:dashed; background:var(--ml-color-surface-sunken); }
+.ml-window .window-content .ml-card[data-state="paused"] .ml-quantity-list { color:var(--ml-color-muted); }
