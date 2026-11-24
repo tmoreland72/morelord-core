@@ -1,3 +1,13 @@
+---
+title: Morelord Core: Usage and Error Reporting
+description: Reporting consent, privacy, event coverage, and troubleshooting.
+slug: morelord-core/telemetry
+product: morelord-core
+audience: game-master
+version: 0.9.4
+foundry: 14
+---
+
 # Usage, errors and download reporting
 
 The reporting website and migrations were deployed on September 20, 2026. Core 0.3.10 introduced the reporting client. The next Core update adds the one-time GM notice described below.
