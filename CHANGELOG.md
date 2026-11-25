@@ -1,5 +1,13 @@
 # Morelord Core Changelog
 
+## 0.9.5
+
+### Fixed
+
+- Keep Morelord Account first in Game Settings, immediately followed by Personal Performance.
+- Use Save Changes for account, performance, ignored-user, and location settings. Account and location windows close only after saving successfully.
+- Provide shared live Enabled/Disabled checkbox labels for Craftworks content settings.
+
 ## 0.9.4
 
 ### Improvements

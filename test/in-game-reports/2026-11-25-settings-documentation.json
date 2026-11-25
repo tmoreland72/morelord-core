@@ -1,0 +1,44 @@
+{
+  "deployment": "https://github.com/tmoreland72/morelord-gaming-web/actions/runs/45685141111",
+  "ok": true,
+  "results": [
+    {
+      "url": "https://morelordgaming.com/docs/morelord-core",
+      "status": 200,
+      "checks": {
+        "Morelord Account": true,
+        "Personal Performance": true,
+        "Save Changes": true,
+        "closes the window after success": true,
+        "0.9.4": true
+      }
+    },
+    {
+      "url": "https://morelordgaming.com/docs/morelord-craftworks/gm",
+      "status": 200,
+      "checks": {
+        "label updates immediately": true,
+        "Save Changes": true,
+        "0.5.7": true
+      }
+    },
+    {
+      "url": "https://morelordgaming.com/docs/morelord-marketplace/gm",
+      "status": 200,
+      "checks": {
+        "Save Changes": true,
+        "closes the window only after the save succeeds": true,
+        "0.12.2": true
+      }
+    },
+    {
+      "url": "https://morelordgaming.com/docs/morelord-game-master",
+      "status": 200,
+      "checks": {
+        "Save Changes": true,
+        "failed save keeps the dialog open": true,
+        "0.5.1": true
+      }
+    }
+  ]
+}

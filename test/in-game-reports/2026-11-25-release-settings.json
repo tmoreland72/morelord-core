@@ -1,0 +1,626 @@
+{
+  "suite": "morelord-core-smoke",
+  "schemaVersion": 1,
+  "startedAt": "2026-11-25T19:53:39.770Z",
+  "environment": {
+    "foundry": "14.370",
+    "system": {
+      "id": "dnd5e",
+      "version": "6.1.1"
+    },
+    "role": "gm",
+    "browser": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/158.0.0.0 Safari/537.36",
+    "viewport": {
+      "width": 1280,
+      "height": 1000
+    },
+    "modules": [
+      {
+        "id": "3ds-atlas",
+        "version": "1.6.4"
+      },
+      {
+        "id": "asset-librarian",
+        "version": "1.5.5"
+      },
+      {
+        "id": "blfx-assets-pack01",
+        "version": "1.0.35"
+      },
+      {
+        "id": "blfx-assets-pack02",
+        "version": "1.0.3"
+      },
+      {
+        "id": "boss-loot-adventures-premium",
+        "version": "2.3.3"
+      },
+      {
+        "id": "boss-loot-assets-premium",
+        "version": "3.6.2"
+      },
+      {
+        "id": "campaign-codex",
+        "version": "6.9.971"
+      },
+      {
+        "id": "demon-queen-awakens",
+        "version": "6.0.0"
+      },
+      {
+        "id": "dice-so-nice",
+        "version": "6.4.5"
+      },
+      {
+        "id": "dnd-arcana-unleashed",
+        "version": "1.0.2"
+      },
+      {
+        "id": "dnd-dungeon-masters-guide",
+        "version": "3.0.0"
+      },
+      {
+        "id": "dnd-monster-manual",
+        "version": "1.4.0"
+      },
+      {
+        "id": "dnd-players-handbook",
+        "version": "3.0.0"
+      },
+      {
+        "id": "dnd-ravenloft-horrors-within",
+        "version": "2.0.0"
+      },
+      {
+        "id": "dnd-world-warcraft",
+        "version": "1.1.0"
+      },
+      {
+        "id": "drakkenheim-core",
+        "version": "3.0.0"
+      },
+      {
+        "id": "drakkenheim-monsters",
+        "version": "2.0.1"
+      },
+      {
+        "id": "drakkenheim-scgd",
+        "version": "3.0.0"
+      },
+      {
+        "id": "fa-battlemaps",
+        "version": "1.2.34"
+      },
+      {
+        "id": "gm-vision",
+        "version": "2.0.5"
+      },
+      {
+        "id": "grim-hollow-core",
+        "version": "3.0.0"
+      },
+      {
+        "id": "grim-hollow-players-guide",
+        "version": "2.0.2"
+      },
+      {
+        "id": "heliana-core",
+        "version": "2.4.2"
+      },
+      {
+        "id": "hero-mancer",
+        "version": "3.4.3"
+      },
+      {
+        "id": "house-divided",
+        "version": "5.0.2"
+      },
+      {
+        "id": "lib-wrapper",
+        "version": "1.13.5.1"
+      },
+      {
+        "id": "mage-hand-press-core",
+        "version": "2.1.0"
+      },
+      {
+        "id": "mage-hand-press-valdas-spire-of-secrets",
+        "version": "2.1.0"
+      },
+      {
+        "id": "mini-rolltable",
+        "version": "0.2.6"
+      },
+      {
+        "id": "mini-scene-navigation",
+        "version": "0.5.0"
+      },
+      {
+        "id": "mini-spell-picker",
+        "version": "0.3.9"
+      },
+      {
+        "id": "mini-tweaks",
+        "version": "0.3.2"
+      },
+      {
+        "id": "mini-uploader",
+        "version": "3.5"
+      },
+      {
+        "id": "monks-active-tiles",
+        "version": "14.01"
+      },
+      {
+        "id": "morelord-character-export",
+        "version": "0.3.7"
+      },
+      {
+        "id": "morelord-compendium",
+        "version": "1.0.15"
+      },
+      {
+        "id": "morelord-core",
+        "version": "0.9.4"
+      },
+      {
+        "id": "morelord-craftworks",
+        "version": "0.5.7"
+      },
+      {
+        "id": "morelord-downtime",
+        "version": "0.3.2"
+      },
+      {
+        "id": "morelord-encounters",
+        "version": "0.4.4"
+      },
+      {
+        "id": "morelord-game-master",
+        "version": "0.5.1"
+      },
+      {
+        "id": "morelord-journeys",
+        "version": "0.6.1"
+      },
+      {
+        "id": "morelord-marketplace",
+        "version": "0.12.2"
+      },
+      {
+        "id": "psfx-ambience",
+        "version": "0.13.0"
+      },
+      {
+        "id": "psfx-music",
+        "version": "0.3.0"
+      },
+      {
+        "id": "psfx-patreon",
+        "version": "0.18.0"
+      },
+      {
+        "id": "quick-insert",
+        "version": "3.8.0"
+      },
+      {
+        "id": "sequencer",
+        "version": "4.3.1"
+      },
+      {
+        "id": "socketlib",
+        "version": "v1.1.4"
+      },
+      {
+        "id": "tagger",
+        "version": "1.6.0"
+      },
+      {
+        "id": "tidy5e-sheet",
+        "version": "15.0.1"
+      },
+      {
+        "id": "vision-5e",
+        "version": "3.2.3"
+      },
+      {
+        "id": "wgtngm-light-switch",
+        "version": "1.2.1"
+      },
+      {
+        "id": "wgtngm-mini-edit",
+        "version": "0.7.7"
+      }
+    ]
+  },
+  "results": [
+    {
+      "id": "core.ready",
+      "status": "pass",
+      "durationMs": 0
+    },
+    {
+      "id": "core.users",
+      "status": "pass",
+      "durationMs": 0
+    },
+    {
+      "id": "core.character-routing",
+      "status": "pass",
+      "durationMs": 1
+    },
+    {
+      "id": "core.ignored-users-window",
+      "status": "pass",
+      "durationMs": 436
+    },
+    {
+      "id": "core.settings-menu-order-and-save",
+      "status": "pass",
+      "durationMs": 345
+    },
+    {
+      "id": "core.location-save-closes-after-success",
+      "status": "pass",
+      "durationMs": 398
+    },
+    {
+      "id": "craftworks.settings-checkbox-and-save",
+      "status": "pass",
+      "durationMs": 1161
+    },
+    {
+      "id": "game-master.settings-save-before-close",
+      "status": "pass",
+      "durationMs": 351
+    },
+    {
+      "id": "journeys.settings-save-and-close",
+      "status": "pass",
+      "durationMs": 403
+    },
+    {
+      "id": "marketplace.settings-save-and-close",
+      "status": "pass",
+      "durationMs": 315
+    },
+    {
+      "id": "morelord-encounters.libwrapper-combat-sorting",
+      "status": "pass",
+      "durationMs": 2
+    },
+    {
+      "id": "morelord-encounters.round-start-waves-and-pauses",
+      "status": "pass",
+      "durationMs": 6595
+    }
+  ],
+  "summary": {
+    "pass": 12,
+    "fail": 0,
+    "skip": 0
+  },
+  "ok": true,
+  "visuals": [
+    {
+      "menu": "morelord-core.account",
+      "theme": "dark",
+      "width": 620,
+      "overflow": false,
+      "footerVisible": true,
+      "labels": [
+        "Save Changes"
+      ]
+    },
+    {
+      "menu": "morelord-core.account",
+      "theme": "dark",
+      "width": 360,
+      "overflow": false,
+      "footerVisible": true,
+      "labels": [
+        "Save Changes"
+      ]
+    },
+    {
+      "menu": "morelord-core.account",
+      "theme": "light",
+      "width": 620,
+      "overflow": false,
+      "footerVisible": true,
+      "labels": [
+        "Save Changes"
+      ]
+    },
+    {
+      "menu": "morelord-core.account",
+      "theme": "light",
+      "width": 360,
+      "overflow": false,
+      "footerVisible": true,
+      "labels": [
+        "Save Changes"
+      ]
+    },
+    {
+      "menu": "morelord-core.performance",
+      "theme": "dark",
+      "width": 580,
+      "overflow": false,
+      "footerVisible": true,
+      "labels": [
+        "Save Changes"
+      ]
+    },
+    {
+      "menu": "morelord-core.performance",
+      "theme": "dark",
+      "width": 360,
+      "overflow": false,
+      "footerVisible": true,
+      "labels": [
+        "Save Changes"
+      ]
+    },
+    {
+      "menu": "morelord-core.performance",
+      "theme": "light",
+      "width": 580,
+      "overflow": false,
+      "footerVisible": true,
+      "labels": [
+        "Save Changes"
+      ]
+    },
+    {
+      "menu": "morelord-core.performance",
+      "theme": "light",
+      "width": 360,
+      "overflow": false,
+      "footerVisible": true,
+      "labels": [
+        "Save Changes"
+      ]
+    },
+    {
+      "menu": "morelord-core.ignoredUsers",
+      "theme": "dark",
+      "width": 460,
+      "overflow": false,
+      "footerVisible": true,
+      "labels": [
+        "Save Changes"
+      ]
+    },
+    {
+      "menu": "morelord-core.ignoredUsers",
+      "theme": "dark",
+      "width": 360,
+      "overflow": false,
+      "footerVisible": true,
+      "labels": [
+        "Save Changes"
+      ]
+    },
+    {
+      "menu": "morelord-core.ignoredUsers",
+      "theme": "light",
+      "width": 460,
+      "overflow": false,
+      "footerVisible": true,
+      "labels": [
+        "Save Changes"
+      ]
+    },
+    {
+      "menu": "morelord-core.ignoredUsers",
+      "theme": "light",
+      "width": 360,
+      "overflow": false,
+      "footerVisible": true,
+      "labels": [
+        "Save Changes"
+      ]
+    },
+    {
+      "menu": "morelord-core.locations",
+      "theme": "dark",
+      "width": 980,
+      "overflow": false,
+      "footerVisible": true,
+      "labels": [
+        "Save Changes"
+      ]
+    },
+    {
+      "menu": "morelord-core.locations",
+      "theme": "dark",
+      "width": 560,
+      "overflow": false,
+      "footerVisible": true,
+      "labels": [
+        "Save Changes"
+      ]
+    },
+    {
+      "menu": "morelord-core.locations",
+      "theme": "light",
+      "width": 980,
+      "overflow": false,
+      "footerVisible": true,
+      "labels": [
+        "Save Changes"
+      ]
+    },
+    {
+      "menu": "morelord-core.locations",
+      "theme": "light",
+      "width": 560,
+      "overflow": false,
+      "footerVisible": true,
+      "labels": [
+        "Save Changes"
+      ]
+    },
+    {
+      "menu": "morelord-craftworks.configure",
+      "theme": "dark",
+      "width": 980,
+      "overflow": false,
+      "footerVisible": true,
+      "labels": [
+        "Save Changes"
+      ]
+    },
+    {
+      "menu": "morelord-craftworks.configure",
+      "theme": "dark",
+      "width": 560,
+      "overflow": false,
+      "footerVisible": true,
+      "labels": [
+        "Save Changes"
+      ]
+    },
+    {
+      "menu": "morelord-craftworks.configure",
+      "theme": "light",
+      "width": 980,
+      "overflow": false,
+      "footerVisible": true,
+      "labels": [
+        "Save Changes"
+      ]
+    },
+    {
+      "menu": "morelord-craftworks.configure",
+      "theme": "light",
+      "width": 560,
+      "overflow": false,
+      "footerVisible": true,
+      "labels": [
+        "Save Changes"
+      ]
+    },
+    {
+      "menu": "morelord-journeys.configure",
+      "theme": "dark",
+      "width": 800,
+      "overflow": false,
+      "footerVisible": true,
+      "labels": [
+        "Save Changes"
+      ]
+    },
+    {
+      "menu": "morelord-journeys.configure",
+      "theme": "dark",
+      "width": 560,
+      "overflow": false,
+      "footerVisible": true,
+      "labels": [
+        "Save Changes"
+      ]
+    },
+    {
+      "menu": "morelord-journeys.configure",
+      "theme": "light",
+      "width": 800,
+      "overflow": false,
+      "footerVisible": true,
+      "labels": [
+        "Save Changes"
+      ]
+    },
+    {
+      "menu": "morelord-journeys.configure",
+      "theme": "light",
+      "width": 560,
+      "overflow": false,
+      "footerVisible": true,
+      "labels": [
+        "Save Changes"
+      ]
+    },
+    {
+      "menu": "morelord-marketplace.marketplaceConfiguration",
+      "theme": "dark",
+      "width": 800,
+      "overflow": false,
+      "footerVisible": true,
+      "labels": [
+        "Save Changes"
+      ]
+    },
+    {
+      "menu": "morelord-marketplace.marketplaceConfiguration",
+      "theme": "dark",
+      "width": 560,
+      "overflow": false,
+      "footerVisible": true,
+      "labels": [
+        "Save Changes"
+      ]
+    },
+    {
+      "menu": "morelord-marketplace.marketplaceConfiguration",
+      "theme": "light",
+      "width": 800,
+      "overflow": false,
+      "footerVisible": true,
+      "labels": [
+        "Save Changes"
+      ]
+    },
+    {
+      "menu": "morelord-marketplace.marketplaceConfiguration",
+      "theme": "light",
+      "width": 560,
+      "overflow": false,
+      "footerVisible": true,
+      "labels": [
+        "Save Changes"
+      ]
+    },
+    {
+      "menu": "morelord-game-master.configure",
+      "theme": "dark",
+      "width": 480,
+      "overflow": false,
+      "footerVisible": true,
+      "labels": [
+        "Save Changes"
+      ]
+    },
+    {
+      "menu": "morelord-game-master.configure",
+      "theme": "dark",
+      "width": 360,
+      "overflow": false,
+      "footerVisible": true,
+      "labels": [
+        "Save Changes"
+      ]
+    },
+    {
+      "menu": "morelord-game-master.configure",
+      "theme": "light",
+      "width": 480,
+      "overflow": false,
+      "footerVisible": true,
+      "labels": [
+        "Save Changes"
+      ]
+    },
+    {
+      "menu": "morelord-game-master.configure",
+      "theme": "light",
+      "width": 360,
+      "overflow": false,
+      "footerVisible": true,
+      "labels": [
+        "Save Changes"
+      ]
+    }
+  ]
+}

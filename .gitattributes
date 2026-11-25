@@ -1,1 +1,2 @@
 *.pdf binary
+CHANGELOG.md text eol=lf

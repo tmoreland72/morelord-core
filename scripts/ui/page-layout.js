@@ -1,10 +1,12 @@
 import { preserveWindowScroll } from "./scroll-preservation.js";
 import { activateImageFallbacks } from "./image-fallbacks.js";
+import { activateCheckStates } from "./check-state.js";
 /** One scrolling page body and a separate action footer for Morelord applications. */
 export function applyPageLayout(application, renderedElement) {
   const root = renderedElement instanceof HTMLElement ? renderedElement : application?.element;
   if (!root?.matches?.(".ml-window")) return;
   activateImageFallbacks(root);
+  activateCheckStates(root);
   const content = root.querySelector(".window-content");
   const body = content?.querySelector(":scope > .ml-app-shell");
   if (!body) { preserveWindowScroll(application, root); return; } // DialogV2 has its own shared body/footer layout.

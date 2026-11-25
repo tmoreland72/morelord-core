@@ -569,7 +569,7 @@ class MorelordConnectionApp extends HandlebarsApplicationMixin(ApplicationV2) {
         capSubscriptionTier(data.get(SETTINGS.DEVELOPER_TIER), getActualEntitlements()?.tier));
       await game.settings.set(MODULE_ID, SETTINGS.DEVELOPER_MODE, data.has(SETTINGS.DEVELOPER_MODE));
       notify("info", "Morelord Core settings saved. Reopen module windows to update access displays.");
-      this.render({ force: true });
+      await this.close();
     } finally {
       target.disabled = false;
     }
@@ -614,7 +614,6 @@ class MorelordDiscordApp extends ApplicationV2 {
 }
 
 Hooks.once("init", () => {
-  registerPerformanceSettings();
   registerDisabledTooltipHelper();
   const coreModule = game.modules.get(MODULE_ID);
   if (coreModule) {
@@ -681,6 +680,7 @@ Hooks.once("init", () => {
     type: MorelordConnectionApp,
     restricted: true
   });
+  registerPerformanceSettings();
   game.settings.registerMenu(MODULE_ID, "ignoredUsers", {
     name: "Ignored Users", label: "Select Ignored Users",
     hint: "Exclude accounts such as OBS from Morelord user lists and form delivery.",
