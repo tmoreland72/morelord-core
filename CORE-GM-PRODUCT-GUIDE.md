@@ -12,6 +12,8 @@ foundry: 14
 
 ## Documentation
 
+In Core Game Settings, **Morelord Account** is always the first menu for GMs, followed immediately by **Personal Performance**. Players can access Personal Performance but cannot see the GM-only account menu.
+
 **Documentation** opens the corresponding module's documentation on the Morelord Gaming website in a new browser tab. Use the website's module tree and nested section links to navigate the complete guides. Modules without a dedicated website page open the documentation index.
 
 Every player and GM page, including module Game Settings, must document each field and action using its displayed label, accepted values, defaults, dependencies, and effects. Examples belong in the guide.
@@ -62,13 +64,13 @@ GMs can use **Select multiple** on the Compendium Packs sidebar tab, including i
 
 ### Token Distance Indicator
 
-**Token Distance Indicator** accepts checked (enabled) or unchecked (disabled), defaults to checked, and applies to every client in the world. Only a GM can change it. Choose **Save Core Settings** to apply it in **Connect or Manage Account → Core Settings**, or change the same checkbox directly in **Game Settings → Configure Settings → Morelord Core**. Players do not see that checkbox. No account connection or premium access is required. A world that has never saved the checkbox takes the previous per-client choice from the first GM who loads it, including off. When that GM had not saved a per-client choice, the world stays checked. Disable it when using another distance indicator such as TheRipper's Hover Distance to avoid duplicate displays.
+**Token Distance Indicator** accepts checked (enabled) or unchecked (disabled), defaults to checked, and applies to every client in the world. Only a GM can change it. Choose **Save Changes** to apply it in **Connect or Manage Account → Core Settings**, or change the same checkbox directly in **Game Settings → Configure Settings → Morelord Core**. Players do not see that checkbox. No account connection or premium access is required. A world that has never saved the checkbox takes the previous per-client choice from the first GM who loads it, including off. When that GM had not saved a per-client choice, the world stays checked. Disable it when using another distance indicator such as TheRipper's Hover Distance to avoid duplicate displays.
 
 Select exactly one token, then hover over another visible token to see distance between their nearest occupied spaces using native grid/diagonal rules. Adjacent tokens show 5 ft on feet-based scenes, and distances round up to 5-unit intervals in the scene's units. Token size does not add extra center-to-center distance. Gridless scenes measure nearest footprint edges with a half-space allowance for adjacency. Players can instead hover without selecting: Core uses their assigned character's token if exactly one owned, visible token exists. Multiple selections, ambiguous character tokens, and hovering the source itself show nothing. The indicator measures flat map distance without elevation, walls, reach, or movement costs; it never exposes hidden or unseen tokens to players.
 
 ### Reaction Used
 
-**Reaction Used** accepts checked (enabled) or unchecked (disabled), defaults to checked, and applies to the whole world. Only a GM can change it. Choose **Save Core Settings** to apply it in **Connect or Manage Account → Core Settings**, or change the same checkbox in **Game Settings → Configure Settings → Morelord Core**. No account connection or premium access is required. Automatic marking listens for a D&D 5e activity whose activation type is reaction.
+**Reaction Used** accepts checked (enabled) or unchecked (disabled), defaults to checked, and applies to the whole world. Only a GM can change it. Choose **Save Changes** to apply it in **Connect or Manage Account → Core Settings**, or change the same checkbox in **Game Settings → Configure Settings → Morelord Core**. No account connection or premium access is required. Automatic marking listens for a D&D 5e activity whose activation type is reaction.
 
 While **Reaction Used** is checked, a creature in a started combat that uses such an activity is marked on its token. In the right-click token HUD status effects the status is labeled **Reaction**, so the name fits the grid. Anyone allowed to update that token can toggle **Reaction** there, including for an opportunity attack, a readied action, or a mark that should not stay on. The active GM removes the mark when that creature's turn starts. When the turn is a shared mob turn from Morelord Encounters, the active GM removes it from every token in that mob on the scene. When combat is deleted, ends, or the round returns to 0, the active GM removes it from tokens on that combat's scene. A player client, and a GM who is not the active GM, does not clear marks. Unchecking **Reaction Used** stops automatic marking and clearing. The status remains on the token HUD for manual use.
 
@@ -192,9 +194,9 @@ Disconnecting clears the account token, installation reference, connection label
 
 ## Core Settings and Reporting Preferences
 
-**Token Distance Indicator** and **Reaction Used** are documented above under What Morelord Core Does. Change either checkbox here with **Save Core Settings**, or in **Game Settings → Configure Settings → Morelord Core**. Both apply to the whole world, and only a GM can change them.
+**Token Distance Indicator** and **Reaction Used** are documented above under What Morelord Core Does. Change either checkbox here with **Save Changes**, or in **Game Settings → Configure Settings → Morelord Core**. Both apply to the whole world, and only a GM can change them.
 
-Open **Connect or Manage Account**, then scroll to **Core Settings**. These controls are available without connecting an account. Use **Save Core Settings** to apply changes.
+Open **Connect or Manage Account**, then scroll to **Core Settings**. These controls are available without connecting an account. Use **Save Changes** to apply changes. The window closes only after all settings have saved successfully; a failed save leaves it open for retry.
 
 | Control                 | Meaning                                                                                                                                                                                                                                                                                      |
 | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -208,9 +210,48 @@ The elected active GM receives a one-time **Morelord Reporting Preferences** not
 
 Account activation separately supplies world and installation information needed to approve and label that connection. See [TELEMETRY.md](TELEMETRY.md) for reporting details.
 
+## Personal Performance
+
+Available in Morelord Core **0.9.4**. Players and GMs can choose graphics settings for their own device without a Morelord account or premium membership.
+
+Open **Game Settings → Configure Settings → Morelord Core → Personal Performance → Open Performance Setup**. Refresh an already-open Foundry session after installing the update if the menu is missing. The menu remains available after dismissing the initial offer or disabling automatic offers.
+
+### Offer Performance Setup
+
+**Offer Performance Setup** is a GM-only world checkbox, enabled by default, under **Game Settings → Configure Settings → Morelord Core**. Its description is: “Show players the performance setup feature one time to automatically make game settings changes appropriate for their devices.”
+
+When enabled, players and GMs receive the **Performance Setup** window once per browser storage profile on that Foundry server. Opening the window does not change settings: each person chooses a preset and applies it. Unchecking the box suppresses automatic offers for the world; **Open Performance Setup** still works. Clearing browser storage can cause the offer to appear again.
+
+### Performance Setup
+
+**Choose a performance preset** offers **Low**, **Balanced**, and **High**. No preset is selected initially; reopening the window selects your last applied preset. Choose a starting point for your device:
+
+| Setting | Low | Balanced | High |
+| --- | --- | --- | --- |
+| Performance Mode | Low | Medium | Maximum |
+| Maximum Framerate | 10 FPS | 30 FPS | 60 FPS |
+| Pixel Ratio Resolution Scaling | Off | On | On |
+| Photosensitivity Mode | On | Off | Off |
+| Zoomed Texture Antialiasing | Off | On | On |
+| Token Vision Animation | Off | On | On |
+| Light Source Animation | Off | On | On |
+| Dice So Nice: Dice visibility, when active | Hide all | Show only mine | Show all players' dice |
+
+**Low** suits older laptops or devices that struggle with busy scenes. **Balanced** is a starting point for everyday computers. **High** uses maximum graphics and a higher frame-rate limit for gaming computers. These presets do not benchmark your hardware or guarantee a frame rate. **Zoomed Texture Antialiasing** reduces texture shimmering when zoomed out. Low turns **Photosensitivity Mode** on; Balanced and High turn it off.
+
+- **Save Changes** is disabled until a preset is selected. It closes the window after successfully applying the table's seven Foundry graphics settings to the current browser and, when Dice So Nice is active, changes that user's dice visibility. Reload Foundry when convenient to finish applying graphics changes; Core does not force a reload. You can fine-tune Foundry settings afterward. Later logins preserve those manual changes instead of reapplying the preset.
+- **Keep My Settings**, or closing the window, dismisses the offer without changing graphics settings. Reopen it with **Open Performance Setup** whenever needed.
+- **Documentation** opens this **Personal Performance** section on the Morelord Gaming website in a new browser tab.
+
+When **Dice So Nice** is active, Low hides all its 3D dice on that user's client, Balanced shows only their own dice, and High shows all players' dice permitted by each roll's normal visibility rules. Dice appearance, sounds, and world options are preserved. Dice So Nice can request a reload when switching to or from **Hide all**. It is optional: if absent or inactive, Core leaves it untouched. If an active version lacks the dice visibility API, update Dice So Nice before applying a preset.
+
+Foundry graphics settings, the last chosen preset, and the dismissed offer are remembered for the browser. Dice So Nice stores visibility on the current user's world account, so that user's other sessions can share the dice choice.
+
+For example, select **Low** on an older laptop, choose **Save Changes**, and reload. If the scene runs comfortably, adjust individual graphics settings later or return to **Open Performance Setup** to try **Balanced**.
+
 ## Ignored Users
 
-Open **Morelord Core → Select Ignored Users**. Check recording or observer accounts to exclude them, then select **Save**. Uncheck and save to include them again. Ignored accounts cannot send or receive routed Morelord Gaming module messages; do not ignore participating GMs or players. This does not delete users or change their Foundry role.
+Open **Morelord Core → Select Ignored Users**. Check recording or observer accounts to exclude them, then select **Save Changes**. The window closes after the settings save succeeds; a failed save leaves it open. Uncheck and save to include them again. Ignored accounts cannot send or receive routed Morelord Gaming module messages; do not ignore participating GMs or players. This does not delete users or change their Foundry role.
 
 Characters assigned to or owned only by ignored users are also excluded from shared character selections, including party-group members. Characters shared with a non-ignored player remain available, even if that player is offline. GM-managed party members without a player owner or assigned user remain available. Reopen a selection window after changing Ignored Users to refresh its options; existing stored participation records are preserved.
 
@@ -254,7 +295,7 @@ When the list is empty, the left side reads "No locations yet." The main panel s
 
 While you are editing, the heading is **New Location** or **Edit Location**. The introduction reads "Locations are shared by Marketplace, Craftworks, Downtime, and Journeys." **Documentation** sits to the right of that introduction, and it is also on the empty panel. It opens the Locations section of this guide on the Morelord Gaming website in a new browser tab: `https://morelordgaming.com/docs/morelord-core#locations`.
 
-**Save Location** before you select another location or choose **Create Location**. Those actions load a different record and drop edits that are still unsaved.
+**Save Changes** before you select another location or choose **Create Location**. Those actions load a different record and drop edits that are still unsaved.
 
 ![New location named Phandalin, with settlement type Village and a Forge capability set to Common.](/images/foundry/core-locations.png)
 
@@ -300,7 +341,7 @@ On an Instructor, each group also has **Any Language**, **Any Skill**, **Any Too
 
 ### Save and delete
 
-**Save Location** keeps the editor open and in front. Other open Morelord windows may refresh and stay behind this window. The notice reads "{Name} saved." These records stay in the world. **Export / Import Settings** does not copy them. Marketplace's **Enable Locations** setting is included with that transfer; the locations themselves are not.
+**Save Changes** saves the location and closes the window after success. A failed save leaves the editor open with your entries so you can correct the problem and retry. Other open Morelord windows may refresh in the background. The notice reads "{Name} saved." These records stay in the world. **Export / Import Settings** does not copy them. Marketplace's **Enable Locations** setting is included with that transfer; the locations themselves are not.
 
 **Delete** appears after the location has been saved. The dialog title is **Delete Morelord Location**. The dialog reads "Delete {Name}? Projects and integrations that reference it may become unavailable." **No** keeps the location. **Yes** removes the location record. The notice reads "Location deleted." The Foundry Scenes remain. If other locations remain, the editor opens the one that comes first by name. If none remain, the window returns to **Create First Location**.
 
@@ -378,7 +419,7 @@ A travel day can also store extra capabilities for that day. They remain on the 
 
 ### Example: a town forge
 
-Create a location named **Highmarket**. Set **Settlement Type** to Town (1,001–6,000 people). Associate the town scene and the smithy interior. Then add these capabilities and choose **Save Location**. The notice reads "Highmarket saved."
+Create a location named **Highmarket**. Set **Settlement Type** to Town (1,001–6,000 people). Associate the town scene and the smithy interior. Then add these capabilities and choose **Save Changes**. The notice reads "Highmarket saved."
 
 - **Forge**, tier **Rare**. Open **Specialty**, add Martial Weapons and Heavy Armor, and choose **Confirm**. The summary lists those two. Martial Weapons covers Martial Melee Weapons and Martial Ranged Weapons. In Craftworks **Crafting**, set Smith's Tools to **Forge**. Smith's Tools recipes of Rare, Uncommon, or Common can be worked in Highmarket. A Very Rare item needs the Forge tier raised to Very Rare or Legendary. Leave **Specialty** on **Any** when this forge should cover every armor and weapon category.
 - **Workshop**, tier **Common**. Check Cobbler and Leatherworker. A Common cobbler or leatherworker recipe can be worked here when those tools are assigned to **Workshop**. A carpenter recipe needs Carpenter checked, or **Specialty** left on **Any**, and a tier high enough for that item.
@@ -468,8 +509,8 @@ If needed, disconnect and reconnect the world to create a fresh account connecti
 | Check membership       | Morelord Core module settings  | Open **Connect or Manage Account**                              |
 | Update access          | Morelord Account window        | **Refresh Access**                                              |
 | Manage the web account | Morelord Account window        | **Open Account**                                                |
-| Change reporting       | Account window → Core Settings | Set the two reporting choices, then **Save Core Settings**      |
-| Mark reactions         | Account window → Core Settings | Check or uncheck **Reaction Used**, then **Save Core Settings** |
+| Change reporting       | Account window → Core Settings | Set the two reporting choices, then **Save Changes**      |
+| Mark reactions         | Account window → Core Settings | Check or uncheck **Reaction Used**, then **Save Changes** |
 | Exclude observers      | Morelord Core module settings  | **Select Ignored Users**                                        |
 | Manage locations       | Morelord Core module settings  | **Manage Locations**                                            |
 | Transfer configuration | Morelord Core module settings  | **Export / Import Settings**                                    |
